@@ -126,7 +126,7 @@ public class PipelineTests
     public async Task Identical_frames_do_not_trigger_ocr()
     {
         var (p, ocr, tr, ov) = Make();
-        ocr.ByFrame[1] = ("Hello", 0);
+        for (int i = 1; i <= 50; i++) ocr.ByFrame[i] = ("Hello", 0);
         for (int i = 1; i <= 50; i++) p.Submit(F(i, 77));
         Assert.True(await WaitUntil(() => ov.Shown.Count == 1));
         await Task.Delay(300);
@@ -135,13 +135,13 @@ public class PipelineTests
     }
 
     [Fact]
-    public void LatestQueue_is_bounded_and_drops_oldest()
+    public async Task LatestQueue_is_bounded_and_drops_oldest()
     {
         var q = new LatestQueue<int>(2);
         for (int i = 0; i < 100; i++) q.Offer(i);
         Assert.Equal(98, q.Dropped);
-        Assert.Equal(98, q.TakeAsync(CancellationToken.None).AsTask().Result);
-        Assert.Equal(99, q.TakeAsync(CancellationToken.None).AsTask().Result);
+        Assert.Equal(98, await q.TakeAsync(CancellationToken.None));
+        Assert.Equal(99, await q.TakeAsync(CancellationToken.None));
     }
 
     [Fact]
