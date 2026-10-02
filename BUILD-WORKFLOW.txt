@@ -1,0 +1,19 @@
+name: build
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: '8.0.x' }
+      - name: Run tests
+        run: dotnet test tests/Flafyo.Core.Tests -c Release
+      - name: Build EXE
+        run: dotnet publish src/Flafyo.App/Flafyo.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish
+      - name: SHA256
+        run: Get-FileHash publish/FLAFYO.GameTranslator.exe -Algorithm SHA256 | Format-List
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FLAFYO-GAME-TRANSLATOR
+          path: publish/FLAFYO.GameTranslator.exe
