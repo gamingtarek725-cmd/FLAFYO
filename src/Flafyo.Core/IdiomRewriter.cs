@@ -43,7 +43,14 @@ public sealed class IdiomRewriter
     public string Rewrite(string text)
     {
         text = text.Replace('’', '\'');
-        foreach (var (re, rep) in _rules) text = re.Replace(text, rep);
+        foreach (var (re, rep) in _rules)
+            text = re.Replace(text, m =>
+            {
+                var r = m.Result(rep);
+                // keep the capital letter when the matched phrase started with one ("Press E" → "Press the key E")
+                if (r.Length > 0 && m.Value.Length > 0 && char.IsUpper(m.Value[0])) r = char.ToUpperInvariant(r[0]) + r[1..];
+                return r;
+            });
         return text;
     }
 
