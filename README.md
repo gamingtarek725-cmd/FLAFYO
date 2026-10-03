@@ -1,4 +1,4 @@
-# FLAFYO GAME TRANSLATOR — Phase 2
+# FLAFYO GAME TRANSLATOR — Phase 3 (offline AI translation)
 
 ## الحالة الفعلية
 **لم يتم تجميع أي كود ولم يُشغَّل أي اختبار بعد** (بيئة الكتابة بلا .NET/Windows). أول تحقق = تشغيل GitHub Actions.
@@ -11,9 +11,9 @@
 | ترجمة **أونلاين مؤقتة** (MyMemory) + قاموس ألعاب + Cache | مكتوب، غير مُختبر |
 | Overlay شفاف لا يأخذ Focus ويمرّر الماوس + مخفي عن الالتقاط | مكتوب، غير مُختبر |
 | واجهة (اختيار منطقة، سرعة، تشغيل/إيقاف) | مكتوبة، غير مُختبرة |
-| ترجمة **أوفلاين** | غير مبنية (المرحلة التالية) |
+| ترجمة **أوفلاين** بنموذج OPUS-MT en→ar (ONNX int8): Tokenizer + Greedy decoding + تنزيل الحزمة من الواجهة | مكتوب، **غير مُختبر** (يُختبر في CI بخطوة "Real offline translation test") |
 | Windows Graphics Capture (للـ Fullscreen) | غير مبني |
 | Installer، Profiles، SQLite، موقع | غير مبنية |
 | Acceptance Test داخل لعبة | لم يُجرَ |
 
-حدود v1: شاشة رئيسية واحدة، ويفضّل Windowed/Borderless، والترجمة تحتاج إنترنت مؤقتًا.
+حدود v1: شاشة رئيسية واحدة، ويفضّل Windowed/Borderless. الجودة: OPUS-MT نموذج متوسط الحجم؛ نستخدم Greedy decoding حاليًا (Beam search لاحقًا). الجملة تُترجم كاملة لكن بدون ذاكرة للحوار السابق.

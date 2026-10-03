@@ -15,13 +15,40 @@ public partial class MainWindow : Window
     private OverlayWindow? _overlay;
     private TranslationPipeline? _pipeline;
     private RegionCaptureWorker? _capture;
-    private OnlineTranslator? _translator;
+    private ITranslator? _translator;
+    private bool _downloading;
 
-    public MainWindow() { InitializeComponent(); }
+    public MainWindow() { InitializeComponent(); UpdatePackStatus(); }
 
     private System.Drawing.Rectangle Region => (System.Drawing.Rectangle)Volatile.Read(ref _regionBox);
 
     private void SetStatus(string s) => Dispatcher.InvokeAsync(() => StatusText.Text = s);
+
+    private void UpdatePackStatus()
+    {
+        bool installed = ModelPack.IsInstalled(ModelPack.DefaultDir);
+        PackText.Text = installed
+            ? "✅ الحزمة مثبتة. الترجمة هتشتغل بدون إنترنت."
+            : "الحزمة مش مثبتة. لحد ما تنزّلها هتشتغل الترجمة بالإنترنت (مؤقتًا).";
+        PackButton.IsEnabled = !installed && !_downloading;
+        PackButton.Visibility = installed ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    private async void Pack_Click(object sender, RoutedEventArgs e)
+    {
+        if (_downloading) return;
+        _downloading = true; PackButton.IsEnabled = false;
+        var progress = new Progress<double>(v => PackText.Text = $"جاري التنزيل… {v * 100:0}%");
+        try
+        {
+            await ModelPack.DownloadAsync(ModelPack.DefaultDir, progress, CancellationToken.None);
+        }
+        catch (Exception ex)
+        {
+            PackText.Text = "فشل التنزيل: " + ex.Message + " (جرّب تاني)";
+        }
+        finally { _downloading = false; UpdatePackStatus(); }
+    }
 
     private void Select_Click(object sender, RoutedEventArgs e)
     {
@@ -52,8 +79,24 @@ public partial class MainWindow : Window
 
         _overlay ??= new OverlayWindow();
         var sink = new WpfOverlaySink(_overlay, () => Region);
+
+        // Offline AI model if the language pack is installed (loads in the background); otherwise the temporary online service.
+        string modeText;
+        var modelDir = ModelPack.DefaultDir;
+        if (ModelPack.IsInstalled(modelDir))
+        {
+            int threads = SpeedBox.SelectedIndex == 0 ? 1 : 2;   // few CPU threads: the game keeps priority
+            _translator = new LazyTranslator(() => OnnxMarianTranslator.Load(modelDir, threads),
+                                             () => new OnlineTranslator("en", "ar"), s => SetStatus(s));
+            modeText = "بدون إنترنت";
+        }
+        else
+        {
+            _translator = new OnlineTranslator("en", "ar");
+            modeText = "بالإنترنت (مؤقتًا)";
+        }
+
         var dictFile = Path.Combine(AppContext.BaseDirectory, "dictionary.txt");
-        _translator = new OnlineTranslator("en", "ar");
         var resolver = new TranslationResolver(_translator, new TranslationCache(), BuiltInDictionary.Load(dictFile));
 
         var p = new TranslationPipeline(ocr, resolver, sink, log: s => SetStatus(s));
@@ -65,7 +108,7 @@ public partial class MainWindow : Window
         _capture = new RegionCaptureWorker(p, () => Region, () => _intervalMs, 1, s => SetStatus(s));
         _capture.Start();
 
-        StatusText.Text = "الترجمة شغّالة";
+        StatusText.Text = "الترجمة شغّالة — " + modeText;
         StartButton.IsEnabled = false; StopButton.IsEnabled = true; SelectButton.IsEnabled = false;
     }
 
@@ -77,10 +120,11 @@ public partial class MainWindow : Window
         _capture = null; _pipeline = null;
         c?.Dispose();
         if (p != null) await p.DisposeAsync();
-        _translator?.Dispose(); _translator = null;
+        (_translator as IDisposable)?.Dispose(); _translator = null;
         _overlay?.Hide();
         StatusText.Text = "متوقف";
         StartButton.IsEnabled = true; StopButton.IsEnabled = false; SelectButton.IsEnabled = true;
+        UpdatePackStatus();
     }
 
     protected override void OnClosed(EventArgs e)
