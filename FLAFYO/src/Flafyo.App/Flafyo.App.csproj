@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <PlatformTarget>x64</PlatformTarget>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <AssemblyName>FLAFYO.GameTranslator</AssemblyName>
+    <RootNamespace>Flafyo.Desktop</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Version>0.2.0</Version>
+    <Copyright>© 2026 FLAFYO. All rights reserved.</Copyright>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Flafyo.Windows/Flafyo.Windows.csproj" />
+  </ItemGroup>
+</Project>
