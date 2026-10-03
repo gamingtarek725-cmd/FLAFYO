@@ -8,7 +8,7 @@
     <AssemblyName>FLAFYO.GameTranslator</AssemblyName>
     <RootNamespace>Flafyo.Desktop</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
     <Copyright>© 2026 FLAFYO. All rights reserved.</Copyright>
   </PropertyGroup>
   <ItemGroup>

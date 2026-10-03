@@ -1,8 +1,11 @@
+using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interop;
 using Flafyo.Core;
 using Flafyo.Windows;
 
@@ -10,20 +13,64 @@ namespace Flafyo.Desktop;
 
 public partial class MainWindow : Window
 {
+    private const int HotkeyId = 0xF1A, WmHotkey = 0x0312;
+    private const uint ModAlt = 0x1, ModControl = 0x2, ModNoRepeat = 0x4000, VkT = 0x54;
+
+    [DllImport("user32.dll")] private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint modifiers, uint vk);
+    [DllImport("user32.dll")] private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+
     private object _regionBox = System.Drawing.Rectangle.Empty;   // boxed so reads/writes are atomic across threads
     private volatile int _intervalMs = 200;
+    private readonly AppSettings _settings = AppSettings.Load();
+    private bool _ready;
     private OverlayWindow? _overlay;
     private TranslationPipeline? _pipeline;
     private RegionCaptureWorker? _capture;
     private ITranslator? _translator;
     private bool _downloading;
+    private IntPtr _hwnd;
 
-    public MainWindow() { InitializeComponent(); UpdatePackStatus(); }
+    public MainWindow()
+    {
+        InitializeComponent();
+        UserData.EnsureTemplates();
+        if (_settings.Width >= 20 && _settings.Height >= 10)
+        {
+            Volatile.Write(ref _regionBox, (object)new System.Drawing.Rectangle(_settings.X, _settings.Y, _settings.Width, _settings.Height));
+            RegionText.Text = $"المنطقة المحفوظة: {_settings.Width}×{_settings.Height}";
+        }
+        SpeedBox.SelectedIndex = Math.Clamp(_settings.SpeedIndex, 0, 2);
+        _ready = true;
+        UpdatePackStatus();
+        SourceInitialized += OnSourceInitialized;
+    }
 
     private System.Drawing.Rectangle Region => (System.Drawing.Rectangle)Volatile.Read(ref _regionBox);
 
     private void SetStatus(string s) => Dispatcher.InvokeAsync(() => StatusText.Text = s);
 
+    // ---- global hotkey (registered with Windows; no keyboard hook, game input is untouched) ----
+    private void OnSourceInitialized(object? sender, EventArgs e)
+    {
+        var src = (HwndSource)PresentationSource.FromVisual(this);
+        _hwnd = src.Handle;
+        src.AddHook(WndProc);
+        if (!RegisterHotKey(_hwnd, HotkeyId, ModControl | ModAlt | ModNoRepeat, VkT))
+            HotkeyText.Text = "تعذّر تسجيل الاختصار (برنامج تاني بيستخدمه). استخدم الأزرار.";
+    }
+
+    private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (msg == WmHotkey && wParam.ToInt32() == HotkeyId) { handled = true; ToggleTranslation(); }
+        return IntPtr.Zero;
+    }
+
+    private async void ToggleTranslation()
+    {
+        if (_pipeline == null) StartTranslation(); else await StopAsync();
+    }
+
+    // ---- language pack ----
     private void UpdatePackStatus()
     {
         bool installed = ModelPack.IsInstalled(ModelPack.DefaultDir);
@@ -39,17 +86,18 @@ public partial class MainWindow : Window
         if (_downloading) return;
         _downloading = true; PackButton.IsEnabled = false;
         var progress = new Progress<double>(v => PackText.Text = $"جاري التنزيل… {v * 100:0}%");
-        try
-        {
-            await ModelPack.DownloadAsync(ModelPack.DefaultDir, progress, CancellationToken.None);
-        }
-        catch (Exception ex)
-        {
-            PackText.Text = "فشل التنزيل: " + ex.Message + " (جرّب تاني)";
-        }
+        try { await ModelPack.DownloadAsync(ModelPack.DefaultDir, progress, CancellationToken.None); }
+        catch (Exception ex) { PackText.Text = "فشل التنزيل: " + ex.Message + " (جرّب تاني)"; }
         finally { _downloading = false; UpdatePackStatus(); }
     }
 
+    private void OpenFolder_Click(object sender, RoutedEventArgs e)
+    {
+        UserData.EnsureTemplates();
+        try { Process.Start(new ProcessStartInfo("explorer.exe", $"\"{UserData.Dir}\"") { UseShellExecute = true }); } catch { }
+    }
+
+    // ---- region + speed ----
     private void Select_Click(object sender, RoutedEventArgs e)
     {
         WindowState = WindowState.Minimized;
@@ -58,14 +106,24 @@ public partial class MainWindow : Window
         WindowState = WindowState.Normal;
         Activate();
         if (!ok) return;
-        Volatile.Write(ref _regionBox, (object)selector.SelectedRegion);
-        RegionText.Text = $"المنطقة: {selector.SelectedRegion.Width}×{selector.SelectedRegion.Height}";
+        var r = selector.SelectedRegion;
+        Volatile.Write(ref _regionBox, (object)r);
+        RegionText.Text = $"المنطقة: {r.Width}×{r.Height}";
+        _settings.X = r.X; _settings.Y = r.Y; _settings.Width = r.Width; _settings.Height = r.Height;
+        _settings.Save();
     }
 
-    private void Speed_Changed(object sender, SelectionChangedEventArgs e) =>
+    private void Speed_Changed(object sender, SelectionChangedEventArgs e)
+    {
         _intervalMs = SpeedBox.SelectedIndex switch { 0 => 400, 2 => 100, _ => 200 };
+        if (!_ready) return;
+        _settings.SpeedIndex = SpeedBox.SelectedIndex; _settings.Save();
+    }
 
-    private void Start_Click(object sender, RoutedEventArgs e)
+    // ---- start / stop ----
+    private void Start_Click(object sender, RoutedEventArgs e) => StartTranslation();
+
+    private void StartTranslation()
     {
         if (_pipeline != null) return;
         if (Region.Width < 20 || Region.Height < 10) { StatusText.Text = "اختر منطقة النص أولًا (الزر الأول)"; return; }
@@ -96,8 +154,9 @@ public partial class MainWindow : Window
             modeText = "بالإنترنت (مؤقتًا)";
         }
 
-        var dictFile = Path.Combine(AppContext.BaseDirectory, "dictionary.txt");
-        var resolver = new TranslationResolver(_translator, new TranslationCache(), BuiltInDictionary.Load(dictFile));
+        UserData.EnsureTemplates();
+        var resolver = new TranslationResolver(_translator, new TranslationCache(),
+            BuiltInDictionary.Load(UserData.DictionaryFile), IdiomRewriter.Load(UserData.IdiomsFile));
 
         var p = new TranslationPipeline(ocr, resolver, sink, log: s => SetStatus(s));
         p.Latency += l => Dispatcher.InvokeAsync(() =>
@@ -129,6 +188,7 @@ public partial class MainWindow : Window
 
     protected override void OnClosed(EventArgs e)
     {
+        if (_hwnd != IntPtr.Zero) UnregisterHotKey(_hwnd, HotkeyId);
         _capture?.Dispose();
         _overlay?.Close();
         base.OnClosed(e);

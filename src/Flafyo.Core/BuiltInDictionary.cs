@@ -17,6 +17,7 @@ public static class BuiltInDictionary
             if (userFile != null && File.Exists(userFile))
                 foreach (var line in File.ReadAllLines(userFile))
                 {
+                    if (line.TrimStart().StartsWith('#')) continue;
                     var i = line.IndexOf('=');
                     if (i > 0) d[line[..i].Trim()] = line[(i + 1)..].Trim();
                 }

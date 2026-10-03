@@ -17,6 +17,17 @@ jobs:
         with:
           name: FLAFYO-GAME-TRANSLATOR
           path: publish/FLAFYO.GameTranslator.exe
+      - name: Build installer (Setup.exe)
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          choco install innosetup -y --no-progress
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" installer\FLAFYO.iss
+      - uses: actions/upload-artifact@v4
+        continue-on-error: true
+        with:
+          name: FLAFYO-Setup
+          path: installer-out/FLAFYO-GAME-TRANSLATOR-Setup.exe
       - name: Download offline language pack (for the real-model test)
         continue-on-error: true
         shell: pwsh

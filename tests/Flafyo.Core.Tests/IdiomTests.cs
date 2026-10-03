@@ -1,0 +1,45 @@
+using Flafyo.Core;
+using Xunit;
+
+namespace Flafyo.Core.Tests;
+
+public class IdiomTests
+{
+    [Fact]
+    public void Get_round_him_becomes_persuade_him() =>
+        Assert.Equal("How can I persuade him?", IdiomRewriter.Load().Rewrite("How can I get round him?"));
+
+    [Fact]
+    public void Verb_forms_and_curly_apostrophes_are_handled()
+    {
+        var rw = IdiomRewriter.Load();
+        Assert.Equal("She persuade the guard", rw.Rewrite("She got round the guard"));
+        Assert.Equal("I will protect you", rw.Rewrite("I’ve got your back"));
+    }
+
+    [Fact]
+    public void Does_not_match_inside_other_words() =>
+        Assert.Equal("The budget round was long", IdiomRewriter.Load().Rewrite("The budget round was long"));
+
+    [Fact]
+    public void User_rules_come_first_and_comments_are_ignored()
+    {
+        var lines = new[] { "# comment", "", "get round * = trick *" };
+        var rw = new IdiomRewriter();
+        foreach (var (p, r) in IdiomRewriter.ParseLines(lines)) rw.Add(p, r);
+        Assert.Equal("trick him", rw.Rewrite("get round him"));
+    }
+
+    [Fact]
+    public void Invalid_rule_is_rejected() => Assert.False(new IdiomRewriter().Add("hello", "hi *"));
+
+    [Fact]
+    public async Task Resolver_translates_the_rewritten_text_but_caches_the_original()
+    {
+        var tr = new FakeTranslator(); var cache = new TranslationCache();
+        var res = new TranslationResolver(tr, cache, null, IdiomRewriter.Load());
+        var (text, _) = await res.ResolveAsync("How can I get round him?", CancellationToken.None);
+        Assert.Equal("AR:How can I persuade him?", text);
+        Assert.True(cache.TryGet("How can I get round him?", out _));
+    }
+}

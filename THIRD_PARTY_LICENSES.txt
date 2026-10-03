@@ -1,0 +1,14 @@
+FLAFYO GAME TRANSLATOR — © 2026 FLAFYO. All rights reserved.
+This product includes third-party components. Each remains the property of its owners and is used under its own license.
+(Draft list — verify each license text before public release.)
+
+1. .NET 8 runtime and libraries (Microsoft) ............ MIT License
+2. Microsoft.ML.OnnxRuntime (Microsoft) ................. MIT License
+3. System.Drawing.Common (Microsoft) .................... MIT License
+4. OPUS-MT English→Arabic translation model
+   (Helsinki-NLP / University of Helsinki), ONNX conversion by "Xenova" on Hugging Face ... CC BY 4.0 (attribution required)
+   Downloaded by the user on demand from https://huggingface.co/Xenova/opus-mt-en-ar
+5. Windows.Media.Ocr — Windows built-in OCR API (Microsoft) ... part of Windows, no redistribution.
+6. MyMemory Translation API (Translated) — optional online fallback; subject to the provider's terms of use.
+
+Windows is a trademark of Microsoft Corporation. All other trademarks belong to their owners.
