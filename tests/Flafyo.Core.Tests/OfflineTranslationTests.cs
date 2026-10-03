@@ -80,5 +80,15 @@ public class OnnxMarianIntegrationTests
             Assert.False(string.IsNullOrWhiteSpace(ar), "empty translation for: " + s);
             Assert.Matches(new Regex(@"\p{IsArabic}"), ar);
         }
+
+        _out.WriteLine("---- idiom tests: raw model vs. with idiom rewriting ----");
+        var idioms = IdiomRewriter.Load();
+        foreach (var s in new[] { "How can I get round him?", "Press E to open the door.", "Watch your back out there.", "He kicked the bucket last night." })
+        {
+            var raw = tr.TranslateSync(s, CancellationToken.None);
+            var rewritten = idioms.Rewrite(s);
+            var fixedAr = tr.TranslateSync(rewritten, CancellationToken.None);
+            _out.WriteLine($"{s}\n   RAW     : {raw}\n   REWRITE : {rewritten}\n   RESULT  : {fixedAr}");
+        }
     }
 }

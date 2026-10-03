@@ -8,9 +8,14 @@
     <AssemblyName>FLAFYO.GameTranslator</AssemblyName>
     <RootNamespace>Flafyo.Desktop</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\flafyo.ico</ApplicationIcon>
     <Version>0.3.0</Version>
     <Copyright>© 2026 FLAFYO. All rights reserved.</Copyright>
   </PropertyGroup>
+  <ItemGroup>
+    <Resource Include="Assets\flafyo.ico" />
+    <Resource Include="Assets\logo.png" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../Flafyo.Windows/Flafyo.Windows.csproj" />
   </ItemGroup>

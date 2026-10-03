@@ -81,6 +81,8 @@ public static class BuiltInIdioms
     {
         "get/gets/got/getting round * = persuade *",
         "get/gets/got/getting around * = persuade *",
+        "press * to = press the key * to",
+        "hold * to = hold the key * to",
         "kick the bucket = die",
         "bite the dust = die",
         "give up the ghost = die",

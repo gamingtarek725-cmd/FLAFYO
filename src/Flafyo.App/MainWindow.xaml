@@ -1,11 +1,12 @@
 <Window x:Class="Flafyo.Desktop.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="FLAFYO GAME TRANSLATOR" Width="460" Height="720" ResizeMode="CanMinimize"
+        Title="FLAFYO GAME TRANSLATOR" Icon="Assets/flafyo.ico" Width="460" Height="840" ResizeMode="CanMinimize"
         Background="#0E0F14" FlowDirection="RightToLeft" WindowStartupLocation="CenterScreen">
   <StackPanel Margin="24">
-    <TextBlock Text="FLAFYO GAME TRANSLATOR" Foreground="#00D9A5" FontSize="22" FontWeight="Bold" FlowDirection="LeftToRight" HorizontalAlignment="Center"/>
+    <Image Source="Assets/logo.png" Width="150" Height="150" HorizontalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"/>
     <TextBlock x:Name="StatusText" Text="جاهز" Foreground="White" FontSize="16" Margin="0,18,0,0" TextWrapping="Wrap"/>
+    <TextBlock x:Name="EngineText" Text="" Foreground="#FFC857" Margin="0,6,0,0" TextWrapping="Wrap"/>
     <TextBlock x:Name="RegionText" Text="لم يتم اختيار منطقة بعد" Foreground="#9AA0B4" Margin="0,6,0,0"/>
     <TextBlock x:Name="LatencyText" Text="" Foreground="#9AA0B4" Margin="0,6,0,0"/>
 

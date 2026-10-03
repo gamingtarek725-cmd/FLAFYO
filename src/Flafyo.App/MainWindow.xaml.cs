@@ -70,6 +70,16 @@ public partial class MainWindow : Window
         if (_pipeline == null) StartTranslation(); else await StopAsync();
     }
 
+    private void ShowEngine(string engine, string? error) => Dispatcher.InvokeAsync(() =>
+        EngineText.Text = engine switch
+        {
+            "loading" => "المحرك: جاري تحميل النموذج المحلي…",
+            "offline" => "المحرك: الذكاء الاصطناعي المحلي ✅",
+            "online-fallback" => $"⚠️ النموذج المحلي فشل، فبيترجم بالإنترنت (حرفية). السبب: {error}",
+            "online" => "المحرك: ترجمة أونلاين مؤقتة (الحزمة غير مثبتة)",
+            _ => $"⚠️ فشل تحميل المحرك: {error}"
+        });
+
     // ---- language pack ----
     private void UpdatePackStatus()
     {
@@ -144,13 +154,17 @@ public partial class MainWindow : Window
         if (ModelPack.IsInstalled(modelDir))
         {
             int threads = SpeedBox.SelectedIndex == 0 ? 1 : 2;   // few CPU threads: the game keeps priority
-            _translator = new LazyTranslator(() => OnnxMarianTranslator.Load(modelDir, threads),
-                                             () => new OnlineTranslator("en", "ar"), s => SetStatus(s));
+            var lazy = new LazyTranslator(() => OnnxMarianTranslator.Load(modelDir, threads),
+                                          () => new OnlineTranslator("en", "ar"));
+            lazy.EngineReady += ShowEngine;
+            ShowEngine(lazy.Engine, lazy.Error);   // in case it finished before we subscribed
+            _translator = lazy;
             modeText = "بدون إنترنت";
         }
         else
         {
             _translator = new OnlineTranslator("en", "ar");
+            ShowEngine("online", null);
             modeText = "بالإنترنت (مؤقتًا)";
         }
 
@@ -181,6 +195,7 @@ public partial class MainWindow : Window
         if (p != null) await p.DisposeAsync();
         (_translator as IDisposable)?.Dispose(); _translator = null;
         _overlay?.Hide();
+        EngineText.Text = "";
         StatusText.Text = "متوقف";
         StartButton.IsEnabled = true; StopButton.IsEnabled = false; SelectButton.IsEnabled = true;
         UpdatePackStatus();

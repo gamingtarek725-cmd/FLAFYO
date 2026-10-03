@@ -18,6 +18,10 @@ public class IdiomTests
     }
 
     [Fact]
+    public void Key_prompts_keep_the_key_name() =>
+        Assert.Equal("Press the key E to open the door.", IdiomRewriter.Load().Rewrite("Press E to open the door."));
+
+    [Fact]
     public void Does_not_match_inside_other_words() =>
         Assert.Equal("The budget round was long", IdiomRewriter.Load().Rewrite("The budget round was long"));
 

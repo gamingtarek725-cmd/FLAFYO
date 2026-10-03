@@ -14,6 +14,7 @@ ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequiredOverridesAllowed=dialog
 UninstallDisplayIcon={app}\FLAFYO.GameTranslator.exe
 LicenseFile=..\THIRD_PARTY_LICENSES.txt
+SetupIconFile=..\src\Flafyo.App\Assets\flafyo.ico
 
 [Tasks]
 Name: "desktopicon"; Description: "Create a desktop shortcut"
