@@ -90,5 +90,37 @@ public class OnnxMarianIntegrationTests
             var fixedAr = tr.TranslateSync(rewritten, CancellationToken.None);
             _out.WriteLine($"{s}\n   RAW     : {raw}\n   REWRITE : {rewritten}\n   RESULT  : {fixedAr}");
         }
+
+        // ---- quality check against the product owner's natural translations (character-bigram similarity, 0..1) ----
+        var book = Phrasebook.LoadEmbedded();
+        var scores = new List<(double Raw, double Idiom, string En, string Ref, string Model)>();
+        foreach (var (en, refAr) in book.Entries)
+        {
+            var raw = tr.TranslateSync(en, CancellationToken.None);
+            var viaIdioms = tr.TranslateSync(idioms.Rewrite(en), CancellationToken.None);
+            scores.Add((Dice(raw, refAr), Dice(viaIdioms, refAr), en, refAr, viaIdioms));
+        }
+        _out.WriteLine($"==== QUALITY on {scores.Count} reference sentences ====");
+        _out.WriteLine($"mean similarity  raw model: {scores.Average(x => x.Raw):0.000}   model + idiom rules: {scores.Average(x => x.Idiom):0.000}");
+        _out.WriteLine("---- 12 weakest (model + idiom rules) ----");
+        foreach (var x in scores.OrderBy(x => x.Idiom).Take(12))
+            _out.WriteLine($"[{x.Idiom:0.00}] {x.En}\n    REF  : {x.Ref}\n    MODEL: {x.Model}");
+    }
+
+    private static string ArabicLetters(string s) => new string(s.Where(c => c >= '\u0621' && c <= '\u064A').ToArray());
+
+    private static double Dice(string a, string b)
+    {
+        a = ArabicLetters(a); b = ArabicLetters(b);
+        if (a.Length < 2 || b.Length < 2) return a == b ? 1 : 0;
+        var counts = new Dictionary<string, int>();
+        for (int i = 0; i < a.Length - 1; i++) { var g = a.Substring(i, 2); counts[g] = counts.GetValueOrDefault(g) + 1; }
+        int common = 0;
+        for (int i = 0; i < b.Length - 1; i++)
+        {
+            var g = b.Substring(i, 2);
+            if (counts.TryGetValue(g, out var n) && n > 0) { counts[g] = n - 1; common++; }
+        }
+        return 2.0 * common / ((a.Length - 1) + (b.Length - 1));
     }
 }

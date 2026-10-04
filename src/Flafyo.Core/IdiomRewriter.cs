@@ -84,44 +84,91 @@ public sealed class IdiomRewriter
 
 public static class BuiltInIdioms
 {
-    public static readonly string[] Lines =
+    // Verb idioms are written once and expanded to all four forms: base / 3rd person / past / -ing (tense is kept).
+    private static IEnumerable<string> Verb(string[] v, string rest, string[] r, string repRest)
     {
-        "get/gets/got/getting round * = persuade *",
-        "get/gets/got/getting around * = persuade *",
-        "press * to = press the key * to",
-        "hold * to = hold the key * to",
-        "kick the bucket = die",
-        "bite the dust = die",
-        "give up the ghost = die",
-        "watch your back = be careful, someone may attack you",
-        "watch my back = protect me",
-        "cover me = protect me",
-        "i've got your back = I will protect you",
-        "i got your back = I will protect you",
-        "i'm on it = I will do it now",
-        "you're on your own = nobody will help you",
-        "break a leg = good luck",
-        "piece of cake = very easy",
-        "hang in there = do not give up",
-        "let's roll = let's go",
-        "make it out alive = survive",
-        "call it a night = stop for tonight",
-        "hold your horses = wait a moment",
-        "once in a blue moon = very rarely",
-        "under the weather = sick",
-        "spill the beans = reveal the secret",
-        "out of the blue = suddenly",
-        "cost an arm and a leg = cost a lot of money",
-        "take it easy = relax",
-        "in over your head = in a situation too difficult for you",
-        "keep an eye on * = watch *",
-        "back off = go away",
-        "heads up = warning",
-        "hit the road = leave",
-        "pull the plug = stop it",
-        "call the shots = make the decisions",
-        "lose your nerve = become afraid",
-        "have a word with * = talk to *",
-        "figure out = understand",
-    };
+        for (int i = 0; i < 4; i++) yield return $"{v[i]}{rest} = {r[i]}{repRest}";
+    }
+
+    private static string[] F(string a, string b, string c, string d) => new[] { a, b, c, d };
+
+    public static IEnumerable<string> Lines
+    {
+        get
+        {
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var line in All())
+            {
+                var key = line.Split('=')[0].Trim();
+                if (seen.Add(key)) yield return line;   // first rule for a pattern wins (e.g. "hit"/"hit")
+            }
+        }
+    }
+
+    private static IEnumerable<string> All()
+    {
+        foreach (var l in Verb(F("kick", "kicks", "kicked", "kicking"), " the bucket", F("die", "dies", "died", "dying"), "")) yield return l;
+        foreach (var l in Verb(F("bite", "bites", "bit", "biting"), " the dust", F("die", "dies", "died", "dying"), "")) yield return l;
+        foreach (var l in Verb(F("give", "gives", "gave", "giving"), " up the ghost", F("die", "dies", "died", "dying"), "")) yield return l;
+        foreach (var l in Verb(F("spill", "spills", "spilled", "spilling"), " the beans", F("reveal", "reveals", "revealed", "revealing"), " the secret")) yield return l;
+        foreach (var l in Verb(F("get", "gets", "got", "getting"), " round *", F("persuade", "persuades", "persuaded", "persuading"), " *")) yield return l;
+        foreach (var l in Verb(F("pull", "pulls", "pulled", "pulling"), " the plug", F("stop", "stops", "stopped", "stopping"), " it")) yield return l;
+        foreach (var l in Verb(F("call", "calls", "called", "calling"), " the shots", F("make", "makes", "made", "making"), " the decisions")) yield return l;
+        foreach (var l in Verb(F("call", "calls", "called", "calling"), " it a night", F("stop", "stops", "stopped", "stopping"), " for tonight")) yield return l;
+        foreach (var l in Verb(F("hit", "hits", "hit", "hitting"), " the road", F("leave", "leaves", "left", "leaving"), "")) yield return l;
+        foreach (var l in Verb(F("lose", "loses", "lost", "losing"), " * nerve", F("become", "becomes", "became", "becoming"), " afraid")) yield return l;
+        foreach (var l in Verb(F("keep", "keeps", "kept", "keeping"), " an eye on *", F("watch", "watches", "watched", "watching"), " *")) yield return l;
+        foreach (var l in Verb(F("have", "has", "had", "having"), " a word with *", F("talk", "talks", "talked", "talking"), " to *")) yield return l;
+        foreach (var l in Verb(F("figure", "figures", "figured", "figuring"), " out", F("understand", "understands", "understood", "understanding"), "")) yield return l;
+        foreach (var l in Verb(F("hold", "holds", "held", "holding"), " your horses", F("wait", "waits", "waited", "waiting"), " a moment")) yield return l;
+        foreach (var l in Verb(F("make", "makes", "made", "making"), " it out alive", F("survive", "survives", "survived", "surviving"), "")) yield return l;
+        foreach (var l in Verb(F("take", "takes", "took", "taking"), " it easy", F("relax", "relaxes", "relaxed", "relaxing"), "")) yield return l;
+        foreach (var l in Verb(F("back", "backs", "backed", "backing"), " off", F("go", "goes", "went", "going"), " away")) yield return l;
+        foreach (var l in Verb(F("cost", "costs", "cost", "costing"), " an arm and a leg", F("cost", "costs", "cost", "costing"), " a lot of money")) yield return l;
+
+        foreach (var l in Verb(F("do", "does", "did", "doing"), " the dirty on *", F("cheat", "cheats", "cheated", "cheating"), " *")) yield return l;
+        foreach (var l in Verb(F("steer", "steers", "steered", "steering"), " clear of *", F("avoid", "avoids", "avoided", "avoiding"), " *")) yield return l;
+        foreach (var l in Verb(F("let", "lets", "let", "letting"), " the cat out of the bag", F("reveal", "reveals", "revealed", "revealing"), " the secret")) yield return l;
+        foreach (var l in Verb(F("break", "breaks", "broke", "breaking"), " the ice", F("ease", "eases", "eased", "easing"), " the tension")) yield return l;
+        foreach (var l in Verb(F("hit", "hits", "hit", "hitting"), " the sack", F("go", "goes", "went", "going"), " to sleep")) yield return l;
+        foreach (var l in Verb(F("fall", "falls", "fell", "falling"), " on deaf ears", F("be", "is", "was", "being"), " ignored")) yield return l;
+        foreach (var l in Verb(F("leave", "leaves", "left", "leaving"), " no stone unturned", F("try", "tries", "tried", "trying"), " everything possible")) yield return l;
+        foreach (var l in Verb(F("have", "has", "had", "having"), " a hunch", F("have", "has", "had", "having"), " a strong feeling")) yield return l;
+        foreach (var l in Verb(F("sit", "sits", "sat", "sitting"), " on the fence", F("stay", "stays", "stayed", "staying"), " neutral")) yield return l;
+        foreach (var l in Verb(F("beat", "beats", "beat", "beating"), " around the bush", F("avoid", "avoids", "avoided", "avoiding"), " the subject")) yield return l;
+        foreach (var l in Verb(F("get", "gets", "got", "getting"), " my goat", F("annoy", "annoys", "annoyed", "annoying"), " me")) yield return l;
+        foreach (var l in Verb(F("get", "gets", "got", "getting"), " your goat", F("annoy", "annoys", "annoyed", "annoying"), " you")) yield return l;
+        foreach (var l in Verb(F("get", "gets", "got", "getting"), " his goat", F("annoy", "annoys", "annoyed", "annoying"), " him")) yield return l;
+        foreach (var l in Verb(F("get", "gets", "got", "getting"), " her goat", F("annoy", "annoys", "annoyed", "annoying"), " her")) yield return l;
+
+        foreach (var l in new[]
+        {
+            "by hook or by crook = by any means",
+            "my cup of tea = my favorite thing",
+            "in hot water = in serious trouble",
+            "ragtag and bobtail = ordinary common people",
+            "the nitty-gritty = the important details",
+            "a bolt from the blue = a complete surprise",
+            "the ins and outs = all the details",
+            "cut your coat according to your cloth = live within your means",
+            "press * to = press the key * to",
+            "hold * to = hold the key * to",
+            "watch your back = be careful, someone may attack you",
+            "watch my back = protect me",
+            "cover me = protect me",
+            "i've got your back = I will protect you",
+            "i got your back = I will protect you",
+            "i'm on it = I will do it now",
+            "you're on your own = nobody will help you",
+            "break a leg = good luck",
+            "piece of cake = very easy",
+            "hang in there = do not give up",
+            "let's roll = let's go",
+            "once in a blue moon = very rarely",
+            "under the weather = sick",
+            "out of the blue = suddenly",
+            "in over your head = in a situation too difficult for you",
+            "heads up = warning",
+        }) yield return l;
+    }
 }

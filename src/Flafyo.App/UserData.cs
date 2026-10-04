@@ -9,6 +9,7 @@ internal static class UserData
     public static string Dir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FLAFYO");
     public static string DictionaryFile => Path.Combine(Dir, "dictionary.txt");
     public static string IdiomsFile => Path.Combine(Dir, "idioms.txt");
+    public static string HistoryFile => Path.Combine(Dir, "history.txt");
     public static string SettingsFile => Path.Combine(Dir, "settings.json");
 
     public static void EnsureTemplates()
@@ -36,6 +37,7 @@ public sealed class AppSettings
     public int Width { get; set; }
     public int Height { get; set; }
     public int SpeedIndex { get; set; } = 1;
+    public int TextSizeIndex { get; set; } = 1;
 
     public static AppSettings Load()
     {

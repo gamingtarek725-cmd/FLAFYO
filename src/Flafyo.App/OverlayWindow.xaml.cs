@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -8,6 +9,9 @@ namespace Flafyo.Desktop;
 
 public partial class OverlayWindow : Window
 {
+    [DllImport("user32.dll")] private static extern int GetSystemMetrics(int index);
+    private const int SM_XVIRTUALSCREEN = 76, SM_YVIRTUALSCREEN = 77, SM_CXVIRTUALSCREEN = 78, SM_CYVIRTUALSCREEN = 79;
+
     public OverlayWindow()
     {
         InitializeComponent();
@@ -15,19 +19,38 @@ public partial class OverlayWindow : Window
         OverlayWindowStyles.Apply(hwnd); // click-through + never takes focus + hidden from capture
     }
 
-    /// <summary>Places the translation just above the region (or below it if there is no room). regionPx is in screen pixels.</summary>
+    /// <summary>
+    /// Places the translation just above the region (or below it if there is no room), always fully inside the screen.
+    /// regionPx is in physical screen pixels.
+    /// </summary>
     public void ShowText(string text, System.Drawing.Rectangle regionPx)
     {
         double scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
         if (scale <= 0) scale = 1;
+
+        // screen bounds in DIPs, same coordinate system as Left/Top
+        double sl = GetSystemMetrics(SM_XVIRTUALSCREEN) / scale, st = GetSystemMetrics(SM_YVIRTUALSCREEN) / scale;
+        double sw = GetSystemMetrics(SM_CXVIRTUALSCREEN) / scale, sh = GetSystemMetrics(SM_CYVIRTUALSCREEN) / scale;
+        const double margin = 8;
+
         Label.Text = text;
-        Width = Math.Max(regionPx.Width / scale, 420);
-        Left = regionPx.X / scale;
+        double w = Math.Min(Math.Max(regionPx.Width / scale, 420), sw - 2 * margin);
+        Width = w;
+        MaxHeight = sh - 2 * margin;
+        Left = Math.Max(sl + margin, Math.Min(regionPx.X / scale, sl + sw - w - margin));
+
         if (!IsVisible) Show();      // ShowActivated=false → does not steal focus
         UpdateLayout();
-        double top = regionPx.Y / scale - ActualHeight - 8;
-        if (top < 0) top = (regionPx.Bottom / scale) + 8;
-        Top = top;
+
+        double h = ActualHeight;
+        double regionTop = regionPx.Y / scale, regionBottom = regionPx.Bottom / scale;
+        double top = regionTop - h - margin;                                   // preferred: above the region
+        if (top < st + margin)
+        {
+            top = regionBottom + margin;                                       // else below it
+            if (top + h > st + sh - margin) top = regionTop + margin;          // else inside its top edge
+        }
+        Top = Math.Max(st + margin, Math.Min(top, st + sh - h - margin));
     }
 }
 

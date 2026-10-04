@@ -48,11 +48,11 @@ public class PipelineTests
     }
 
     private static (TranslationPipeline p, FakeOcr ocr, FakeTranslator tr, RecordingOverlay ov) Make(
-        IReadOnlyDictionary<string, string>? dict = null, int restartMs = 20)
+        IReadOnlyDictionary<string, string>? dict = null, int restartMs = 20, int settleMs = 40)
     {
         var ocr = new FakeOcr(); var tr = new FakeTranslator(); var ov = new RecordingOverlay();
         var p = new TranslationPipeline(ocr, new TranslationResolver(tr, new TranslationCache(), dict), ov,
-            new PipelineOptions { RestartBackoff = TimeSpan.FromMilliseconds(restartMs) });
+            new PipelineOptions { RestartBackoff = TimeSpan.FromMilliseconds(restartMs), SettleDelay = TimeSpan.FromMilliseconds(settleMs) });
         p.Start();
         return (p, ocr, tr, ov);
     }
@@ -72,7 +72,7 @@ public class PipelineTests
     [Fact]
     public async Task Stale_result_is_never_shown()
     {
-        var (p, ocr, _, ov) = Make();
+        var (p, ocr, _, ov) = Make(settleMs: 250);
         ocr.ByFrame[1] = ("Old text", 800);
         ocr.ByFrame[2] = ("New text", 0);
         p.Submit(F(1, 10));
@@ -145,6 +145,18 @@ public class PipelineTests
     }
 
     [Fact]
+    public void ChangeDetector_sees_a_small_text_sized_change_in_a_large_region()
+    {
+        var d = new ChangeDetector();
+        var a = Enumerable.Repeat((byte)30, 640 * 320).ToArray();
+        var b = (byte[])a.Clone();
+        for (int y = 100; y < 108; y++) for (int x = 100; x < 120; x++) b[y * 640 + x] = 255;   // a few small letters appear
+        Assert.True(d.HasChanged(new Frame(1, 1, 640, 320, a, 0)));
+        Assert.False(d.HasChanged(new Frame(2, 1, 640, 320, (byte[])a.Clone(), 0)));
+        Assert.True(d.HasChanged(new Frame(3, 1, 640, 320, b, 0)));
+    }
+
+    [Fact]
     public void ChangeDetector_detects_changes_only()
     {
         var d = new ChangeDetector();
@@ -163,6 +175,7 @@ public class PipelineTests
 
     [Theory]
     [InlineData("  Find\n the   key ", "Find the key")]
+    [InlineData("some informa-\ntion here", "some information here")]
     [InlineData("-- ## 123 ", "")]
     [InlineData(null, "")]
     public void Normalizer_cleans_ocr_text(string? raw, string expected) =>

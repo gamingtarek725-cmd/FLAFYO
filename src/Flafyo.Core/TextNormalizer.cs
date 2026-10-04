@@ -1,14 +1,17 @@
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Flafyo.Core;
 
 public static class TextNormalizer
 {
-    /// <summary>Normalizes OCR output. Returns empty string when the text is noise (no letters).</summary>
+    private static readonly Regex HyphenatedBreak = new(@"(?<=\p{L})-[ \t]*[\r\n]+[ \t]*(?=\p{Ll})", RegexOptions.Compiled);
+
+    /// <summary>Normalizes OCR output (all lines become one sentence). Returns empty string when the text is noise (no letters).</summary>
     public static string Normalize(string? raw)
     {
         if (string.IsNullOrWhiteSpace(raw)) return "";
-        var s = raw.Normalize(NormalizationForm.FormKC);
+        var s = HyphenatedBreak.Replace(raw.Normalize(NormalizationForm.FormKC), ""); // "informa-\ntion" → "information"
         var sb = new StringBuilder(s.Length);
         bool lastSpace = false, hasLetter = false;
         foreach (var ch in s)

@@ -10,23 +10,31 @@ public sealed class PipelineOptions
     public int TranslateQueueCapacity { get; init; } = 4;
     public double ChangeThreshold { get; init; } = 2.0;
     public TimeSpan RestartBackoff { get; init; } = TimeSpan.FromMilliseconds(500);
+    /// <summary>The recognized text must stay unchanged this long before it is translated (avoids translating half-typed lines).</summary>
+    public TimeSpan SettleDelay { get; init; } = TimeSpan.FromMilliseconds(350);
+    /// <summary>Join a sentence that continues in the next text box ("...to do about" + "the situation.").</summary>
+    public bool MergeContinuations { get; init; } = true;
 }
 
 /// <summary>
-/// Capture → detect → OCR → translate → overlay. Every stage runs on its own background worker connected by bounded
-/// drop-oldest queues, so <see cref="Submit"/> never waits on OCR or translation. Results for superseded frames are discarded.
+/// Capture → detect → OCR → settle → translate → overlay. Every stage runs on its own background worker connected by
+/// bounded drop-oldest queues, so <see cref="Submit"/> never waits on OCR or translation.
+/// Staleness is decided by the recognized TEXT (not by video noise): a translation is shown only if the text it was made
+/// for is still the text on screen.
 /// </summary>
 public sealed class TranslationPipeline : IAsyncDisposable
 {
     private sealed class RegionState
     {
-        public long LatestFrameId = -1;
-        public CancellationTokenSource Cts = new();
+        public long Version;                                   // bumps every time the recognized text really changes
+        public CancellationTokenSource Cts = new();            // cancels in-flight translation of the old text
         public string? LastOcrText;
         public string? Shown;
+        public string? SentenceSoFar;
+        public long SentenceTicks;
     }
 
-    private sealed record TextJob(long FrameId, int RegionId, string Text, long CapturedTicks, double OcrMs);
+    private sealed record TextJob(long Version, int RegionId, string Text, long CapturedTicks, double OcrMs);
 
     private readonly IOcrEngine _ocr;
     private readonly TranslationResolver _resolver;
@@ -42,6 +50,8 @@ public sealed class TranslationPipeline : IAsyncDisposable
     private long _submitted, _stale, _restarts, _shown;
 
     public event Action<LatencyReport>? Latency;
+    /// <summary>(regionId, recognized English text, Arabic result) — for the UI and the history file.</summary>
+    public event Action<int, string, string>? Translated;
 
     public TranslationPipeline(IOcrEngine ocr, TranslationResolver resolver, IOverlaySink overlay,
         PipelineOptions? options = null, Action<string>? log = null)
@@ -77,22 +87,27 @@ public sealed class TranslationPipeline : IAsyncDisposable
         _detectQ.Offer(frame);
     }
 
-    private bool IsStale(RegionState st, long frameId) => Interlocked.Read(ref st.LatestFrameId) > frameId;
+    private long VersionOf(RegionState st) => Interlocked.Read(ref st.Version);
+
+    /// <summary>Marks the text as changed: older translations of this region are cancelled and become stale.</summary>
+    private (long Version, CancellationToken Token) NewVersion(RegionState st)
+    {
+        lock (st)
+        {
+            st.Cts.Cancel();
+            st.Cts = new CancellationTokenSource();
+            return (Interlocked.Increment(ref st.Version), st.Cts.Token);
+        }
+    }
 
     private async Task DetectLoop(CancellationToken ct)
     {
         while (true)
         {
             var f = await _detectQ.TakeAsync(ct).ConfigureAwait(false);
-            if (!_detector.HasChanged(f)) continue; // unchanged → no OCR, no translation
-            var st = _regions.GetOrAdd(f.RegionId, _ => new RegionState());
-            lock (st)
-            {
-                st.Cts.Cancel(); // abort in-flight OCR/translation of the older text
-                st.Cts = new CancellationTokenSource();
-                Interlocked.Exchange(ref st.LatestFrameId, f.Id);
-            }
-            _ocrQ.Offer(f);
+            if (!_detector.HasChanged(f)) continue;     // unchanged → no OCR, no translation
+            _regions.GetOrAdd(f.RegionId, _ => new RegionState());
+            _ocrQ.Offer(f);                              // latest frames win; OCR in progress is never aborted by video noise
         }
     }
 
@@ -101,33 +116,65 @@ public sealed class TranslationPipeline : IAsyncDisposable
         while (true)
         {
             var f = await _ocrQ.TakeAsync(ct).ConfigureAwait(false);
-            if (!_regions.TryGetValue(f.RegionId, out var st)) continue;
-            CancellationToken regionTok;
-            lock (st) regionTok = st.Cts.Token;
-            if (IsStale(st, f.Id)) { Interlocked.Increment(ref _stale); continue; }
+            var st = _regions.GetOrAdd(f.RegionId, _ => new RegionState());
 
             string raw;
             var sw = Stopwatch.StartNew();
-            try
-            {
-                using var linked = CancellationTokenSource.CreateLinkedTokenSource(regionTok, ct);
-                raw = await _ocr.RecognizeAsync(f, linked.Token).ConfigureAwait(false);
-            }
-            catch (OperationCanceledException) when (!ct.IsCancellationRequested) { Interlocked.Increment(ref _stale); continue; }
-            catch (Exception ex) when (ex is not OperationCanceledException) { _log?.Invoke($"OCR failed: {ex.Message}"); continue; }
+            try { raw = await _ocr.RecognizeAsync(f, ct).ConfigureAwait(false); }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
+            catch (Exception ex) { _log?.Invoke($"OCR failed: {ex.Message}"); continue; }
             var ocrMs = sw.Elapsed.TotalMilliseconds;
 
-            if (IsStale(st, f.Id)) { Interlocked.Increment(ref _stale); continue; }
             var text = TextNormalizer.Normalize(raw);
             if (text.Length == 0)
             {
-                if (st.Shown != null) { st.Shown = null; st.LastOcrText = null; SafeClear(f.RegionId); }
+                if (st.LastOcrText != null)
+                {
+                    st.LastOcrText = null;
+                    NewVersion(st);
+                    if (st.Shown != null) { st.Shown = null; SafeClear(f.RegionId); }
+                }
                 continue;
             }
-            if (text == st.LastOcrText) continue; // same text → nothing to do (dirty-state)
+            if (text == st.LastOcrText) continue;       // same text → nothing to do
+
             st.LastOcrText = text;
-            _translateQ.Offer(new TextJob(f.Id, f.RegionId, text, f.CapturedTicks, ocrMs));
+            var (version, token) = NewVersion(st);
+            var jobText = BuildJobText(st, text);
+            _ = SettleAndQueueAsync(st, version, f.RegionId, jobText, f.CapturedTicks, ocrMs, token, ct);
         }
+    }
+
+    private string BuildJobText(RegionState st, string text)
+    {
+        long now = Stopwatch.GetTimestamp();
+        string jobText = text;
+        var prev = st.SentenceSoFar;
+        if (_opt.MergeContinuations && prev != null
+            && (now - st.SentenceTicks) < 30 * Stopwatch.Frequency
+            && SentenceRules.LooksLikeContinuation(prev, text))
+        {
+            jobText = prev + " " + text;
+            if (jobText.Length > 400) jobText = text;
+        }
+        st.SentenceSoFar = SentenceRules.EndsSentence(jobText) ? null : jobText;
+        st.SentenceTicks = now;
+        return jobText;
+    }
+
+    private async Task SettleAndQueueAsync(RegionState st, long version, int regionId, string jobText,
+        long capturedTicks, double ocrMs, CancellationToken regionTok, CancellationToken stop)
+    {
+        try
+        {
+            using var linked = CancellationTokenSource.CreateLinkedTokenSource(regionTok, stop);
+            if (_opt.SettleDelay > TimeSpan.Zero)
+                await Task.Delay(_opt.SettleDelay, linked.Token).ConfigureAwait(false);
+            if (VersionOf(st) != version) { Interlocked.Increment(ref _stale); return; }
+            _translateQ.Offer(new TextJob(version, regionId, jobText, capturedTicks, ocrMs));
+        }
+        catch (OperationCanceledException) { Interlocked.Increment(ref _stale); }  // text changed while settling
+        catch (Exception ex) { _log?.Invoke("Settle failed: " + ex.Message); }
     }
 
     private async Task TranslateLoop(CancellationToken ct)
@@ -136,7 +183,7 @@ public sealed class TranslationPipeline : IAsyncDisposable
         {
             var job = await _translateQ.TakeAsync(ct).ConfigureAwait(false);
             if (!_regions.TryGetValue(job.RegionId, out var st)) continue;
-            if (IsStale(st, job.FrameId)) { Interlocked.Increment(ref _stale); continue; }
+            if (VersionOf(st) != job.Version) { Interlocked.Increment(ref _stale); continue; }
             CancellationToken regionTok;
             lock (st) regionTok = st.Cts.Token;
 
@@ -151,11 +198,11 @@ public sealed class TranslationPipeline : IAsyncDisposable
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 _log?.Invoke($"Translation failed: {ex.Message}");
-                if (st.LastOcrText == job.Text) st.LastOcrText = null; // allow a retry on the next change
+                if (VersionOf(st) == job.Version) st.LastOcrText = null; // allow a retry the next time the text is read
                 continue;
             }
-            if (IsStale(st, job.FrameId)) { Interlocked.Increment(ref _stale); continue; }
-            if (string.IsNullOrWhiteSpace(result.Text) || result.Text == st.Shown) continue; // dirty-state: no redundant redraw
+            if (VersionOf(st) != job.Version) { Interlocked.Increment(ref _stale); continue; }
+            if (string.IsNullOrWhiteSpace(result.Text) || result.Text == st.Shown) continue; // no redundant redraw
 
             st.Shown = result.Text;
             try { _overlay.Show(job.RegionId, result.Text); Interlocked.Increment(ref _shown); }
@@ -163,6 +210,7 @@ public sealed class TranslationPipeline : IAsyncDisposable
 
             var total = (Stopwatch.GetTimestamp() - job.CapturedTicks) * 1000.0 / Stopwatch.Frequency;
             Latency?.Invoke(new LatencyReport(job.RegionId, job.OcrMs, sw.Elapsed.TotalMilliseconds, total, result.Instant));
+            try { Translated?.Invoke(job.RegionId, job.Text, result.Text); } catch { /* a UI subscriber must never break the worker */ }
         }
     }
 
@@ -196,5 +244,23 @@ public sealed class TranslationPipeline : IAsyncDisposable
         try { await Task.WhenAll(_workers).ConfigureAwait(false); } catch { /* workers already log their own failures */ }
         foreach (var r in _regions.Values) r.Cts.Cancel();
         _stop.Dispose();
+    }
+}
+
+public static class SentenceRules
+{
+    public static bool EndsSentence(string s)
+    {
+        s = s.TrimEnd();
+        return s.Length > 0 && ".!?…:\"”»".IndexOf(s[^1]) >= 0;
+    }
+
+    /// <summary>True when <paramref name="next"/> looks like the rest of an unfinished sentence <paramref name="prev"/>.</summary>
+    public static bool LooksLikeContinuation(string prev, string next)
+    {
+        if (EndsSentence(prev) || prev.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length < 3) return false;
+        var first = next.FirstOrDefault(char.IsLetter);
+        if (first == default || !char.IsLower(first)) return false;
+        return !next.Contains(prev, StringComparison.OrdinalIgnoreCase) && !prev.Contains(next, StringComparison.OrdinalIgnoreCase);
     }
 }

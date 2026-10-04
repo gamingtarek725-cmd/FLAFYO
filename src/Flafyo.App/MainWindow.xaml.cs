@@ -40,6 +40,7 @@ public partial class MainWindow : Window
             RegionText.Text = $"المنطقة المحفوظة: {_settings.Width}×{_settings.Height}";
         }
         SpeedBox.SelectedIndex = Math.Clamp(_settings.SpeedIndex, 0, 2);
+        TextSizeBox.SelectedIndex = Math.Clamp(_settings.TextSizeIndex, 0, 2);
         _ready = true;
         UpdatePackStatus();
         SourceInitialized += OnSourceInitialized;
@@ -130,6 +131,14 @@ public partial class MainWindow : Window
         _settings.SpeedIndex = SpeedBox.SelectedIndex; _settings.Save();
     }
 
+    private void TextSize_Changed(object sender, SelectionChangedEventArgs e)
+    {
+        if (!_ready) return;
+        _settings.TextSizeIndex = TextSizeBox.SelectedIndex; _settings.Save();
+    }
+
+    private int TextScale() => TextSizeBox.SelectedIndex switch { 0 => 1, 2 => 3, _ => 2 };
+
     // ---- start / stop ----
     private void Start_Click(object sender, RoutedEventArgs e) => StartTranslation();
 
@@ -138,7 +147,7 @@ public partial class MainWindow : Window
         if (_pipeline != null) return;
         if (Region.Width < 20 || Region.Height < 10) { StatusText.Text = "اختر منطقة النص أولًا (الزر الأول)"; return; }
 
-        var ocr = new WindowsOcrEngine("en-US");
+        var ocr = new WindowsOcrEngine("en-US", TextScale());
         if (!ocr.IsAvailable)
         {
             StatusText.Text = "حزمة OCR الإنجليزية غير مثبتة: Settings ← Time & language ← Language & region ← أضف English";
@@ -170,11 +179,21 @@ public partial class MainWindow : Window
 
         UserData.EnsureTemplates();
         var resolver = new TranslationResolver(_translator, new TranslationCache(),
-            BuiltInDictionary.Load(UserData.DictionaryFile), IdiomRewriter.Load(UserData.IdiomsFile));
+            BuiltInDictionary.Load(UserData.DictionaryFile), IdiomRewriter.Load(UserData.IdiomsFile), Phrasebook.LoadEmbedded());
 
-        var p = new TranslationPipeline(ocr, resolver, sink, log: s => SetStatus(s));
+        // wait a little before translating so half-typed lines are not translated on their own
+        var options = new PipelineOptions
+        {
+            SettleDelay = TimeSpan.FromMilliseconds(SpeedBox.SelectedIndex switch { 0 => 500, 2 => 220, _ => 350 })
+        };
+        var p = new TranslationPipeline(ocr, resolver, sink, options, s => SetStatus(s));
         p.Latency += l => Dispatcher.InvokeAsync(() =>
             LatencyText.Text = $"OCR {l.OcrMs:0} ms | ترجمة {l.TranslationMs:0} ms | الإجمالي {l.TotalMs:0} ms");
+        p.Translated += (_, src, ar) =>
+        {
+            Dispatcher.InvokeAsync(() => LastText.Text = $"المقروء: {src}\nالترجمة: {ar}");
+            AppendHistory(src, ar);
+        };
         p.Start();
         _pipeline = p;
 
@@ -184,6 +203,17 @@ public partial class MainWindow : Window
         StatusText.Text = "الترجمة شغّالة — " + modeText;
         StartButton.IsEnabled = false; StopButton.IsEnabled = true; SelectButton.IsEnabled = false;
     }
+
+    private static void AppendHistory(string src, string ar) => Task.Run(() =>
+    {
+        try
+        {
+            var f = new FileInfo(UserData.HistoryFile);
+            if (f.Exists && f.Length > 1_000_000) f.Delete();   // keep it small
+            File.AppendAllText(UserData.HistoryFile, $"{DateTime.Now:HH:mm:ss}  {src}  =>  {ar}{Environment.NewLine}", System.Text.Encoding.UTF8);
+        }
+        catch { }
+    });
 
     private async void Stop_Click(object sender, RoutedEventArgs e) => await StopAsync();
 
@@ -196,6 +226,7 @@ public partial class MainWindow : Window
         (_translator as IDisposable)?.Dispose(); _translator = null;
         _overlay?.Hide();
         EngineText.Text = "";
+        LastText.Text = "";
         StatusText.Text = "متوقف";
         StartButton.IsEnabled = true; StopButton.IsEnabled = false; SelectButton.IsEnabled = true;
         UpdatePackStatus();
