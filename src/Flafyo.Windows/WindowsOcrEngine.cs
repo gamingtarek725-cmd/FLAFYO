@@ -57,7 +57,7 @@ public sealed class WindowsOcrEngine : IOcrEngine
             for (int i = 0; i < n; i++) buf[i] = (byte)((src[i] - min) * 255 / range);
             sum = 0; for (int i = 0; i < n; i++) sum += buf[i];
         }
-        else Buffer.BlockCopy(src, 0, buf, 0, n);
+        else System.Buffer.BlockCopy(src, 0, buf, 0, n);
 
         // 2) dark background with light text → invert (OCR prefers dark text on light)
         if (AutoInvert && sum / Math.Max(1, n) < 110)
