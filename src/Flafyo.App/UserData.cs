@@ -9,6 +9,7 @@ internal static class UserData
     public static string Dir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FLAFYO");
     public static string DictionaryFile => Path.Combine(Dir, "dictionary.txt");
     public static string IdiomsFile => Path.Combine(Dir, "idioms.txt");
+    public static string MasculineFile => Path.Combine(Dir, "masculine.txt");
     public static string HistoryFile => Path.Combine(Dir, "history.txt");
     public static string SettingsFile => Path.Combine(Dir, "settings.json");
 
@@ -25,6 +26,9 @@ internal static class UserData
                     "# الاصطلاحات: اكتب العبارة الإنجليزي = معناها بإنجليزي بسيط (بتتبدل قبل الترجمة)\n" +
                     "# النجمة * تعني كلمة واحدة وتتكرر في الناحية التانية. الشرطة المائلة / للبدائل.\n" +
                     "# مثال:\n# get/got round * = persuade *\n# kick the bucket = die\n", System.Text.Encoding.UTF8);
+            if (!File.Exists(MasculineFile))
+                File.WriteAllText(MasculineFile,
+                    "# تحويل صيغة المؤنث للمذكر: المؤنث = المذكر (بتتضاف لقائمة البرنامج الجاهزة)\n# مثال:\n# اجلسي = اجلس\n", System.Text.Encoding.UTF8);
         }
         catch { /* never block the app because of files */ }
     }
@@ -38,6 +42,8 @@ public sealed class AppSettings
     public int Height { get; set; }
     public int SpeedIndex { get; set; } = 1;
     public int TextSizeIndex { get; set; } = 1;
+    public int PackIndex { get; set; } = 0;
+    public bool Masculine { get; set; } = true;
 
     public static AppSettings Load()
     {

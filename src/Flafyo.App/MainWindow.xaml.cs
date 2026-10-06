@@ -21,6 +21,8 @@ public partial class MainWindow : Window
 
     private object _regionBox = System.Drawing.Rectangle.Empty;   // boxed so reads/writes are atomic across threads
     private volatile int _intervalMs = 200;
+    private volatile bool _masculine = true;
+    private IReadOnlyDictionary<string, string> _masculineMap = new Dictionary<string, string>();
     private readonly AppSettings _settings = AppSettings.Load();
     private bool _ready;
     private OverlayWindow? _overlay;
@@ -41,6 +43,9 @@ public partial class MainWindow : Window
         }
         SpeedBox.SelectedIndex = Math.Clamp(_settings.SpeedIndex, 0, 2);
         TextSizeBox.SelectedIndex = Math.Clamp(_settings.TextSizeIndex, 0, 2);
+        PackBox.SelectedIndex = Math.Clamp(_settings.PackIndex, 0, 1);
+        MasculineBox.IsChecked = _settings.Masculine;
+        _masculine = _settings.Masculine;
         _ready = true;
         UpdatePackStatus();
         SourceInitialized += OnSourceInitialized;
@@ -49,6 +54,16 @@ public partial class MainWindow : Window
     private System.Drawing.Rectangle Region => (System.Drawing.Rectangle)Volatile.Read(ref _regionBox);
 
     private void SetStatus(string s) => Dispatcher.InvokeAsync(() => StatusText.Text = s);
+
+    private void ShowEngine(string engine, string? error, string label) => Dispatcher.InvokeAsync(() =>
+        EngineText.Text = engine switch
+        {
+            "loading" => $"المحرك: جاري تحميل الحزمة {label}…",
+            "offline" => $"المحرك: الذكاء الاصطناعي المحلي — الحزمة {label} ✅",
+            "fallback" => $"⚠️ الحزمة {label} فشلت، فبيستخدم البديل. السبب: {error}",
+            "online" => "المحرك: ترجمة أونلاين مؤقتة (مفيش حزمة مثبتة)",
+            _ => $"⚠️ فشل تحميل المحرك: {error}"
+        });
 
     // ---- global hotkey (registered with Windows; no keyboard hook, game input is untouched) ----
     private void OnSourceInitialized(object? sender, EventArgs e)
@@ -71,35 +86,43 @@ public partial class MainWindow : Window
         if (_pipeline == null) StartTranslation(); else await StopAsync();
     }
 
-    private void ShowEngine(string engine, string? error) => Dispatcher.InvokeAsync(() =>
-        EngineText.Text = engine switch
-        {
-            "loading" => "المحرك: جاري تحميل النموذج المحلي…",
-            "offline" => "المحرك: الذكاء الاصطناعي المحلي ✅",
-            "online-fallback" => $"⚠️ النموذج المحلي فشل، فبيترجم بالإنترنت (حرفية). السبب: {error}",
-            "online" => "المحرك: ترجمة أونلاين مؤقتة (الحزمة غير مثبتة)",
-            _ => $"⚠️ فشل تحميل المحرك: {error}"
-        });
-
-    // ---- language pack ----
+    // ---- language packs ----
     private void UpdatePackStatus()
     {
-        bool installed = ModelPack.IsInstalled(ModelPack.DefaultDir);
-        PackText.Text = installed
-            ? "✅ الحزمة مثبتة. الترجمة هتشتغل بدون إنترنت."
-            : "الحزمة مش مثبتة. لحد ما تنزّلها هتشتغل الترجمة بالإنترنت (مؤقتًا).";
-        PackButton.IsEnabled = !installed && !_downloading;
-        PackButton.Visibility = installed ? Visibility.Collapsed : Visibility.Visible;
+        bool light = LanguagePack.Light.IsInstalled(), heavy = LanguagePack.Heavy.IsInstalled();
+        LightText.Text = light ? "✅ الحزمة الخفيفة مثبتة (سريعة)" : "الحزمة الخفيفة (حوالي 145 ميجا): مش مثبتة";
+        HeavyText.Text = heavy ? "✅ الحزمة التقيلة مثبتة (أدق)" : "الحزمة التقيلة (حوالي 0.9 جيجا): مش مثبتة";
+        LightButton.Visibility = light ? Visibility.Collapsed : Visibility.Visible;
+        HeavyButton.Visibility = heavy ? Visibility.Collapsed : Visibility.Visible;
+        LightButton.IsEnabled = HeavyButton.IsEnabled = !_downloading;
     }
 
-    private async void Pack_Click(object sender, RoutedEventArgs e)
+    private async Task DownloadPackAsync(LanguagePack pack, TextBlock text)
     {
         if (_downloading) return;
-        _downloading = true; PackButton.IsEnabled = false;
-        var progress = new Progress<double>(v => PackText.Text = $"جاري التنزيل… {v * 100:0}%");
-        try { await ModelPack.DownloadAsync(ModelPack.DefaultDir, progress, CancellationToken.None); }
-        catch (Exception ex) { PackText.Text = "فشل التنزيل: " + ex.Message + " (جرّب تاني)"; }
+        _downloading = true; LightButton.IsEnabled = HeavyButton.IsEnabled = false;
+        string? error = null;
+        var progress = new Progress<double>(v => text.Text = $"جاري تنزيل الحزمة {pack.ShortName}… {v * 100:0}%");
+        try { await pack.DownloadAsync(progress, CancellationToken.None); }
+        catch (Exception ex) { error = "فشل التنزيل: " + ex.Message + " (جرّب تاني)"; }
         finally { _downloading = false; UpdatePackStatus(); }
+        if (error != null) text.Text = error;
+    }
+
+    private async void Light_Click(object sender, RoutedEventArgs e) => await DownloadPackAsync(LanguagePack.Light, LightText);
+    private async void Heavy_Click(object sender, RoutedEventArgs e) => await DownloadPackAsync(LanguagePack.Heavy, HeavyText);
+
+    private void Pack_Changed(object sender, SelectionChangedEventArgs e)
+    {
+        if (!_ready) return;
+        _settings.PackIndex = PackBox.SelectedIndex; _settings.Save();
+    }
+
+    private void Masculine_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_ready) return;
+        _masculine = MasculineBox.IsChecked == true;
+        _settings.Masculine = _masculine; _settings.Save();
     }
 
     private void OpenFolder_Click(object sender, RoutedEventArgs e)
@@ -108,7 +131,7 @@ public partial class MainWindow : Window
         try { Process.Start(new ProcessStartInfo("explorer.exe", $"\"{UserData.Dir}\"") { UseShellExecute = true }); } catch { }
     }
 
-    // ---- region + speed ----
+    // ---- region + speed + text size ----
     private void Select_Click(object sender, RoutedEventArgs e)
     {
         WindowState = WindowState.Minimized;
@@ -157,25 +180,35 @@ public partial class MainWindow : Window
         _overlay ??= new OverlayWindow();
         var sink = new WpfOverlaySink(_overlay, () => Region);
 
-        // Offline AI model if the language pack is installed (loads in the background); otherwise the temporary online service.
-        string modeText;
-        var modelDir = ModelPack.DefaultDir;
-        if (ModelPack.IsInstalled(modelDir))
+        // chosen pack → (if missing) the other pack → (if none) the temporary online service
+        int threads = SpeedBox.SelectedIndex == 0 ? 1 : 2;   // few CPU threads: the game keeps priority
+        int beams = SpeedBox.SelectedIndex == 0 ? 1 : 3;
+        var chosen = PackBox.SelectedIndex == 1 ? LanguagePack.Heavy : LanguagePack.Light;
+        var other = chosen.Kind == PackKind.Heavy ? LanguagePack.Light : LanguagePack.Heavy;
+        var pack = chosen.IsInstalled() ? chosen : other.IsInstalled() ? other : null;
+
+        ITranslator inner; string modeText;
+        if (pack != null)
         {
-            int threads = SpeedBox.SelectedIndex == 0 ? 1 : 2;   // few CPU threads: the game keeps priority
-            var lazy = new LazyTranslator(() => OnnxMarianTranslator.Load(modelDir, threads),
-                                          () => new OnlineTranslator("en", "ar"));
-            lazy.EngineReady += ShowEngine;
-            ShowEngine(lazy.Engine, lazy.Error);   // in case it finished before we subscribed
-            _translator = lazy;
-            modeText = "بدون إنترنت";
+            var backup = pack == chosen ? other : chosen;
+            bool backupInstalled = backup.IsInstalled();
+            var lazy = new LazyTranslator(
+                () => pack.CreateTranslator(threads, beams),
+                () => backupInstalled ? backup.CreateTranslator(threads, beams) : new OnlineTranslator("en", "ar"));
+            lazy.EngineReady += (eng, err) => ShowEngine(eng, err, pack.ShortName);
+            ShowEngine(lazy.Engine, lazy.Error, pack.ShortName);   // in case it finished before we subscribed
+            inner = lazy; modeText = "بدون إنترنت";
         }
         else
         {
-            _translator = new OnlineTranslator("en", "ar");
-            ShowEngine("online", null);
+            inner = new OnlineTranslator("en", "ar");
+            ShowEngine("online", null, "");
             modeText = "بالإنترنت (مؤقتًا)";
         }
+
+        // the user's own masculine.txt is added to the built-in list
+        try { _masculineMap = ArabicGender.ParseUserFile(File.ReadAllLines(UserData.MasculineFile)); } catch { }
+        _translator = new PostProcessTranslator(inner, s => _masculine ? ArabicGender.MakeMasculine(s, _masculineMap) : s);
 
         UserData.EnsureTemplates();
         var resolver = new TranslationResolver(_translator, new TranslationCache(),

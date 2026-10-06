@@ -141,8 +141,37 @@ public static class BuiltInIdioms
         foreach (var l in Verb(F("get", "gets", "got", "getting"), " his goat", F("annoy", "annoys", "annoyed", "annoying"), " him")) yield return l;
         foreach (var l in Verb(F("get", "gets", "got", "getting"), " her goat", F("annoy", "annoys", "annoyed", "annoying"), " her")) yield return l;
 
+        foreach (var l in Verb(F("stand", "stands", "stood", "standing"), " your ground", F("refuse", "refuses", "refused", "refusing"), " to retreat")) yield return l;
+        foreach (var l in Verb(F("take", "takes", "took", "taking"), " cover", F("hide", "hides", "hid", "hiding"), "")) yield return l;
+        foreach (var l in Verb(F("fall", "falls", "fell", "falling"), " back", F("retreat", "retreats", "retreated", "retreating"), "")) yield return l;
+        foreach (var l in Verb(F("stand", "stands", "stood", "standing"), " down", F("stop", "stops", "stopped", "stopping"), " attacking")) yield return l;
+        foreach (var l in Verb(F("take", "takes", "took", "taking"), " a breather", F("rest", "rests", "rested", "resting"), " for a moment")) yield return l;
+        foreach (var l in Verb(F("keep", "keeps", "kept", "keeping"), " it up", F("continue", "continues", "continued", "continuing"), " doing well")) yield return l;
+
         foreach (var l in new[]
         {
+            "watch out for * = be careful of *",
+            "watch out = be careful",
+            "bear with me = please be patient with me",
+            "i'm all ears = I am listening carefully",
+            "no hard feelings = I am not angry",
+            "in the nick of time = just in time",
+            "on the run = escaping",
+            "game on = let's begin",
+            "step aside = move away",
+            "back me up = help me",
+            "i have your six = I will protect you",
+            "watch your six = watch behind you",
+            "on the house = free",
+            "it's a long shot = it is unlikely to succeed",
+            "you're toast = you are finished",
+            "we're toast = we are finished",
+            "we're done for = we are doomed",
+            "my bad = my mistake",
+            "you bet = of course",
+            "sit tight = wait patiently",
+            "hang tight = wait patiently",
+            "buckle up = prepare yourself",
             "by hook or by crook = by any means",
             "my cup of tea = my favorite thing",
             "in hot water = in serious trouble",

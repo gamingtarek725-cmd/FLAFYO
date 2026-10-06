@@ -22,6 +22,14 @@ public class IdiomTests
         Assert.Equal("Press the key E to open the door.", IdiomRewriter.Load().Rewrite("Press E to open the door."));
 
     [Theory]
+    [InlineData("Take cover!", "Hide!")]
+    [InlineData("Watch out for the dog", "Be careful of the dog")]
+    [InlineData("He took a breather", "He rested for a moment")]
+    [InlineData("Stand your ground", "Refuse to retreat")]
+    public void More_game_idioms(string input, string expected) =>
+        Assert.Equal(expected, IdiomRewriter.Load().Rewrite(input));
+
+    [Theory]
     [InlineData("He'll do the dirty on you.", "He'll cheat you.")]
     [InlineData("Steer clear of troubles", "Avoid troubles")]
     [InlineData("You get my goat", "You annoy me")]

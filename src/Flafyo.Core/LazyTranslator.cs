@@ -5,7 +5,7 @@ public sealed class LazyTranslator : ITranslator, IDisposable
 {
     private readonly Task<ITranslator> _load;
 
-    /// <summary>"loading", "offline", "online-fallback" or "failed".</summary>
+    /// <summary>"loading", "offline", "fallback" or "failed".</summary>
     public string Engine { get; private set; } = "loading";
     public string? Error { get; private set; }
     public event Action<string, string?>? EngineReady;
@@ -28,7 +28,7 @@ public sealed class LazyTranslator : ITranslator, IDisposable
                 log?.Invoke("Offline model failed to load: " + Error);
                 if (fallback == null) { Engine = "failed"; EngineReady?.Invoke(Engine, Error); throw; }
                 var f = fallback();
-                Engine = "online-fallback";
+                Engine = "fallback";
                 EngineReady?.Invoke(Engine, Error);
                 return f;
             }

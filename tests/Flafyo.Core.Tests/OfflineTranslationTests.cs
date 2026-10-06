@@ -48,68 +48,12 @@ public class TokenizerTests
     }
 }
 
-public class OnnxMarianIntegrationTests
+internal static class Quality
 {
-    private readonly ITestOutputHelper _out;
-    public OnnxMarianIntegrationTests(ITestOutputHelper output) => _out = output;
-
-    /// <summary>Runs only when FLAFYO_MODEL_DIR points at the downloaded language pack (done by CI).</summary>
-    [Fact]
-    public void Real_model_translates_sentences_into_arabic()
-    {
-        var dir = Environment.GetEnvironmentVariable("FLAFYO_MODEL_DIR");
-        if (string.IsNullOrEmpty(dir)) return;
-
-        using var tr = OnnxMarianTranslator.Load(dir, threads: 2);
-        _out.WriteLine("Language tag: " + (tr.LanguageTag ?? "(none)"));
-        _out.WriteLine("Encoded 'Find the key.': " + string.Join(",", tr.DebugEncode("Find the key.")));
-
-        var samples = new[]
-        {
-            "Find the key.",
-            "Press E to open the door.",
-            "You must not leave this place alive.",
-            "We need to talk about what happened last night.",
-            "WARNING: ENEMY NEARBY",
-        };
-        foreach (var s in samples)
-        {
-            var sw = System.Diagnostics.Stopwatch.StartNew();
-            var ar = tr.TranslateSync(s, CancellationToken.None);
-            _out.WriteLine($"[{sw.ElapsedMilliseconds} ms] {s}  =>  {ar}");
-            Assert.False(string.IsNullOrWhiteSpace(ar), "empty translation for: " + s);
-            Assert.Matches(new Regex(@"\p{IsArabic}"), ar);
-        }
-
-        _out.WriteLine("---- idiom tests: raw model vs. with idiom rewriting ----");
-        var idioms = IdiomRewriter.Load();
-        foreach (var s in new[] { "How can I get round him?", "Press E to open the door.", "Watch your back out there.", "He kicked the bucket last night." })
-        {
-            var raw = tr.TranslateSync(s, CancellationToken.None);
-            var rewritten = idioms.Rewrite(s);
-            var fixedAr = tr.TranslateSync(rewritten, CancellationToken.None);
-            _out.WriteLine($"{s}\n   RAW     : {raw}\n   REWRITE : {rewritten}\n   RESULT  : {fixedAr}");
-        }
-
-        // ---- quality check against the product owner's natural translations (character-bigram similarity, 0..1) ----
-        var book = Phrasebook.LoadEmbedded();
-        var scores = new List<(double Raw, double Idiom, string En, string Ref, string Model)>();
-        foreach (var (en, refAr) in book.Entries)
-        {
-            var raw = tr.TranslateSync(en, CancellationToken.None);
-            var viaIdioms = tr.TranslateSync(idioms.Rewrite(en), CancellationToken.None);
-            scores.Add((Dice(raw, refAr), Dice(viaIdioms, refAr), en, refAr, viaIdioms));
-        }
-        _out.WriteLine($"==== QUALITY on {scores.Count} reference sentences ====");
-        _out.WriteLine($"mean similarity  raw model: {scores.Average(x => x.Raw):0.000}   model + idiom rules: {scores.Average(x => x.Idiom):0.000}");
-        _out.WriteLine("---- 12 weakest (model + idiom rules) ----");
-        foreach (var x in scores.OrderBy(x => x.Idiom).Take(12))
-            _out.WriteLine($"[{x.Idiom:0.00}] {x.En}\n    REF  : {x.Ref}\n    MODEL: {x.Model}");
-    }
-
     private static string ArabicLetters(string s) => new string(s.Where(c => c >= '\u0621' && c <= '\u064A').ToArray());
 
-    private static double Dice(string a, string b)
+    /// <summary>Character-bigram similarity 0..1 (a rough measure: correct translations with other wording also score low).</summary>
+    public static double Dice(string a, string b)
     {
         a = ArabicLetters(a); b = ArabicLetters(b);
         if (a.Length < 2 || b.Length < 2) return a == b ? 1 : 0;
@@ -122,5 +66,62 @@ public class OnnxMarianIntegrationTests
             if (counts.TryGetValue(g, out var n) && n > 0) { counts[g] = n - 1; common++; }
         }
         return 2.0 * common / ((a.Length - 1) + (b.Length - 1));
+    }
+}
+
+public class OnnxMarianIntegrationTests
+{
+    private readonly ITestOutputHelper _out;
+    public OnnxMarianIntegrationTests(ITestOutputHelper output) => _out = output;
+
+    /// <summary>Runs only when FLAFYO_MODEL_DIR points at the downloaded light language pack (done by CI).</summary>
+    [Fact]
+    public void Light_model_translates_sentences_into_arabic()
+    {
+        var dir = Environment.GetEnvironmentVariable("FLAFYO_MODEL_DIR");
+        if (string.IsNullOrEmpty(dir)) return;
+
+        using var tr = OnnxMarianTranslator.Load(dir, threads: 2);
+        var idioms = IdiomRewriter.Load();
+        _out.WriteLine("Language tag: " + (tr.LanguageTag ?? "(none)"));
+
+        var samples = new[]
+        {
+            "Find the key.", "Press E to open the door.", "You must not leave this place alive.",
+            "We need to talk about what happened last night.", "WARNING: ENEMY NEARBY",
+            "Watch your back out there.", "How can I get round him?", "He kicked the bucket last night.",
+        };
+
+        foreach (var beams in new[] { 1, 3 })
+        {
+            tr.Beams = beams;
+            _out.WriteLine($"---- {(beams == 1 ? "greedy" : "beam search (3)")} + idiom rules + masculine fix ----");
+            foreach (var s in samples)
+            {
+                var sw = System.Diagnostics.Stopwatch.StartNew();
+                var ar = ArabicGender.MakeMasculine(tr.TranslateSync(idioms.Rewrite(s), CancellationToken.None));
+                _out.WriteLine($"[{sw.ElapsedMilliseconds} ms] {s}  =>  {ar}");
+                Assert.False(string.IsNullOrWhiteSpace(ar), "empty translation for: " + s);
+                Assert.Matches(new Regex(@"\p{IsArabic}"), ar);
+            }
+        }
+
+        // quality vs. the product owner's translations, on every second sentence (to keep CI fast)
+        var book = Phrasebook.LoadEmbedded();
+        var rows = new List<(double Greedy, double Beam, string En, string Ref, string Model)>();
+        foreach (var (en, refAr) in book.Entries.Where((_, i) => i % 2 == 0))
+        {
+            var rewritten = idioms.Rewrite(en);
+            tr.Beams = 1;
+            var g = ArabicGender.MakeMasculine(tr.TranslateSync(rewritten, CancellationToken.None));
+            tr.Beams = 3;
+            var b = ArabicGender.MakeMasculine(tr.TranslateSync(rewritten, CancellationToken.None));
+            rows.Add((Quality.Dice(g, refAr), Quality.Dice(b, refAr), en, refAr, b));
+        }
+        _out.WriteLine($"==== QUALITY (light pack) on {rows.Count} reference sentences ====");
+        _out.WriteLine($"mean similarity  greedy: {rows.Average(x => x.Greedy):0.000}   beam search 3: {rows.Average(x => x.Beam):0.000}");
+        _out.WriteLine("---- 8 weakest with beam search ----");
+        foreach (var x in rows.OrderBy(x => x.Beam).Take(8))
+            _out.WriteLine($"[{x.Beam:0.00}] {x.En}\n    REF  : {x.Ref}\n    MODEL: {x.Model}");
     }
 }
