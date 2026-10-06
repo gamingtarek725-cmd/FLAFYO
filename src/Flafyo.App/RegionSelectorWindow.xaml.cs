@@ -12,9 +12,10 @@ public partial class RegionSelectorWindow : Window
 
     public System.Drawing.Rectangle SelectedRegion { get; private set; }
 
-    public RegionSelectorWindow()
+    public RegionSelectorWindow(string? hint = null)
     {
         InitializeComponent();
+        if (!string.IsNullOrEmpty(hint)) Hint.Text = hint;
         Left = 0; Top = 0;
         Width = SystemParameters.PrimaryScreenWidth;
         Height = SystemParameters.PrimaryScreenHeight;

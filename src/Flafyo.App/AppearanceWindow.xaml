@@ -1,0 +1,73 @@
+<Window x:Class="Flafyo.Desktop.AppearanceWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="شكل الترجمة" Icon="Assets/flafyo.ico" Width="460" Height="760" MinWidth="380" MinHeight="420"
+        Background="#0E0F14" FlowDirection="RightToLeft" WindowStartupLocation="CenterOwner">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="20">
+      <TextBlock Text="شكل الترجمة داخل اللعبة" Foreground="#00D9A5" FontSize="18" FontWeight="Bold"/>
+      <TextBlock Text="أي تغيير بيظهر فوراً في شريط المعاينة." Foreground="#9AA0B4" Margin="0,4,0,10"/>
+
+      <TextBlock Text="نوع الخط" Foreground="White" Margin="0,8,0,4"/>
+      <ComboBox x:Name="FontBox" SelectionChanged="OnSelect"/>
+
+      <StackPanel Orientation="Horizontal" Margin="0,12,0,4">
+        <TextBlock Text="حجم الخط:" Foreground="White"/>
+        <TextBlock x:Name="SizeLabel" Foreground="#FFC857" Margin="8,0,0,0"/>
+      </StackPanel>
+      <Slider x:Name="SizeSlider" Minimum="12" Maximum="72" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="OnSlide"/>
+      <CheckBox x:Name="BoldCheck" Content="خط عريض" Foreground="White" Margin="0,8,0,0" Checked="OnToggle" Unchecked="OnToggle"/>
+      <CheckBox x:Name="ShadowCheck" Content="ظل للكلام (أوضح على أي خلفية)" Foreground="White" Margin="0,6,0,0" Checked="OnToggle" Unchecked="OnToggle"/>
+
+      <TextBlock Text="محاذاة الكلام" Foreground="White" Margin="0,12,0,4"/>
+      <ComboBox x:Name="AlignBox" SelectionChanged="OnSelect">
+        <ComboBoxItem Content="يمين (الأنسب للعربي)"/>
+        <ComboBoxItem Content="وسط"/>
+        <ComboBoxItem Content="يسار"/>
+      </ComboBox>
+
+      <TextBlock Text="لون الكلام" Foreground="White" Margin="0,14,0,4"/>
+      <ComboBox x:Name="TextColorBox" SelectionChanged="OnSelect"/>
+      <TextBlock Text="لون الخلفية" Foreground="White" Margin="0,12,0,4"/>
+      <ComboBox x:Name="BackColorBox" SelectionChanged="OnSelect"/>
+      <StackPanel Orientation="Horizontal" Margin="0,12,0,4">
+        <TextBlock Text="عتامة الخلفية:" Foreground="White"/>
+        <TextBlock x:Name="OpacityLabel" Foreground="#FFC857" Margin="8,0,0,0"/>
+      </StackPanel>
+      <Slider x:Name="OpacitySlider" Minimum="0" Maximum="100" TickFrequency="5" IsSnapToTickEnabled="True" ValueChanged="OnSlide"/>
+
+      <CheckBox x:Name="BorderCheck" Content="إطار حوالين الشريط" Foreground="White" Margin="0,12,0,0" Checked="OnToggle" Unchecked="OnToggle"/>
+      <TextBlock Text="لون الإطار" Foreground="White" Margin="0,8,0,4"/>
+      <ComboBox x:Name="BorderColorBox" SelectionChanged="OnSelect"/>
+
+      <TextBlock Text="مكان الشريط" Foreground="White" FontWeight="Bold" Margin="0,18,0,4"/>
+      <ComboBox x:Name="ModeBox" SelectionChanged="OnSelect">
+        <ComboBoxItem Content="فوق منطقة النص (تلقائي)"/>
+        <ComboBoxItem Content="تحت منطقة النص (تلقائي)"/>
+        <ComboBoxItem Content="مكان ثابت أحدده بنفسي"/>
+      </ComboBox>
+      <Button x:Name="AreaButton" Content="حدد مكان وحجم الشريط بالماوس" Margin="0,8,0,0" Padding="8" Click="Area_Click"/>
+      <TextBlock x:Name="AreaText" Foreground="#9AA0B4" Margin="0,4,0,0"/>
+
+      <StackPanel Orientation="Horizontal" Margin="0,12,0,4">
+        <TextBlock Text="عرض الشريط (في الوضع التلقائي):" Foreground="White"/>
+        <TextBlock x:Name="WidthLabel" Foreground="#FFC857" Margin="8,0,0,0"/>
+      </StackPanel>
+      <Slider x:Name="WidthSlider" Minimum="0" Maximum="1800" TickFrequency="20" IsSnapToTickEnabled="True" ValueChanged="OnSlide"/>
+
+      <StackPanel Orientation="Horizontal" Margin="0,12,0,4">
+        <TextBlock Text="إخفاء الترجمة تلقائياً بعد:" Foreground="White"/>
+        <TextBlock x:Name="HideLabel" Foreground="#FFC857" Margin="8,0,0,0"/>
+      </StackPanel>
+      <Slider x:Name="HideSlider" Minimum="0" Maximum="30" TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="OnSlide"/>
+
+      <CheckBox x:Name="OriginalCheck" Content="اعرض النص الإنجليزي الأصلي تحت الترجمة" Foreground="White" Margin="0,12,0,0" Checked="OnToggle" Unchecked="OnToggle"/>
+
+      <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+        <Button Content="معاينة" Padding="14,6" Click="Preview_Click"/>
+        <Button Content="إعادة الضبط" Padding="14,6" Margin="10,0,0,0" Click="Reset_Click"/>
+        <Button Content="إغلاق" Padding="14,6" Margin="10,0,0,0" Click="Close_Click"/>
+      </StackPanel>
+    </StackPanel>
+  </ScrollViewer>
+</Window>

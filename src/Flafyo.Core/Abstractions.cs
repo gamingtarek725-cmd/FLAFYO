@@ -18,6 +18,8 @@ public interface IOverlaySink
 {
     void Show(int regionId, string translated);
     void Clear(int regionId);
+    /// <summary>Same as Show, but also receives the recognized English text (for the "show original" option).</summary>
+    void Show(int regionId, string translated, string source) => Show(regionId, translated);
 }
 
 public sealed record LatencyReport(int RegionId, double OcrMs, double TranslationMs, double TotalMs, bool FromCacheOrDictionary);

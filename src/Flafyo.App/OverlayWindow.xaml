@@ -4,7 +4,10 @@
         WindowStyle="None" AllowsTransparency="True" Background="Transparent" Topmost="True"
         ShowInTaskbar="False" ShowActivated="False" Focusable="False" ResizeMode="NoResize"
         SizeToContent="Height" Width="600" FlowDirection="RightToLeft">
-  <Border Background="#E6101018" CornerRadius="8" Padding="14,8" BorderBrush="#FF00D9A5" BorderThickness="1">
-    <TextBlock x:Name="Label" Foreground="White" FontSize="22" TextWrapping="Wrap" FontFamily="Segoe UI"/>
+  <Border x:Name="Card" CornerRadius="8" Padding="14,8" BorderThickness="1">
+    <StackPanel>
+      <TextBlock x:Name="Label" TextWrapping="Wrap"/>
+      <TextBlock x:Name="Original" TextWrapping="Wrap" FlowDirection="LeftToRight" Margin="0,6,0,0" Visibility="Collapsed"/>
+    </StackPanel>
   </Border>
 </Window>

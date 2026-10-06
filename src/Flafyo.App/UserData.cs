@@ -44,6 +44,10 @@ public sealed class AppSettings
     public int TextSizeIndex { get; set; } = 1;
     public int PackIndex { get; set; } = 0;
     public bool Masculine { get; set; } = true;
+    public bool Precise { get; set; } = false;
+    public OverlayStyle Style { get; set; } = new();
+    public double WindowWidth { get; set; }
+    public double WindowHeight { get; set; }
 
     public static AppSettings Load()
     {
@@ -64,5 +68,36 @@ public sealed class AppSettings
             File.WriteAllText(UserData.SettingsFile, JsonSerializer.Serialize(this));
         }
         catch { }
+    }
+}
+
+/// <summary>How the translation strip looks and where it appears (saved in settings.json).</summary>
+public sealed class OverlayStyle
+{
+    public string FontFamily { get; set; } = "Segoe UI";
+    public double FontSize { get; set; } = 22;
+    public bool Bold { get; set; }
+    public string TextColor { get; set; } = "#FFFFFF";
+    public string BackColor { get; set; } = "#101018";
+    public int BackOpacity { get; set; } = 90;            // percent
+    public bool Border { get; set; } = true;
+    public string BorderColor { get; set; } = "#00D9A5";
+    public int Align { get; set; }                         // 0 = start (right for Arabic), 1 = center, 2 = end (left)
+    public bool Shadow { get; set; } = true;
+    public int OverlayMode { get; set; }                   // 0 = above the text region, 1 = below it, 2 = fixed area chosen by the user
+    public int AreaX { get; set; }
+    public int AreaY { get; set; }
+    public int AreaW { get; set; }
+    public int AreaH { get; set; }
+    public int AutoWidthPx { get; set; }                   // 0 = same width as the text region
+    public int AutoHideSeconds { get; set; }               // 0 = stays until the text changes
+    public bool ShowOriginal { get; set; }
+
+    public void CopyFrom(OverlayStyle o)
+    {
+        FontFamily = o.FontFamily; FontSize = o.FontSize; Bold = o.Bold; TextColor = o.TextColor; BackColor = o.BackColor;
+        BackOpacity = o.BackOpacity; Border = o.Border; BorderColor = o.BorderColor; Align = o.Align; Shadow = o.Shadow;
+        OverlayMode = o.OverlayMode; AreaX = o.AreaX; AreaY = o.AreaY; AreaW = o.AreaW; AreaH = o.AreaH;
+        AutoWidthPx = o.AutoWidthPx; AutoHideSeconds = o.AutoHideSeconds; ShowOriginal = o.ShowOriginal;
     }
 }

@@ -205,7 +205,7 @@ public sealed class TranslationPipeline : IAsyncDisposable
             if (string.IsNullOrWhiteSpace(result.Text) || result.Text == st.Shown) continue; // no redundant redraw
 
             st.Shown = result.Text;
-            try { _overlay.Show(job.RegionId, result.Text); Interlocked.Increment(ref _shown); }
+            try { _overlay.Show(job.RegionId, result.Text, job.Text); Interlocked.Increment(ref _shown); }
             catch (Exception ex) { _log?.Invoke($"Overlay failed: {ex.Message}"); }
 
             var total = (Stopwatch.GetTimestamp() - job.CapturedTicks) * 1000.0 / Stopwatch.Frequency;

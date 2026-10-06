@@ -73,3 +73,15 @@ public class PipelineBehaviorTests
     public void Continuation_rules(string prev, string next, bool expected) =>
         Assert.Equal(expected, SentenceRules.LooksLikeContinuation(prev, next));
 }
+
+public class OverlaySinkTests
+{
+    [Fact]
+    public void Three_argument_show_falls_back_to_the_two_argument_one()
+    {
+        var ov = new RecordingOverlay();
+        IOverlaySink sink = ov;
+        sink.Show(1, "ar", "en");
+        Assert.Equal(new[] { "ar" }, ov.Shown.ToArray());
+    }
+}

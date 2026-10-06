@@ -1,7 +1,7 @@
 <Window x:Class="Flafyo.Desktop.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="FLAFYO GAME TRANSLATOR" Icon="Assets/flafyo.ico" Width="480" Height="1080" ResizeMode="CanMinimize"
+        Title="FLAFYO GAME TRANSLATOR" Icon="Assets/flafyo.ico" Width="480" Height="760" MinWidth="400" MinHeight="420" ResizeMode="CanResize"
         Background="#0E0F14" FlowDirection="RightToLeft" WindowStartupLocation="CenterScreen">
   <ScrollViewer VerticalScrollBarVisibility="Auto">
   <StackPanel Margin="24">
@@ -31,6 +31,8 @@
         </ComboBox>
         <CheckBox x:Name="MasculineBox" Content="صيغة المذكر في الترجمة" Foreground="White" Margin="0,10,0,0"
                   IsChecked="True" Checked="Masculine_Changed" Unchecked="Masculine_Changed"/>
+        <CheckBox x:Name="PreciseBox" Content="دقة أعلى (أبطأ 2–4 مرات، الحزمة الخفيفة فقط)" Foreground="White" Margin="0,8,0,0"
+                  IsChecked="False" Checked="Precise_Changed" Unchecked="Precise_Changed"/>
       </StackPanel>
     </Border>
 
@@ -46,6 +48,7 @@
       <ComboBoxItem Content="عادي"/>
       <ComboBoxItem Content="صغير (تكبير أكتر قبل القراءة)"/>
     </ComboBox>
+    <Button Content="شكل الترجمة: الخط واللون والحجم والمكان" Margin="0,14,0,0" Padding="8" Click="Appearance_Click"/>
     <Button x:Name="StartButton" Content="٢) ابدأ الترجمة" Margin="0,16,0,0" Padding="10" FontSize="15" Click="Start_Click"/>
     <Button x:Name="StopButton" Content="إيقاف" Margin="0,8,0,0" Padding="10" FontSize="15" IsEnabled="False" Click="Stop_Click"/>
     <TextBlock x:Name="HotkeyText" Text="اختصار التشغيل/الإيقاف من داخل اللعبة: Ctrl + Alt + T" Foreground="#9AA0B4" Margin="0,12,0,0" FontSize="12" TextWrapping="Wrap"/>

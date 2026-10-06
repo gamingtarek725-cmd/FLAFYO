@@ -150,6 +150,10 @@ public static class BuiltInIdioms
 
         foreach (var l in new[]
         {
+            "you will catch it = you will be punished",
+            "you'll catch it = you will be punished",
+            "beyond all dispute = without any doubt",
+            "beyond dispute = without any doubt",
             "watch out for * = be careful of *",
             "watch out = be careful",
             "bear with me = please be patient with me",

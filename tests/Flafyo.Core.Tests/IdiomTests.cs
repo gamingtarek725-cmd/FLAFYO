@@ -23,6 +23,8 @@ public class IdiomTests
 
     [Theory]
     [InlineData("Take cover!", "Hide!")]
+    [InlineData("You will catch it!", "You will be punished!")]
+    [InlineData("Beyond all dispute", "Without any doubt")]
     [InlineData("Watch out for the dog", "Be careful of the dog")]
     [InlineData("He took a breather", "He rested for a moment")]
     [InlineData("Stand your ground", "Refuse to retreat")]

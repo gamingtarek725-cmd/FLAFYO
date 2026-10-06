@@ -45,7 +45,16 @@ public partial class MainWindow : Window
         TextSizeBox.SelectedIndex = Math.Clamp(_settings.TextSizeIndex, 0, 2);
         PackBox.SelectedIndex = Math.Clamp(_settings.PackIndex, 0, 1);
         MasculineBox.IsChecked = _settings.Masculine;
+        PreciseBox.IsChecked = _settings.Precise;
         _masculine = _settings.Masculine;
+        // restore the last window size, but never bigger than the screen
+        if (_settings.WindowWidth >= MinWidth && _settings.WindowHeight >= MinHeight)
+        {
+            Width = _settings.WindowWidth; Height = _settings.WindowHeight;
+        }
+        var work = SystemParameters.WorkArea;
+        Width = Math.Min(Width, work.Width - 20);
+        Height = Math.Min(Height, work.Height - 20);
         _ready = true;
         UpdatePackStatus();
         SourceInitialized += OnSourceInitialized;
@@ -125,6 +134,40 @@ public partial class MainWindow : Window
         _settings.Masculine = _masculine; _settings.Save();
     }
 
+    // ---- translation strip appearance ----
+    private OverlayWindow EnsureOverlay()
+    {
+        _overlay ??= new OverlayWindow();
+        _overlay.ApplyStyle(_settings.Style);
+        return _overlay;
+    }
+
+    private System.Drawing.Rectangle PreviewRegion() =>
+        Region.Width >= 20 && Region.Height >= 10 ? Region : OverlayWindow.DefaultPreviewRegion();
+
+    private System.Drawing.Rectangle? PickOverlayArea()
+    {
+        var selector = new RegionSelectorWindow("اسحب بالماوس لتحديد مكان وحجم شريط الترجمة. Esc للإلغاء");
+        return selector.ShowDialog() == true ? selector.SelectedRegion : (System.Drawing.Rectangle?)null;
+    }
+
+    private void Appearance_Click(object sender, RoutedEventArgs e)
+    {
+        var overlay = EnsureOverlay();
+        var win = new AppearanceWindow(_settings.Style, PickOverlayArea,
+            changed: () => { _settings.Save(); overlay.ApplyStyle(_settings.Style); overlay.ShowPreview(PreviewRegion()); },
+            preview: () => overlay.ShowPreview(PreviewRegion()))
+        { Owner = this };
+        win.Closed += (_, _) => { if (_pipeline == null) overlay.Hide(); };
+        win.Show();
+    }
+
+    private void Precise_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_ready) return;
+        _settings.Precise = PreciseBox.IsChecked == true; _settings.Save();
+    }
+
     private void OpenFolder_Click(object sender, RoutedEventArgs e)
     {
         UserData.EnsureTemplates();
@@ -177,12 +220,11 @@ public partial class MainWindow : Window
             return;
         }
 
-        _overlay ??= new OverlayWindow();
-        var sink = new WpfOverlaySink(_overlay, () => Region);
+        var sink = new WpfOverlaySink(EnsureOverlay(), () => Region);
 
         // chosen pack → (if missing) the other pack → (if none) the temporary online service
         int threads = SpeedBox.SelectedIndex == 0 ? 1 : 2;   // few CPU threads: the game keeps priority
-        int beams = SpeedBox.SelectedIndex == 0 ? 1 : 3;
+        int beams = SpeedBox.SelectedIndex != 0 && PreciseBox.IsChecked == true ? 3 : 1;   // beam search only on request
         var chosen = PackBox.SelectedIndex == 1 ? LanguagePack.Heavy : LanguagePack.Light;
         var other = chosen.Kind == PackKind.Heavy ? LanguagePack.Light : LanguagePack.Heavy;
         var pack = chosen.IsInstalled() ? chosen : other.IsInstalled() ? other : null;
@@ -267,6 +309,10 @@ public partial class MainWindow : Window
 
     protected override void OnClosed(EventArgs e)
     {
+        if (WindowState == WindowState.Normal && ActualWidth > 0)
+        {
+            _settings.WindowWidth = ActualWidth; _settings.WindowHeight = ActualHeight; _settings.Save();
+        }
         if (_hwnd != IntPtr.Zero) UnregisterHotKey(_hwnd, HotkeyId);
         _capture?.Dispose();
         _overlay?.Close();
