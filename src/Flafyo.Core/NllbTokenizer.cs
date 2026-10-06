@@ -3,10 +3,10 @@ using System.Text.Json;
 
 namespace Flafyo.Core;
 
-/// <summary>Tokenizer for NLLB-200 models, built from the model's tokenizer.json (Unigram vocabulary + language codes).</summary>
+/// <summary>Tokenizer for NLLB-200 models, built from the model's tokenizer.json (BPE or Unigram vocabulary + language codes).</summary>
 public sealed class NllbTokenizer
 {
-    private readonly SentencePieceUnigram _spm;
+    private readonly Func<string, IEnumerable<string>> _segment;
     private readonly Dictionary<string, int> _pieceToId = new(StringComparer.Ordinal);
     private readonly Dictionary<int, string> _idToPiece = new();
     private readonly Dictionary<string, int> _special = new(StringComparer.Ordinal);
@@ -16,11 +16,12 @@ public sealed class NllbTokenizer
     public int Eos { get; }
     public int Pad { get; }
     public int MaxId { get; }
+    public string Kind { get; }
     public bool IsSpecial(int id) => id < 4 || _specialIds.Contains(id);
 
-    private NllbTokenizer(SentencePieceUnigram spm, int unk, int eos, int pad, int maxId)
+    private NllbTokenizer(Func<string, IEnumerable<string>> segment, string kind, int unk, int eos, int pad, int maxId)
     {
-        _spm = spm; Unk = unk; Eos = eos; Pad = pad; MaxId = maxId;
+        _segment = segment; Kind = kind; Unk = unk; Eos = eos; Pad = pad; MaxId = maxId;
     }
 
     public static NllbTokenizer Load(string tokenizerJsonPath) =>
@@ -30,6 +31,7 @@ public sealed class NllbTokenizer
     {
         using var doc = JsonDocument.Parse(json);
         var root = doc.RootElement;
+
         var special = new Dictionary<string, int>(StringComparer.Ordinal);
         var specialIds = new HashSet<int>();
         int maxId = 0;
@@ -44,26 +46,57 @@ public sealed class NllbTokenizer
 
         var model = root.GetProperty("model");
         var type = model.TryGetProperty("type", out var ty) ? ty.GetString() : "Unigram";
-        if (type != "Unigram") throw new NotSupportedException("Unsupported tokenizer type: " + type);
-        int unk = model.TryGetProperty("unk_id", out var u) && u.ValueKind == JsonValueKind.Number ? u.GetInt32() : 3;
-
-        var pieces = new List<(string, float)>();
         var pieceToId = new Dictionary<string, int>(StringComparer.Ordinal);
         var idToPiece = new Dictionary<int, string>();
-        int index = 0;
-        foreach (var item in model.GetProperty("vocab").EnumerateArray())
+        Func<string, IEnumerable<string>> segment;
+        int unk = 3;
+
+        if (type == "Unigram")
         {
-            var piece = item[0].GetString() ?? "";
-            var score = (float)item[1].GetDouble();
-            pieceToId[piece] = index; idToPiece[index] = piece;
-            if (index >= 4 && !specialIds.Contains(index)) pieces.Add((piece, score));   // specials are never produced by segmentation
-            index++;
+            if (model.TryGetProperty("unk_id", out var u) && u.ValueKind == JsonValueKind.Number) unk = u.GetInt32();
+            var pieces = new List<(string, float)>();
+            int index = 0;
+            foreach (var item in model.GetProperty("vocab").EnumerateArray())
+            {
+                var piece = item[0].GetString() ?? "";
+                var score = (float)item[1].GetDouble();
+                pieceToId[piece] = index; idToPiece[index] = piece;
+                if (index >= 4 && !specialIds.Contains(index)) pieces.Add((piece, score));   // specials are never produced by segmentation
+                index++;
+            }
+            if (index - 1 > maxId) maxId = index - 1;
+            var spm = new SentencePieceUnigram(pieces);
+            segment = spm.Segment;
         }
-        if (index - 1 > maxId) maxId = index - 1;
+        else if (type == "BPE")
+        {
+            foreach (var p in model.GetProperty("vocab").EnumerateObject())
+            {
+                int id = p.Value.GetInt32();
+                pieceToId[p.Name] = id; idToPiece[id] = p.Name;
+                if (id > maxId) maxId = id;
+            }
+            var merges = new List<(string, string)>();
+            foreach (var m in model.GetProperty("merges").EnumerateArray())
+            {
+                if (m.ValueKind == JsonValueKind.String)
+                {
+                    var s = m.GetString() ?? "";
+                    int sp = s.IndexOf(' ');
+                    if (sp > 0) merges.Add((s[..sp], s[(sp + 1)..]));
+                }
+                else if (m.ValueKind == JsonValueKind.Array && m.GetArrayLength() >= 2)
+                    merges.Add((m[0].GetString() ?? "", m[1].GetString() ?? ""));
+            }
+            var unkToken = model.TryGetProperty("unk_token", out var ut) && ut.ValueKind == JsonValueKind.String ? ut.GetString() : "<unk>";
+            if (unkToken != null && pieceToId.TryGetValue(unkToken, out var uid)) unk = uid;
+            segment = new BpeModel(merges).Segment;
+        }
+        else throw new NotSupportedException("Unsupported tokenizer type: " + type);
 
         int eos = special.TryGetValue("</s>", out var e) ? e : 2;
-        int pad = special.TryGetValue("<pad>", out var p) ? p : 1;
-        var tok = new NllbTokenizer(new SentencePieceUnigram(pieces), unk, eos, pad, maxId);
+        int pad = special.TryGetValue("<pad>", out var pd) ? pd : 1;
+        var tok = new NllbTokenizer(segment, type ?? "?", unk, eos, pad, maxId);
         foreach (var kv in pieceToId) tok._pieceToId[kv.Key] = kv.Value;
         foreach (var kv in idToPiece) tok._idToPiece[kv.Key] = kv.Value;
         foreach (var kv in special) tok._special[kv.Key] = kv.Value;
@@ -78,8 +111,11 @@ public sealed class NllbTokenizer
     public int[] Encode(string text, string srcLang)
     {
         var ids = new List<int> { LangId(srcLang) };
-        foreach (var piece in _spm.Segment(MarianTokenizer.Normalize(text)))
-            ids.Add(_pieceToId.TryGetValue(piece, out var id) ? id : Unk);
+        foreach (var piece in _segment(MarianTokenizer.Normalize(text)))
+        {
+            if (_pieceToId.TryGetValue(piece, out var id)) ids.Add(id);
+            else if (ids[^1] != Unk) ids.Add(Unk);                 // unknown characters are merged into one <unk>
+        }
         ids.Add(Eos);
         return ids.ToArray();
     }

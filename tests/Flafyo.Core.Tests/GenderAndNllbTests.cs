@@ -68,5 +68,34 @@ public class NllbTokenizerTests
 
     [Fact]
     public void Unsupported_tokenizer_type_is_reported() =>
-        Assert.Throws<NotSupportedException>(() => NllbTokenizer.FromJson(@"{""model"":{""type"":""BPE"",""vocab"":{}}}"));
+        Assert.Throws<NotSupportedException>(() => NllbTokenizer.FromJson(@"{""model"":{""type"":""WordPiece"",""vocab"":{}}}"));
+}
+
+public class NllbBpeTokenizerTests
+{
+    private const string Json = @"{
+      ""added_tokens"": [
+        {""id"":0,""content"":""<s>""},{""id"":1,""content"":""<pad>""},{""id"":2,""content"":""</s>""},{""id"":3,""content"":""<unk>""},
+        {""id"":20,""content"":""eng_Latn""},{""id"":21,""content"":""arb_Arab""}],
+      ""model"": {""type"":""BPE"",""unk_token"":""<unk>"",
+        ""vocab"": {""<s>"":0,""<pad>"":1,""</s>"":2,""<unk>"":3,""▁"":4,""h"":5,""e"":6,""l"":7,""o"":8,
+                    ""▁h"":9,""el"":10,""lo"":11,""ello"":12,""▁hello"":13},
+        ""merges"": [""▁ h"", ""e l"", [""l"", ""o""], ""el lo"", ""▁h ello""]}}";
+
+    [Fact]
+    public void Bpe_merges_a_word_into_one_piece_and_handles_both_merge_formats()
+    {
+        var tok = NllbTokenizer.FromJson(Json);
+        Assert.Equal("BPE", tok.Kind);
+        Assert.Equal(new[] { 20, 13, 2 }, tok.Encode("hello", "eng_Latn"));
+        Assert.Equal(new[] { 20, 13, 13, 2 }, tok.Encode("hello   hello", "eng_Latn"));
+    }
+
+    [Fact]
+    public void Bpe_unknown_characters_become_a_single_unk() =>
+        Assert.Equal(new[] { 20, 4, 3, 2 }, NllbTokenizer.FromJson(Json).Encode("@@", "eng_Latn"));
+
+    [Fact]
+    public void Bpe_decode_restores_text() =>
+        Assert.Equal("hello hello", NllbTokenizer.FromJson(Json).Decode(new[] { 21, 13, 13, 2 }));
 }
