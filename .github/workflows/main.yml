@@ -28,10 +28,11 @@ jobs:
         with:
           name: FLAFYO-Setup
           path: installer-out/FLAFYO-GAME-TRANSLATOR-Setup.exe
-      - name: Download offline language pack (for the real-model test)
+      - name: Download light language pack (for the real-model test)
         continue-on-error: true
         shell: pwsh
         run: |
+          $ProgressPreference = 'SilentlyContinue'
           $base = "https://huggingface.co/Xenova/opus-mt-en-ar/resolve/63765349ac9f6c43f6e5bd8c0a5583224cfd8587"
           $dir = Join-Path $env:RUNNER_TEMP "model"
           New-Item -ItemType Directory -Force (Join-Path $dir "onnx") | Out-Null
@@ -39,6 +40,21 @@ jobs:
             Invoke-WebRequest "$base/$f" -OutFile (Join-Path $dir $f)
           }
           "FLAFYO_MODEL_DIR=$dir" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-      - name: Real offline translation test
+      - name: Real light translation test
         continue-on-error: true
-        run: dotnet test tests/Flafyo.Core.Tests -c Release --filter "FullyQualifiedName~Integration" --logger "console;verbosity=detailed"
+        run: dotnet test tests/Flafyo.Core.Tests -c Release --filter "FullyQualifiedName~OnnxMarianIntegration" --logger "console;verbosity=detailed"
+      - name: Download heavy language pack (for the heavy-model test)
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          $ProgressPreference = 'SilentlyContinue'
+          $base = "https://huggingface.co/Xenova/nllb-200-distilled-600M/resolve/bfaad393bfa9f83f73fb0ddaeb21f42d3323e821"
+          $dir = Join-Path $env:RUNNER_TEMP "heavy"
+          New-Item -ItemType Directory -Force (Join-Path $dir "onnx") | Out-Null
+          foreach ($f in "config.json","generation_config.json","tokenizer.json","onnx/encoder_model_quantized.onnx","onnx/decoder_model_merged_quantized.onnx") {
+            Invoke-WebRequest "$base/$f" -OutFile (Join-Path $dir $f)
+          }
+          "FLAFYO_HEAVY_MODEL_DIR=$dir" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Real heavy translation test
+        continue-on-error: true
+        run: dotnet test tests/Flafyo.Core.Tests -c Release --filter "FullyQualifiedName~OnnxNllbHeavyIntegration" --logger "console;verbosity=detailed"
