@@ -22,17 +22,18 @@ public partial class AppearanceWindow : Window
 
     private readonly OverlayStyle _s;
     private readonly Func<System.Drawing.Rectangle?> _pickArea;
-    private readonly Action _changed, _preview;
+    private readonly Action _changed, _preview, _previewScreen;
     private bool _loading = true;
 
-    public AppearanceWindow(OverlayStyle style, Func<System.Drawing.Rectangle?> pickArea, Action changed, Action preview)
+    public AppearanceWindow(OverlayStyle style, Func<System.Drawing.Rectangle?> pickArea, Action changed, Action preview, Action previewScreen)
     {
         InitializeComponent();
-        _s = style; _pickArea = pickArea; _changed = changed; _preview = preview;
+        _s = style; _pickArea = pickArea; _changed = changed; _preview = preview; _previewScreen = previewScreen;
         FillFonts();
         FillColors(TextColorBox, TextColors);
         FillColors(BackColorBox, BackColors);
         FillColors(BorderColorBox, TextColors);
+        FillColors(HeadingColorBox, TextColors);
         LoadFromStyle();
         _loading = false;
         Loaded += (_, _) => _preview();
@@ -99,6 +100,10 @@ public partial class AppearanceWindow : Window
         WidthSlider.Value = _s.AutoWidthPx;
         HideSlider.Value = _s.AutoHideSeconds;
         OriginalCheck.IsChecked = _s.ShowOriginal;
+        SelectColor(HeadingColorBox, _s.HeadingTextColor);
+        HeadingScaleSlider.Value = _s.HeadingScalePercent;
+        HeadingBoldCheck.IsChecked = _s.HeadingBold;
+        AutoFitCheck.IsChecked = _s.AutoFit;
         UpdateLabels();
     }
 
@@ -118,6 +123,10 @@ public partial class AppearanceWindow : Window
         _s.AutoWidthPx = (int)WidthSlider.Value;
         _s.AutoHideSeconds = (int)HideSlider.Value;
         _s.ShowOriginal = OriginalCheck.IsChecked == true;
+        _s.HeadingTextColor = ColorOf(HeadingColorBox, _s.HeadingTextColor);
+        _s.HeadingScalePercent = (int)HeadingScaleSlider.Value;
+        _s.HeadingBold = HeadingBoldCheck.IsChecked == true;
+        _s.AutoFit = AutoFitCheck.IsChecked == true;
     }
 
     private void UpdateLabels()
@@ -125,6 +134,7 @@ public partial class AppearanceWindow : Window
         SizeLabel.Text = $"{SizeSlider.Value:0}";
         OpacityLabel.Text = $"{OpacitySlider.Value:0}%";
         WidthLabel.Text = WidthSlider.Value < 1 ? "نفس عرض منطقة النص" : $"{WidthSlider.Value:0} بكسل";
+        HeadingScaleLabel.Text = $"{HeadingScaleSlider.Value:0}%";
         HideLabel.Text = HideSlider.Value < 1 ? "لا تختفي" : $"{HideSlider.Value:0} ثانية";
         AreaText.Text = _s.AreaW >= 100 ? $"المكان المحدد: {_s.AreaW}×{_s.AreaH} بكسل" : "لم يتم تحديد مكان بعد";
         AreaButton.IsEnabled = true;
@@ -152,6 +162,7 @@ public partial class AppearanceWindow : Window
     }
 
     private void Preview_Click(object sender, RoutedEventArgs e) => _preview();
+    private void PreviewScreen_Click(object sender, RoutedEventArgs e) => _previewScreen();
 
     private void Reset_Click(object sender, RoutedEventArgs e)
     {

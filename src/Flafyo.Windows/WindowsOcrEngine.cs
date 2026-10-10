@@ -8,10 +8,10 @@ namespace Flafyo.Windows;
 
 /// <summary>
 /// Offline OCR built into Windows 10/11 (needs the language's OCR pack, English by default).
-/// Small text is enlarged first, contrast is stretched, and light-on-dark text is inverted, which makes Windows OCR far
-/// more reliable on game subtitles.
+/// Small text is enlarged first (big screens are shrunk to the OCR limit), contrast is stretched, and light-on-dark text
+/// is inverted, which makes Windows OCR far more reliable on game text. Also returns the position of every text line.
 /// </summary>
-public sealed class WindowsOcrEngine : IOcrEngine
+public sealed class WindowsOcrEngine : IOcrEngine, IOcrLayoutEngine
 {
     private readonly OcrEngine? _engine;
     private volatile int _scale;
@@ -30,19 +30,55 @@ public sealed class WindowsOcrEngine : IOcrEngine
 
     public async Task<string> RecognizeAsync(Frame f, CancellationToken ct)
     {
+        var (result, _) = await RunAsync(f, ct).ConfigureAwait(false);
+        return result.Text;
+    }
+
+    public async Task<IReadOnlyList<OcrTextLine>> RecognizeLayoutAsync(Frame f, CancellationToken ct)
+    {
+        var (result, factor) = await RunAsync(f, ct).ConfigureAwait(false);
+        var lines = new List<OcrTextLine>();
+        foreach (var line in result.Lines)
+        {
+            var words = line.Words
+                .Select(w => (Text: w.Text, X: w.BoundingRect.X, Y: w.BoundingRect.Y, W: w.BoundingRect.Width, H: w.BoundingRect.Height))
+                .OrderBy(w => w.X).ToList();
+            if (words.Count == 0) continue;
+            double lineH = words.Average(w => w.H);
+
+            var seg = new List<(string Text, double X, double Y, double W, double H)>();
+            void Flush()
+            {
+                if (seg.Count == 0) return;
+                double x0 = seg.Min(s => s.X), y0 = seg.Min(s => s.Y), x1 = seg.Max(s => s.X + s.W), y1 = seg.Max(s => s.Y + s.H);
+                lines.Add(new OcrTextLine(string.Join(" ", seg.Select(s => s.Text)),
+                    new System.Drawing.Rectangle((int)(x0 / factor), (int)(y0 / factor), (int)((x1 - x0) / factor), (int)((y1 - y0) / factor))));
+                seg.Clear();
+            }
+            foreach (var w in words)
+            {
+                // a big horizontal gap means another column / another UI element on the same row
+                if (seg.Count > 0 && w.X - (seg[^1].X + seg[^1].W) > lineH * 1.8) Flush();
+                seg.Add(w);
+            }
+            Flush();
+        }
+        return lines;
+    }
+
+    private async Task<(OcrResult Result, double Factor)> RunAsync(Frame f, CancellationToken ct)
+    {
         if (_engine == null) throw new InvalidOperationException("Windows OCR language pack is not installed.");
         int max = (int)OcrEngine.MaxImageDimension;
-        if (f.Width > max || f.Height > max) throw new InvalidOperationException("Region is too large for OCR.");
-
-        var (data, w, h) = Preprocess(f, max);
+        var (data, w, h, factor) = Preprocess(f, max);
         var writer = new DataWriter();
         writer.WriteBytes(data);
         using var bitmap = SoftwareBitmap.CreateCopyFromBuffer(writer.DetachBuffer(), BitmapPixelFormat.Gray8, w, h);
         var result = await _engine.RecognizeAsync(bitmap).AsTask(ct).ConfigureAwait(false);
-        return result.Text;
+        return (result, factor);
     }
 
-    private (byte[] Data, int W, int H) Preprocess(Frame f, int maxDim)
+    private (byte[] Data, int W, int H, double Factor) Preprocess(Frame f, int maxDim)
     {
         var src = f.Gray;
         int n = f.Width * f.Height;
@@ -63,24 +99,28 @@ public sealed class WindowsOcrEngine : IOcrEngine
         if (AutoInvert && sum / Math.Max(1, n) < 110)
             for (int i = 0; i < n; i++) buf[i] = (byte)(255 - buf[i]);
 
-        // 3) enlarge small text (bilinear), never beyond the OCR size limit
-        int factor = Math.Min(_scale, Math.Max(1, maxDim / Math.Max(f.Width, f.Height)));
-        if (factor <= 1) return (buf, f.Width, f.Height);
-        return (Upscale(buf, f.Width, f.Height, factor), f.Width * factor, f.Height * factor);
+        // 3) enlarge small text, or shrink pictures that are bigger than the OCR limit
+        double factor = Math.Min(_scale, (double)maxDim / Math.Max(f.Width, f.Height));
+        if (factor > 1.05 || factor < 0.95)
+        {
+            int W = Math.Max(8, Math.Min(maxDim, (int)Math.Round(f.Width * factor)));
+            int H = Math.Max(8, Math.Min(maxDim, (int)Math.Round(f.Height * factor)));
+            return (Resize(buf, f.Width, f.Height, W, H), W, H, (double)W / f.Width);
+        }
+        return (buf, f.Width, f.Height, 1.0);
     }
 
-    private static byte[] Upscale(byte[] src, int w, int h, int k)
+    private static byte[] Resize(byte[] src, int w, int h, int W, int H)
     {
-        int W = w * k, H = h * k;
         var dst = new byte[W * H];
         for (int y = 0; y < H; y++)
         {
-            float sy = (y + 0.5f) / k - 0.5f;
+            float sy = (y + 0.5f) * h / H - 0.5f;
             int y0 = Math.Clamp((int)MathF.Floor(sy), 0, h - 1), y1 = Math.Min(y0 + 1, h - 1);
             float fy = Math.Clamp(sy - y0, 0f, 1f);
             for (int x = 0; x < W; x++)
             {
-                float sx = (x + 0.5f) / k - 0.5f;
+                float sx = (x + 0.5f) * w / W - 0.5f;
                 int x0 = Math.Clamp((int)MathF.Floor(sx), 0, w - 1), x1 = Math.Min(x0 + 1, w - 1);
                 float fx = Math.Clamp(sx - x0, 0f, 1f);
                 float top = src[y0 * w + x0] * (1 - fx) + src[y0 * w + x1] * fx;

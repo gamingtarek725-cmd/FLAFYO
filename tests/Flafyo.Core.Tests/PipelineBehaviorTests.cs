@@ -65,6 +65,56 @@ public class PipelineBehaviorTests
         await p.DisposeAsync();
     }
 
+    [Fact]
+    public async Task Translation_is_not_cleared_by_a_few_empty_reads_while_the_camera_moves()
+    {
+        var ocr = new FakeOcr(); var tr = new FakeTranslator(); var ov = new RecordingOverlay();
+        await using var p = new TranslationPipeline(ocr, new TranslationResolver(tr, new TranslationCache()), ov,
+            new PipelineOptions { SettleDelay = TimeSpan.FromMilliseconds(30), ClearDelay = TimeSpan.FromMilliseconds(700) });
+        p.Start();
+        ocr.ByFrame[1] = ("Hello there friend", 0);
+        ocr.ByFrame[2] = ("", 0); ocr.ByFrame[3] = ("xx", 0);             // blur/motion: nothing readable
+        ocr.ByFrame[4] = ("Hello there friend", 0);                        // readable again
+        p.Submit(F(1, 10));
+        Assert.True(await WaitUntil(() => ov.Shown.Count == 1));
+        p.Submit(F(2, 90)); await Task.Delay(60);
+        p.Submit(F(3, 160)); await Task.Delay(60);
+        p.Submit(F(4, 230));
+        await Task.Delay(1200);
+        Assert.Equal(0, ov.Clears);                                         // never flickered away
+        Assert.Single(ov.Shown);                                            // and was not translated again
+    }
+
+    [Fact]
+    public async Task Translation_is_cleared_when_the_text_really_disappears()
+    {
+        var ocr = new FakeOcr(); var tr = new FakeTranslator(); var ov = new RecordingOverlay();
+        await using var p = new TranslationPipeline(ocr, new TranslationResolver(tr, new TranslationCache()), ov,
+            new PipelineOptions { SettleDelay = TimeSpan.FromMilliseconds(30), ClearDelay = TimeSpan.FromMilliseconds(300) });
+        p.Start();
+        ocr.ByFrame[1] = ("Hello there friend", 0);
+        ocr.ByFrame[2] = ("", 0);
+        p.Submit(F(1, 10));
+        Assert.True(await WaitUntil(() => ov.Shown.Count == 1));
+        p.Submit(F(2, 200));
+        Assert.True(await WaitUntil(() => ov.Clears >= 1));
+    }
+
+    [Theory]
+    [InlineData("Find the key", true)]
+    [InlineData("I am", true)]
+    [InlineData("Press E to open", true)]
+    [InlineData("ke tt", false)]
+    [InlineData("#$% 12", false)]
+    [InlineData("", false)]
+    public void Garbage_is_not_text(string s, bool expected) => Assert.Equal(expected, TextQuality.LooksLikeText(s));
+
+    [Theory]
+    [InlineData("Find the golden key quickly", "Find the golden kcy quickly", true)]   // one misread letter
+    [InlineData("Find the golden key", "Find the golden key now", false)]              // text grew
+    [InlineData("Find the golden key quickly", "Open the silver door slowly", false)]
+    public void Jitter_detection(string a, string b, bool expected) => Assert.Equal(expected, TextQuality.IsJitterOf(a, b));
+
     [Theory]
     [InlineData("I don't know what to do about", "the situation.", true)]
     [InlineData("I don't know what to do about", "The situation.", false)]   // new sentence

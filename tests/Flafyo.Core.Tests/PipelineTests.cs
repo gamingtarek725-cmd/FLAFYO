@@ -32,7 +32,8 @@ internal sealed class RecordingOverlay : IOverlaySink
 {
     public ConcurrentQueue<string> Shown { get; } = new();
     public void Show(int regionId, string translated) => Shown.Enqueue(translated);
-    public void Clear(int regionId) { }
+    public int Clears;
+    public void Clear(int regionId) => Interlocked.Increment(ref Clears);
 }
 
 public class PipelineTests

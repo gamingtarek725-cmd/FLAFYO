@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
+using System.Windows.Threading;
 using Flafyo.Core;
 using Flafyo.Windows;
 
@@ -13,11 +14,12 @@ namespace Flafyo.Desktop;
 
 public partial class MainWindow : Window
 {
-    private const int HotkeyId = 0xF1A, WmHotkey = 0x0312;
-    private const uint ModAlt = 0x1, ModControl = 0x2, ModNoRepeat = 0x4000, VkT = 0x54;
+    private const int HotkeyToggle = 0xF1A, HotkeyScan = 0xF1B, HotkeyCards = 0xF1C, WmHotkey = 0x0312;
+    private const uint ModAlt = 0x1, ModControl = 0x2, ModNoRepeat = 0x4000, VkT = 0x54, VkS = 0x53, VkH = 0x48;
 
     [DllImport("user32.dll")] private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint modifiers, uint vk);
     [DllImport("user32.dll")] private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+    [DllImport("user32.dll")] private static extern int GetSystemMetrics(int index);
 
     private object _regionBox = System.Drawing.Rectangle.Empty;   // boxed so reads/writes are atomic across threads
     private volatile int _intervalMs = 200;
@@ -26,8 +28,11 @@ public partial class MainWindow : Window
     private readonly AppSettings _settings = AppSettings.Load();
     private bool _ready;
     private OverlayWindow? _overlay;
+    private ScreenOverlayWindow? _screenWindow;
     private TranslationPipeline? _pipeline;
+    private ScreenPipeline? _screen;
     private RegionCaptureWorker? _capture;
+    private IScreenGrabber? _grabber;
     private ITranslator? _translator;
     private bool _downloading;
     private IntPtr _hwnd;
@@ -44,9 +49,13 @@ public partial class MainWindow : Window
         SpeedBox.SelectedIndex = Math.Clamp(_settings.SpeedIndex, 0, 2);
         TextSizeBox.SelectedIndex = Math.Clamp(_settings.TextSizeIndex, 0, 2);
         PackBox.SelectedIndex = Math.Clamp(_settings.PackIndex, 0, 1);
+        ModeBox.SelectedIndex = Math.Clamp(_settings.ModeIndex, 0, 1);
+        CaptureBox.SelectedIndex = Math.Clamp(_settings.CaptureIndex, 0, 1);
+        ContinuousBox.IsChecked = _settings.Continuous;
         MasculineBox.IsChecked = _settings.Masculine;
         PreciseBox.IsChecked = _settings.Precise;
         _masculine = _settings.Masculine;
+
         // restore the last window size, but never bigger than the screen
         if (_settings.WindowWidth >= MinWidth && _settings.WindowHeight >= MinHeight)
         {
@@ -61,6 +70,7 @@ public partial class MainWindow : Window
     }
 
     private System.Drawing.Rectangle Region => (System.Drawing.Rectangle)Volatile.Read(ref _regionBox);
+    private bool ScreenMode => ModeBox.SelectedIndex == 1;
 
     private void SetStatus(string s) => Dispatcher.InvokeAsync(() => StatusText.Text = s);
 
@@ -74,25 +84,36 @@ public partial class MainWindow : Window
             _ => $"⚠️ فشل تحميل المحرك: {error}"
         });
 
-    // ---- global hotkey (registered with Windows; no keyboard hook, game input is untouched) ----
+    // ---- global hotkeys (registered with Windows; no keyboard hook, game input is untouched) ----
     private void OnSourceInitialized(object? sender, EventArgs e)
     {
         var src = (HwndSource)PresentationSource.FromVisual(this);
         _hwnd = src.Handle;
         src.AddHook(WndProc);
-        if (!RegisterHotKey(_hwnd, HotkeyId, ModControl | ModAlt | ModNoRepeat, VkT))
-            HotkeyText.Text = "تعذّر تسجيل الاختصار (برنامج تاني بيستخدمه). استخدم الأزرار.";
+        const uint mods = ModControl | ModAlt | ModNoRepeat;
+        bool ok = RegisterHotKey(_hwnd, HotkeyToggle, mods, VkT);
+        RegisterHotKey(_hwnd, HotkeyScan, mods, VkS);
+        RegisterHotKey(_hwnd, HotkeyCards, mods, VkH);
+        if (!ok) HotkeyText.Text = "تعذّر تسجيل الاختصارات (برنامج تاني بيستخدمها). استخدم الأزرار.";
     }
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
-        if (msg == WmHotkey && wParam.ToInt32() == HotkeyId) { handled = true; ToggleTranslation(); }
+        if (msg == WmHotkey)
+        {
+            switch (wParam.ToInt32())
+            {
+                case HotkeyToggle: handled = true; ToggleTranslation(); break;
+                case HotkeyScan: handled = true; _screen?.ScanNow(); break;
+                case HotkeyCards: handled = true; _screenWindow?.ToggleVisible(); break;
+            }
+        }
         return IntPtr.Zero;
     }
 
     private async void ToggleTranslation()
     {
-        if (_pipeline == null) StartTranslation(); else await StopAsync();
+        if (_pipeline == null && _screen == null) StartTranslation(); else await StopAsync();
     }
 
     // ---- language packs ----
@@ -134,6 +155,24 @@ public partial class MainWindow : Window
         _settings.Masculine = _masculine; _settings.Save();
     }
 
+    private void Mode_Changed(object sender, SelectionChangedEventArgs e)
+    {
+        if (!_ready) return;
+        _settings.ModeIndex = ModeBox.SelectedIndex; _settings.Save();
+    }
+
+    private void Capture_Changed(object sender, SelectionChangedEventArgs e)
+    {
+        if (!_ready) return;
+        _settings.CaptureIndex = CaptureBox.SelectedIndex; _settings.Save();
+    }
+
+    private void Continuous_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_ready) return;
+        _settings.Continuous = ContinuousBox.IsChecked == true; _settings.Save();
+    }
+
     // ---- translation strip appearance ----
     private OverlayWindow EnsureOverlay()
     {
@@ -141,6 +180,8 @@ public partial class MainWindow : Window
         _overlay.ApplyStyle(_settings.Style);
         return _overlay;
     }
+
+    private ScreenOverlayWindow EnsureScreenWindow() => _screenWindow ??= new ScreenOverlayWindow();
 
     private System.Drawing.Rectangle PreviewRegion() =>
         Region.Width >= 20 && Region.Height >= 10 ? Region : OverlayWindow.DefaultPreviewRegion();
@@ -151,14 +192,44 @@ public partial class MainWindow : Window
         return selector.ShowDialog() == true ? selector.SelectedRegion : (System.Drawing.Rectangle?)null;
     }
 
+    private void PreviewScreenCards()
+    {
+        int w = GetSystemMetrics(0), h = GetSystemMetrics(1);
+        var heading = new ScreenBlock(" ", new System.Drawing.Rectangle(w / 2 - 300, h / 3, 360, 40), BlockKind.Heading, 34);
+        var body1 = new ScreenBlock(" ", new System.Drawing.Rectangle(w / 2 - 300, h / 3 + 56, 420, 26), BlockKind.Body, 22);
+        var body2 = new ScreenBlock(" ", new System.Drawing.Rectangle(w / 2 - 300, h / 3 + 90, 420, 26), BlockKind.Body, 22);
+        var sample = new List<TranslatedBlock>
+        {
+            new(heading, "المهام المطلوبة"),
+            new(body1, "اعثر على المفتاح الذهبي"),
+            new(body2, "تحدث مع الحارس عند البوابة"),
+        };
+        var win = EnsureScreenWindow();
+        win.ShowBlocks(sample, new System.Drawing.Rectangle(0, 0, w, h), _settings.Style);
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(7) };
+        timer.Tick += (_, _) => { timer.Stop(); if (_screen == null) win.ClearAll(); };
+        timer.Start();
+    }
+
     private void Appearance_Click(object sender, RoutedEventArgs e)
     {
         var overlay = EnsureOverlay();
         var win = new AppearanceWindow(_settings.Style, PickOverlayArea,
             changed: () => { _settings.Save(); overlay.ApplyStyle(_settings.Style); overlay.ShowPreview(PreviewRegion()); },
-            preview: () => overlay.ShowPreview(PreviewRegion()))
+            preview: () => overlay.ShowPreview(PreviewRegion()),
+            previewScreen: PreviewScreenCards)
         { Owner = this };
         win.Closed += (_, _) => { if (_pipeline == null) overlay.Hide(); };
+        win.Show();
+    }
+
+    private void GameFiles_Click(object sender, RoutedEventArgs e)
+    {
+        var win = new GameFilesWindow(_settings, () =>
+        {
+            var (resolver, translator, _) = BuildTranslation(threads: 4, beams: 1);
+            return (resolver, translator);
+        }) { Owner = this };
         win.Show();
     }
 
@@ -205,31 +276,15 @@ public partial class MainWindow : Window
 
     private int TextScale() => TextSizeBox.SelectedIndex switch { 0 => 1, 2 => 3, _ => 2 };
 
-    // ---- start / stop ----
-    private void Start_Click(object sender, RoutedEventArgs e) => StartTranslation();
-
-    private void StartTranslation()
+    // ---- the translator (shared by region mode, screen mode and game files) ----
+    private (TranslationResolver Resolver, ITranslator Translator, string Mode) BuildTranslation(int threads, int beams)
     {
-        if (_pipeline != null) return;
-        if (Region.Width < 20 || Region.Height < 10) { StatusText.Text = "اختر منطقة النص أولًا (الزر الأول)"; return; }
-
-        var ocr = new WindowsOcrEngine("en-US", TextScale());
-        if (!ocr.IsAvailable)
-        {
-            StatusText.Text = "حزمة OCR الإنجليزية غير مثبتة: Settings ← Time & language ← Language & region ← أضف English";
-            return;
-        }
-
-        var sink = new WpfOverlaySink(EnsureOverlay(), () => Region);
-
         // chosen pack → (if missing) the other pack → (if none) the temporary online service
-        int threads = SpeedBox.SelectedIndex == 0 ? 1 : 2;   // few CPU threads: the game keeps priority
-        int beams = SpeedBox.SelectedIndex != 0 && PreciseBox.IsChecked == true ? 3 : 1;   // beam search only on request
         var chosen = PackBox.SelectedIndex == 1 ? LanguagePack.Heavy : LanguagePack.Light;
         var other = chosen.Kind == PackKind.Heavy ? LanguagePack.Light : LanguagePack.Heavy;
         var pack = chosen.IsInstalled() ? chosen : other.IsInstalled() ? other : null;
 
-        ITranslator inner; string modeText;
+        ITranslator inner; string mode;
         if (pack != null)
         {
             var backup = pack == chosen ? other : chosen;
@@ -239,22 +294,58 @@ public partial class MainWindow : Window
                 () => backupInstalled ? backup.CreateTranslator(threads, beams) : new OnlineTranslator("en", "ar"));
             lazy.EngineReady += (eng, err) => ShowEngine(eng, err, pack.ShortName);
             ShowEngine(lazy.Engine, lazy.Error, pack.ShortName);   // in case it finished before we subscribed
-            inner = lazy; modeText = "بدون إنترنت";
+            inner = lazy; mode = "بدون إنترنت";
         }
         else
         {
             inner = new OnlineTranslator("en", "ar");
             ShowEngine("online", null, "");
-            modeText = "بالإنترنت (مؤقتًا)";
+            mode = "بالإنترنت (مؤقتًا)";
         }
 
         // the user's own masculine.txt is added to the built-in list
         try { _masculineMap = ArabicGender.ParseUserFile(File.ReadAllLines(UserData.MasculineFile)); } catch { }
-        _translator = new PostProcessTranslator(inner, s => _masculine ? ArabicGender.MakeMasculine(s, _masculineMap) : s);
+        var translator = new PostProcessTranslator(inner, s => _masculine ? ArabicGender.MakeMasculine(s, _masculineMap) : s);
 
         UserData.EnsureTemplates();
-        var resolver = new TranslationResolver(_translator, new TranslationCache(),
+        var resolver = new TranslationResolver(translator, new TranslationCache(),
             BuiltInDictionary.Load(UserData.DictionaryFile), IdiomRewriter.Load(UserData.IdiomsFile), Phrasebook.LoadEmbedded());
+        return (resolver, translator, mode);
+    }
+
+    private IScreenGrabber MakeGrabber() => CaptureBox.SelectedIndex == 1 ? new DxgiScreenGrabber() : new GdiScreenGrabber();
+
+    // ---- start / stop ----
+    private void Start_Click(object sender, RoutedEventArgs e) => StartTranslation();
+
+    private void StartTranslation()
+    {
+        if (_pipeline != null || _screen != null) return;
+        bool screen = ScreenMode;
+        if (!screen && (Region.Width < 20 || Region.Height < 10)) { StatusText.Text = "اختر منطقة النص أولًا (الزر الأول)"; return; }
+
+        var ocr = new WindowsOcrEngine("en-US", screen ? 1 : TextScale());
+        if (!ocr.IsAvailable)
+        {
+            StatusText.Text = "حزمة OCR الإنجليزية غير مثبتة: Settings ← Time & language ← Language & region ← أضف English";
+            return;
+        }
+
+        int threads = SpeedBox.SelectedIndex == 0 ? 1 : 2;   // few CPU threads: the game keeps priority
+        int beams = SpeedBox.SelectedIndex != 0 && PreciseBox.IsChecked == true ? 3 : 1;   // beam search only on request
+        var (resolver, translator, mode) = BuildTranslation(threads, beams);
+        _translator = translator;
+        _grabber = MakeGrabber();
+
+        if (screen) StartScreen(ocr, resolver); else StartRegion(ocr, resolver);
+
+        StatusText.Text = (screen ? "ترجمة الشاشة كاملة شغّالة — " : "الترجمة شغّالة — ") + mode;
+        StartButton.IsEnabled = false; StopButton.IsEnabled = true; SelectButton.IsEnabled = !screen; ModeBox.IsEnabled = false;
+    }
+
+    private void StartRegion(WindowsOcrEngine ocr, TranslationResolver resolver)
+    {
+        var sink = new WpfOverlaySink(EnsureOverlay(), () => Region);
 
         // wait a little before translating so half-typed lines are not translated on their own
         var options = new PipelineOptions
@@ -272,11 +363,25 @@ public partial class MainWindow : Window
         p.Start();
         _pipeline = p;
 
-        _capture = new RegionCaptureWorker(p, () => Region, () => _intervalMs, 1, s => SetStatus(s));
+        _capture = new RegionCaptureWorker(p, _grabber!, () => Region, () => _intervalMs, 1, s => SetStatus(s));
         _capture.Start();
+    }
 
-        StatusText.Text = "الترجمة شغّالة — " + modeText;
-        StartButton.IsEnabled = false; StopButton.IsEnabled = true; SelectButton.IsEnabled = false;
+    private void StartScreen(WindowsOcrEngine ocr, TranslationResolver resolver)
+    {
+        var area = new System.Drawing.Rectangle(0, 0, GetSystemMetrics(0), GetSystemMetrics(1));   // the main screen
+        var overlay = new WpfScreenOverlay(EnsureScreenWindow(), () => _settings.Style);
+        var options = new ScreenPipelineOptions
+        {
+            Continuous = ContinuousBox.IsChecked == true,
+            Interval = TimeSpan.FromMilliseconds(SpeedBox.SelectedIndex switch { 0 => 1200, 2 => 450, _ => 700 }),
+            Settle = TimeSpan.FromMilliseconds(SpeedBox.SelectedIndex switch { 0 => 800, 2 => 350, _ => 500 }),
+        };
+        var sp = new ScreenPipeline(_grabber!, ocr, resolver, overlay, () => area, options, s => SetStatus(s));
+        sp.Updated += blocks => Dispatcher.InvokeAsync(() => LastText.Text = $"عدد النصوص المترجمة على الشاشة: {blocks.Count}");
+        sp.Start();
+        _screen = sp;
+        if (!options.Continuous) sp.ScanNow();
     }
 
     private static void AppendHistory(string src, string ar) => Task.Run(() =>
@@ -294,16 +399,19 @@ public partial class MainWindow : Window
 
     private async Task StopAsync()
     {
-        var c = _capture; var p = _pipeline;
-        _capture = null; _pipeline = null;
+        var c = _capture; var p = _pipeline; var s = _screen; var g = _grabber;
+        _capture = null; _pipeline = null; _screen = null; _grabber = null;
         c?.Dispose();
         if (p != null) await p.DisposeAsync();
+        if (s != null) await s.DisposeAsync();
+        g?.Dispose();
         (_translator as IDisposable)?.Dispose(); _translator = null;
         _overlay?.Hide();
+        _screenWindow?.ClearAll();
         EngineText.Text = "";
         LastText.Text = "";
         StatusText.Text = "متوقف";
-        StartButton.IsEnabled = true; StopButton.IsEnabled = false; SelectButton.IsEnabled = true;
+        StartButton.IsEnabled = true; StopButton.IsEnabled = false; SelectButton.IsEnabled = true; ModeBox.IsEnabled = true;
         UpdatePackStatus();
     }
 
@@ -313,9 +421,14 @@ public partial class MainWindow : Window
         {
             _settings.WindowWidth = ActualWidth; _settings.WindowHeight = ActualHeight; _settings.Save();
         }
-        if (_hwnd != IntPtr.Zero) UnregisterHotKey(_hwnd, HotkeyId);
+        if (_hwnd != IntPtr.Zero)
+        {
+            UnregisterHotKey(_hwnd, HotkeyToggle); UnregisterHotKey(_hwnd, HotkeyScan); UnregisterHotKey(_hwnd, HotkeyCards);
+        }
         _capture?.Dispose();
+        _grabber?.Dispose();
         _overlay?.Close();
+        _screenWindow?.Close();
         base.OnClosed(e);
     }
 }

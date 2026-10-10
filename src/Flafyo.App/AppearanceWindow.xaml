@@ -63,6 +63,19 @@
 
       <CheckBox x:Name="OriginalCheck" Content="اعرض النص الإنجليزي الأصلي تحت الترجمة" Foreground="White" Margin="0,12,0,0" Checked="OnToggle" Unchecked="OnToggle"/>
 
+      <TextBlock Text="وضع الشاشة كاملة: العناوين والقوائم" Foreground="White" FontWeight="Bold" Margin="0,22,0,2"/>
+      <TextBlock Text="مثلاً كلمة «المهام» بلون وحجم، والمهام تحتها بلون وحجم تاني." Foreground="#9AA0B4" TextWrapping="Wrap"/>
+      <TextBlock Text="لون العناوين" Foreground="White" Margin="0,10,0,4"/>
+      <ComboBox x:Name="HeadingColorBox" SelectionChanged="OnSelect"/>
+      <StackPanel Orientation="Horizontal" Margin="0,12,0,4">
+        <TextBlock Text="حجم العناوين مقارنة بالباقي:" Foreground="White"/>
+        <TextBlock x:Name="HeadingScaleLabel" Foreground="#FFC857" Margin="8,0,0,0"/>
+      </StackPanel>
+      <Slider x:Name="HeadingScaleSlider" Minimum="100" Maximum="250" TickFrequency="5" IsSnapToTickEnabled="True" ValueChanged="OnSlide"/>
+      <CheckBox x:Name="HeadingBoldCheck" Content="العناوين بخط عريض" Foreground="White" Margin="0,8,0,0" Checked="OnToggle" Unchecked="OnToggle"/>
+      <CheckBox x:Name="AutoFitCheck" Content="حجم الخط تلقائي حسب حجم النص الأصلي (موصى به)" Foreground="White" Margin="0,6,0,0" Checked="OnToggle" Unchecked="OnToggle"/>
+      <Button Content="معاينة وضع الشاشة كاملة" Margin="0,10,0,0" Padding="8" Click="PreviewScreen_Click"/>
+
       <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
         <Button Content="معاينة" Padding="14,6" Click="Preview_Click"/>
         <Button Content="إعادة الضبط" Padding="14,6" Margin="10,0,0,0" Click="Reset_Click"/>

@@ -14,6 +14,8 @@ public sealed class PipelineOptions
     public TimeSpan SettleDelay { get; init; } = TimeSpan.FromMilliseconds(350);
     /// <summary>Join a sentence that continues in the next text box ("...to do about" + "the situation.").</summary>
     public bool MergeContinuations { get; init; } = true;
+    /// <summary>The translation stays on screen this long after the text disappears (camera motion often gives empty OCR reads).</summary>
+    public TimeSpan ClearDelay { get; init; } = TimeSpan.FromMilliseconds(1500);
 }
 
 /// <summary>
@@ -32,6 +34,8 @@ public sealed class TranslationPipeline : IAsyncDisposable
         public string? Shown;
         public string? SentenceSoFar;
         public long SentenceTicks;
+        public long EmptySince;          // timestamp of the first empty/garbage read in the current "text is gone?" period (0 = none)
+        public int ClearScheduled;
     }
 
     private sealed record TextJob(long Version, int RegionId, string Text, long CapturedTicks, double OcrMs);
@@ -126,23 +130,55 @@ public sealed class TranslationPipeline : IAsyncDisposable
             var ocrMs = sw.Elapsed.TotalMilliseconds;
 
             var text = TextNormalizer.Normalize(raw);
+            if (!TextQuality.LooksLikeText(text)) text = "";       // garbage from motion/blur counts as "no text"
             if (text.Length == 0)
             {
-                if (st.LastOcrText != null)
-                {
-                    st.LastOcrText = null;
-                    NewVersion(st);
-                    if (st.Shown != null) { st.Shown = null; SafeClear(f.RegionId); }
-                }
+                // do NOT clear at once: the text is probably still there and only this read failed
+                if (Volatile.Read(ref st.EmptySince) == 0) Volatile.Write(ref st.EmptySince, Stopwatch.GetTimestamp());
+                if (st.LastOcrText != null && Interlocked.Exchange(ref st.ClearScheduled, 1) == 0)
+                    _ = ClearLaterAsync(st, f.RegionId, ct);
                 continue;
             }
-            if (text == st.LastOcrText) continue;       // same text → nothing to do
+            Volatile.Write(ref st.EmptySince, 0);
+            if (st.LastOcrText != null && TextQuality.IsJitterOf(text, st.LastOcrText)) continue;   // same text, a letter misread
 
             st.LastOcrText = text;
             var (version, token) = NewVersion(st);
             var jobText = BuildJobText(st, text);
             _ = SettleAndQueueAsync(st, version, f.RegionId, jobText, f.CapturedTicks, ocrMs, token, ct);
         }
+    }
+
+    private async Task ClearLaterAsync(RegionState st, int regionId, CancellationToken stop)
+    {
+        try
+        {
+            while (!stop.IsCancellationRequested)
+            {
+                while (true)
+                {
+                    long since = Volatile.Read(ref st.EmptySince);
+                    if (since == 0) break;                                   // text came back
+                    var elapsed = TimeSpan.FromSeconds((double)(Stopwatch.GetTimestamp() - since) / Stopwatch.Frequency);
+                    var remaining = _opt.ClearDelay - elapsed;
+                    if (remaining <= TimeSpan.Zero)
+                    {
+                        st.LastOcrText = null;
+                        NewVersion(st);
+                        if (st.Shown != null) { st.Shown = null; SafeClear(regionId); }
+                        Volatile.Write(ref st.EmptySince, 0);
+                        break;
+                    }
+                    await Task.Delay(remaining, stop).ConfigureAwait(false);
+                }
+                Interlocked.Exchange(ref st.ClearScheduled, 0);
+                // a new "empty" period may have started while we were finishing
+                if (Volatile.Read(ref st.EmptySince) == 0 || Interlocked.Exchange(ref st.ClearScheduled, 1) != 0) break;
+            }
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex) { _log?.Invoke("Clear failed: " + ex.Message); }
+        finally { Interlocked.Exchange(ref st.ClearScheduled, 0); }
     }
 
     private string BuildJobText(RegionState st, string text)

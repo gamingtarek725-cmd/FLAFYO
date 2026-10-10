@@ -46,6 +46,10 @@ public sealed class AppSettings
     public bool Masculine { get; set; } = true;
     public bool Precise { get; set; } = false;
     public OverlayStyle Style { get; set; } = new();
+    public int ModeIndex { get; set; }                     // 0 = one text region, 1 = whole screen
+    public int CaptureIndex { get; set; }                  // 0 = normal, 1 = advanced (DXGI) for fullscreen games
+    public bool Continuous { get; set; } = true;
+    public string GameFolder { get; set; } = "";
     public double WindowWidth { get; set; }
     public double WindowHeight { get; set; }
 
@@ -92,6 +96,11 @@ public sealed class OverlayStyle
     public int AutoWidthPx { get; set; }                   // 0 = same width as the text region
     public int AutoHideSeconds { get; set; }               // 0 = stays until the text changes
     public bool ShowOriginal { get; set; }
+    // whole-screen mode: titles/headings get their own look
+    public string HeadingTextColor { get; set; } = "#FFC857";
+    public int HeadingScalePercent { get; set; } = 130;
+    public bool HeadingBold { get; set; } = true;
+    public bool AutoFit { get; set; } = true;              // font size follows the size of the original text
 
     public void CopyFrom(OverlayStyle o)
     {
@@ -99,5 +108,6 @@ public sealed class OverlayStyle
         BackOpacity = o.BackOpacity; Border = o.Border; BorderColor = o.BorderColor; Align = o.Align; Shadow = o.Shadow;
         OverlayMode = o.OverlayMode; AreaX = o.AreaX; AreaY = o.AreaY; AreaW = o.AreaW; AreaH = o.AreaH;
         AutoWidthPx = o.AutoWidthPx; AutoHideSeconds = o.AutoHideSeconds; ShowOriginal = o.ShowOriginal;
+        HeadingTextColor = o.HeadingTextColor; HeadingScalePercent = o.HeadingScalePercent; HeadingBold = o.HeadingBold; AutoFit = o.AutoFit;
     }
 }

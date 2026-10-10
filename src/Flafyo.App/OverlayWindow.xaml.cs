@@ -26,7 +26,7 @@ public partial class OverlayWindow : Window
         ApplyStyle(_style);
     }
 
-    private static SolidColorBrush MakeBrush(string hex, int alphaPercent = 100)
+    internal static SolidColorBrush MakeBrush(string hex, int alphaPercent = 100)
     {
         Color c;
         try { c = (Color)ColorConverter.ConvertFromString(hex); } catch { c = Colors.White; }

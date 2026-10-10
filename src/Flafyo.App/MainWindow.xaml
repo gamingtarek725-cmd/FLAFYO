@@ -48,10 +48,23 @@
       <ComboBoxItem Content="عادي"/>
       <ComboBoxItem Content="صغير (تكبير أكتر قبل القراءة)"/>
     </ComboBox>
+    <TextBlock Text="وضع الترجمة:" Foreground="White" Margin="0,12,0,4"/>
+    <ComboBox x:Name="ModeBox" SelectedIndex="0" SelectionChanged="Mode_Changed">
+      <ComboBoxItem Content="منطقة واحدة (حوار أو ترجمة)"/>
+      <ComboBoxItem Content="الشاشة كاملة (كل النصوص، كل نص في مستطيل)"/>
+    </ComboBox>
+    <CheckBox x:Name="ContinuousBox" Content="تحديث مستمر (لو قفلته: اضغط Ctrl+Alt+S وقت ما تحب)" Foreground="White" Margin="0,8,0,0"
+              IsChecked="True" Checked="Continuous_Changed" Unchecked="Continuous_Changed"/>
+    <TextBlock Text="طريقة التصوير:" Foreground="White" Margin="0,12,0,4"/>
+    <ComboBox x:Name="CaptureBox" SelectedIndex="0" SelectionChanged="Capture_Changed">
+      <ComboBoxItem Content="عادي (Windowed / Borderless)"/>
+      <ComboBoxItem Content="متقدم DXGI (لألعاب Fullscreen والصورة السودة)"/>
+    </ComboBox>
     <Button Content="شكل الترجمة: الخط واللون والحجم والمكان" Margin="0,14,0,0" Padding="8" Click="Appearance_Click"/>
     <Button x:Name="StartButton" Content="٢) ابدأ الترجمة" Margin="0,16,0,0" Padding="10" FontSize="15" Click="Start_Click"/>
     <Button x:Name="StopButton" Content="إيقاف" Margin="0,8,0,0" Padding="10" FontSize="15" IsEnabled="False" Click="Stop_Click"/>
-    <TextBlock x:Name="HotkeyText" Text="اختصار التشغيل/الإيقاف من داخل اللعبة: Ctrl + Alt + T" Foreground="#9AA0B4" Margin="0,12,0,0" FontSize="12" TextWrapping="Wrap"/>
+    <TextBlock x:Name="HotkeyText" Text="اختصارات داخل اللعبة: Ctrl+Alt+T تشغيل/إيقاف، Ctrl+Alt+S ترجمة الشاشة الآن، Ctrl+Alt+H إخفاء/إظهار مستطيلات الترجمة" Foreground="#9AA0B4" Margin="0,12,0,0" FontSize="12" TextWrapping="Wrap"/>
+    <Button Content="ترجمة ملفات اللعبة بالذكاء الاصطناعي" Margin="0,12,0,0" Padding="8" Click="GameFiles_Click"/>
     <Button Content="فتح مجلد القاموس والاصطلاحات" Margin="0,12,0,0" Padding="8" Click="OpenFolder_Click"/>
     <TextBlock Text="الترجمة تظهر في شريط شفاف فوق منطقة النص ولا تمنع الماوس أو الكيبورد. شغّل اللعبة في وضع Windowed أو Borderless."
                Foreground="#9AA0B4" TextWrapping="Wrap" Margin="0,14,0,0" FontSize="12"/>
