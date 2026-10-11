@@ -14,7 +14,7 @@ public static class PlaceholderGuard
         @"\$?\{\{[^{}\r\n]{1,40}\}\}|\$?\{[^{}\r\n]{0,40}\}|%(?:\d+\$)?[-+#0]*\d*(?:\.\d+)?[sdifuxXcl]|<[^<>\r\n]{1,80}>|\[/?(?:b|i|u|s|color|size|url|img|center|font)(?:=[^\]\r\n]*)?\]|\\[nrt]",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-    internal static readonly Regex NewLine = new(@"(\r\n|\n|\r|\\n)", RegexOptions.Compiled);
+    internal static readonly Regex NewLine = new(@"(\r\n|\n|\r|\\[nN])", RegexOptions.Compiled);
     private static readonly Regex Marker = new(@"\[\s*([0-9\u0660-\u0669]{1,3})\s*\]", RegexOptions.Compiled);
 
     public static bool HasLetters(string s) => s.Any(char.IsLetter);

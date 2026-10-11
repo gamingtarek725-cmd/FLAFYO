@@ -272,3 +272,74 @@ public class GameFolderTests : IDisposable
     public void Drive_roots_are_refused() =>
         Assert.Throws<InvalidOperationException>(() => GameInstaller.Apply(_root, Path.GetPathRoot(Path.GetTempPath())!));
 }
+
+public class MoreFormatAndGlossaryTests
+{
+    private static string? Ar(string s) => "AR:" + s;
+
+    [Fact]
+    public void Yaml_values_are_translated_with_their_quotes()
+    {
+        var input = "title: Main Menu\ncount: 5\nitems:\n  - Iron Sword\n  - \"Magic Staff\"\ndesc: 'Hello there friend'\n";
+        var expected = "title: AR:Main Menu\ncount: 5\nitems:\n  - AR:Iron Sword\n  - \"AR:Magic Staff\"\ndesc: 'AR:Hello there friend'\n";
+        Assert.Equal(expected, new YamlTextFormat().Transform(input, Ar));
+    }
+
+    [Fact]
+    public void Ass_dialogue_text_is_translated_and_the_timing_columns_are_kept()
+    {
+        var input = "[Events]\nDialogue: 0,0:00:01.00,0:00:03.00,Default,,0,0,0,,{\\an8}Hello there friend\n";
+        string? seen = null;
+        var r = new AssTextFormat().Transform(input, s => { seen = s; return "AR:" + s; });
+        Assert.Equal("{\\an8}Hello there friend", seen);
+        Assert.Contains("Dialogue: 0,0:00:01.00,0:00:03.00,Default,,0,0,0,,AR:{\\an8}Hello there friend", r);
+    }
+
+    [Fact]
+    public void RenPy_dialogue_is_translated_but_code_lines_and_variables_are_safe()
+    {
+        var input = "define e = Character(\"Eileen\")\nlabel start:\n    e \"Hello there, [player]!\"\n    \"It was a dark night.\"\n    play music \"bgm.ogg\"\n";
+        var r = new RenPyTextFormat().Transform(input, Ar);
+        Assert.Contains("    e \"AR:Hello there, [player]!\"", r);
+        Assert.Contains("    \"AR:It was a dark night.\"", r);
+        Assert.Contains("define e = Character(\"Eileen\")", r);
+        Assert.Contains("play music \"bgm.ogg\"", r);
+    }
+
+    [Fact]
+    public void Vtt_and_resx_use_the_existing_formats()
+    {
+        Assert.IsType<SrtTextFormat>(GameFormats.For("a.vtt", false));
+        Assert.IsType<XmlTextFormat>(GameFormats.For("a.resx", false));
+        Assert.IsType<YamlTextFormat>(GameFormats.For("a.yml", false));
+        Assert.IsType<AssTextFormat>(GameFormats.For("a.ass", false));
+        Assert.IsType<RenPyTextFormat>(GameFormats.For("a.rpy", false));
+    }
+
+    [Fact]
+    public void Glossary_packs_load_and_combine()
+    {
+        var fps = Glossaries.Load(new[] { "fps" });
+        Assert.Equal("إعادة التلقيم", fps["reload"]);                        // case-insensitive
+        foreach (var pack in Glossaries.All) Assert.True(Glossaries.Load(new[] { pack.Id }).Count >= 30, pack.Id);
+        var both = Glossaries.Load(new[] { "ui", "rpg" });
+        Assert.True(both.ContainsKey("Options") && both.ContainsKey("Inventory"));
+        Assert.Empty(Glossaries.Load(null));
+    }
+
+    [Fact]
+    public void Idioms_from_several_files_the_first_file_wins()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "flafyo-idioms-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        try
+        {
+            var game = Path.Combine(dir, "game.txt"); var general = Path.Combine(dir, "general.txt");
+            File.WriteAllText(game, "get round * = trick *");
+            File.WriteAllText(general, "get round * = fool *");
+            Assert.Equal("trick him", IdiomRewriter.LoadMany(game, general).Rewrite("get round him"));
+            Assert.Equal("fool him", IdiomRewriter.LoadMany(general, game).Rewrite("get round him"));
+        }
+        finally { Directory.Delete(dir, true); }
+    }
+}

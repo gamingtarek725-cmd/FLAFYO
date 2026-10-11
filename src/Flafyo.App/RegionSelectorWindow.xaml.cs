@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace Flafyo.Desktop;
 
-/// <summary>Full-screen drag selector (primary monitor). Returns the region in physical screen pixels.</summary>
+/// <summary>Full-screen drag selector (all screens). Returns the region in physical screen pixels.</summary>
 public partial class RegionSelectorWindow : Window
 {
     private System.Windows.Point _start;
@@ -16,9 +16,9 @@ public partial class RegionSelectorWindow : Window
     {
         InitializeComponent();
         if (!string.IsNullOrEmpty(hint)) Hint.Text = hint;
-        Left = 0; Top = 0;
-        Width = SystemParameters.PrimaryScreenWidth;
-        Height = SystemParameters.PrimaryScreenHeight;
+        // cover every connected screen
+        Left = SystemParameters.VirtualScreenLeft; Top = SystemParameters.VirtualScreenTop;
+        Width = SystemParameters.VirtualScreenWidth; Height = SystemParameters.VirtualScreenHeight;
         Loaded += (_, _) => Activate();
         Root.MouseLeftButtonDown += OnDown;
         Root.MouseMove += OnMove;

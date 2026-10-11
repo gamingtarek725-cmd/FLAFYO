@@ -50,6 +50,10 @@ public sealed class AppSettings
     public int CaptureIndex { get; set; }                  // 0 = normal, 1 = advanced (DXGI) for fullscreen games
     public bool Continuous { get; set; } = true;
     public string GameFolder { get; set; } = "";
+    public int MonitorIndex { get; set; }
+    public bool Speak { get; set; }
+    public bool AutoProfile { get; set; } = true;
+    public List<string> Glossaries { get; set; } = new();
     public double WindowWidth { get; set; }
     public double WindowHeight { get; set; }
 

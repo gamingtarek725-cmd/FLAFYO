@@ -23,6 +23,7 @@ public static class GameFormats
         var list = new List<IGameTextFormat>
         {
             new JsonTextFormat(), new PoTextFormat(), new KeyValueTextFormat(), new SrtTextFormat(), new XmlTextFormat(), new CsvTextFormat(),
+            new YamlTextFormat(), new AssTextFormat(), new RenPyTextFormat(),
         };
         if (includePlainText) list.Add(new PlainTextFormat());
         return list;
@@ -224,7 +225,7 @@ public sealed class KeyValueTextFormat : IGameTextFormat
 public sealed class SrtTextFormat : IGameTextFormat
 {
     public string Name => "SRT (subtitles)";
-    public bool Handles(string ext) => ext == ".srt";
+    public bool Handles(string ext) => ext is ".srt" or ".vtt";
 
     public string Transform(string content, Func<string, string?> map)
     {
@@ -266,7 +267,7 @@ public sealed class XmlTextFormat : IGameTextFormat
         RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase);
 
     public string Name => "XML";
-    public bool Handles(string ext) => ext == ".xml";
+    public bool Handles(string ext) => ext is ".xml" or ".resx";
 
     public string Transform(string content, Func<string, string?> map) =>
         Pattern.Replace(content, m =>
@@ -399,6 +400,121 @@ public sealed class PlainTextFormat : IGameTextFormat
             var rep = map(t);
             if (rep == null) continue;
             lines[k] = line[..(line.Length - line.TrimStart().Length)] + rep + line[line.TrimEnd().Length..];
+        }
+        return string.Join(nl, lines);
+    }
+}
+
+// ---------------------------------------------------------------- YAML
+public sealed class YamlTextFormat : IGameTextFormat
+{
+    private static readonly Regex KeyValue = new(@"^(?<pre>\s*(?:-\s+)?(?:""[^""]*""|'[^']*'|[^\s:#'""\-][^:#]*?)\s*:\s+)(?<val>\S.*?)(?<tail>\s*)$", RegexOptions.Compiled);
+    private static readonly Regex ListItem = new(@"^(?<pre>\s*-\s+)(?<val>\S.*?)(?<tail>\s*)$", RegexOptions.Compiled);
+
+    public string Name => "YAML";
+    public bool Handles(string ext) => ext is ".yaml" or ".yml";
+
+    public string Transform(string content, Func<string, string?> map)
+    {
+        var nl = content.Contains("\r\n") ? "\r\n" : "\n";
+        var lines = content.Replace("\r\n", "\n").Split('\n');
+        for (int k = 0; k < lines.Length; k++)
+        {
+            var line = lines[k];
+            if (line.TrimStart().StartsWith('#')) continue;
+            var m = KeyValue.Match(line);
+            if (!m.Success) m = ListItem.Match(line);
+            if (!m.Success) continue;
+
+            var value = m.Groups["val"].Value;
+            char quote = value.Length >= 2 && (value[0] == '"' || value[0] == '\'') && value[^1] == value[0] ? value[0] : '\0';
+            var inner = quote != '\0' ? value[1..^1] : value;
+            if (!GameStringFilter.LooksTranslatable(inner)) continue;
+
+            var rep = map(inner);
+            if (rep == null) continue;
+            string written = quote switch
+            {
+                '"' => "\"" + rep.Replace("\"", "\\\"") + "\"",
+                '\'' => "'" + rep.Replace("'", "''") + "'",
+                _ => rep.Contains(": ") || rep.Contains(" #") ? "\"" + rep.Replace("\"", "\\\"") + "\"" : rep,
+            };
+            lines[k] = m.Groups["pre"].Value + written + m.Groups["tail"].Value;
+        }
+        return string.Join(nl, lines);
+    }
+}
+
+// ---------------------------------------------------------------- ASS / SSA subtitles
+public sealed class AssTextFormat : IGameTextFormat
+{
+    public string Name => "ASS (subtitles)";
+    public bool Handles(string ext) => ext is ".ass" or ".ssa";
+
+    public string Transform(string content, Func<string, string?> map)
+    {
+        var nl = content.Contains("\r\n") ? "\r\n" : "\n";
+        var lines = content.Replace("\r\n", "\n").Split('\n');
+        for (int k = 0; k < lines.Length; k++)
+        {
+            var line = lines[k];
+            if (!line.StartsWith("Dialogue:", StringComparison.OrdinalIgnoreCase)) continue;
+            int pos = -1;
+            for (int c = 0; c < 9; c++) { pos = line.IndexOf(',', pos + 1); if (pos < 0) break; }
+            if (pos < 0) continue;
+            var text = line[(pos + 1)..];
+            if (!GameStringFilter.LooksTranslatable(text)) continue;
+            var rep = map(text);
+            if (rep != null) lines[k] = line[..(pos + 1)] + rep;
+        }
+        return string.Join(nl, lines);
+    }
+}
+
+// ---------------------------------------------------------------- Ren'Py scripts (.rpy)
+public sealed class RenPyTextFormat : IGameTextFormat
+{
+    private static readonly Regex Dialogue = new(@"^(?<pre>\s*(?:[A-Za-z_]\w*\s+)?)""(?<s>(?:[^""\\]|\\.)*)""(?<rest>\s*(?:#.*)?)$", RegexOptions.Compiled);
+    private static readonly Regex Underscore = new(@"_\(""(?<s>(?:[^""\\]|\\.)*)""\)", RegexOptions.Compiled);
+    private static readonly Regex Var = new(@"\[([A-Za-z_][\w.]*)\]", RegexOptions.Compiled);
+    private static readonly Regex DoubleCurly = new(@"\{\{([A-Za-z_][\w.]*)\}\}", RegexOptions.Compiled);
+    private static readonly HashSet<string> Keywords = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "define", "default", "label", "jump", "call", "image", "show", "scene", "play", "stop", "queue", "with", "python", "init",
+        "return", "pause", "hide", "window", "transform", "screen", "style", "text", "add", "textbutton", "action", "if", "elif", "while", "menu", "voice",
+    };
+
+    public string Name => "Ren'Py";
+    public bool Handles(string ext) => ext == ".rpy";
+
+    private string? Translate(string raw, Func<string, string?> map)
+    {
+        var text = raw.Replace("\\\"", "\"");
+        if (!GameStringFilter.LooksTranslatable(text)) return null;
+        var rep = map(Var.Replace(text, "{{$1}}"));                       // [name] becomes a protected code while translating
+        return rep == null ? null : DoubleCurly.Replace(rep, "[$1]").Replace("\"", "\\\"");
+    }
+
+    public string Transform(string content, Func<string, string?> map)
+    {
+        var nl = content.Contains("\r\n") ? "\r\n" : "\n";
+        var lines = content.Replace("\r\n", "\n").Split('\n');
+        for (int k = 0; k < lines.Length; k++)
+        {
+            var line = lines[k];
+            if (line.TrimStart().StartsWith('#')) continue;
+
+            if (line.Contains("_(\""))
+            {
+                lines[k] = Underscore.Replace(line, m => Translate(m.Groups["s"].Value, map) is { } r ? "_(\"" + r + "\")" : m.Value);
+                continue;
+            }
+            var d = Dialogue.Match(line);
+            if (!d.Success) continue;
+            var who = d.Groups["pre"].Value.Trim();
+            if (who.Length > 0 && Keywords.Contains(who)) continue;
+            var rep = Translate(d.Groups["s"].Value, map);
+            if (rep != null) lines[k] = d.Groups["pre"].Value + "\"" + rep + "\"" + d.Groups["rest"].Value;
         }
         return string.Join(nl, lines);
     }

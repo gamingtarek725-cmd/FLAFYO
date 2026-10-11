@@ -6,5 +6,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.19.2" />
     <EmbeddedResource Include="Data\phrasebook.tsv" LogicalName="phrasebook.tsv" />
+    <EmbeddedResource Include="Data\glossary.*.tsv" LogicalName="%(Filename)%(Extension)" />
   </ItemGroup>
 </Project>

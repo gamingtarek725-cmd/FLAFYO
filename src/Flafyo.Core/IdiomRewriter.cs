@@ -67,6 +67,23 @@ public sealed class IdiomRewriter
         }
     }
 
+    /// <summary>Several user files: the first file wins (e.g. the game-specific one), then the others, then the built-in list.</summary>
+    public static IdiomRewriter LoadMany(params string?[] userFiles)
+    {
+        var rw = new IdiomRewriter();
+        foreach (var f in userFiles)
+        {
+            try
+            {
+                if (f != null && File.Exists(f))
+                    foreach (var (p, r) in ParseLines(File.ReadAllLines(f))) rw.Add(p, r);
+            }
+            catch { /* a broken user file must never stop the app */ }
+        }
+        foreach (var (p, r) in ParseLines(BuiltInIdioms.Lines)) rw.Add(p, r);
+        return rw;
+    }
+
     /// <summary>User rules first (they win), then the built-in list.</summary>
     public static IdiomRewriter Load(string? userFile = null)
     {

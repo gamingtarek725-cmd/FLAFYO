@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,8 +15,8 @@ namespace Flafyo.Desktop;
 
 public partial class MainWindow : Window
 {
-    private const int HotkeyToggle = 0xF1A, HotkeyScan = 0xF1B, HotkeyCards = 0xF1C, WmHotkey = 0x0312;
-    private const uint ModAlt = 0x1, ModControl = 0x2, ModNoRepeat = 0x4000, VkT = 0x54, VkS = 0x53, VkH = 0x48;
+    private const int HotkeyToggle = 0xF1A, HotkeyScan = 0xF1B, HotkeyCards = 0xF1C, HotkeySpeak = 0xF1D, WmHotkey = 0x0312;
+    private const uint ModAlt = 0x1, ModControl = 0x2, ModNoRepeat = 0x4000, VkT = 0x54, VkS = 0x53, VkH = 0x48, VkR = 0x52;
 
     [DllImport("user32.dll")] private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint modifiers, uint vk);
     [DllImport("user32.dll")] private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
@@ -24,6 +25,7 @@ public partial class MainWindow : Window
     private object _regionBox = System.Drawing.Rectangle.Empty;   // boxed so reads/writes are atomic across threads
     private volatile int _intervalMs = 200;
     private volatile bool _masculine = true;
+    private volatile string _lastArabic = "";
     private IReadOnlyDictionary<string, string> _masculineMap = new Dictionary<string, string>();
     private readonly AppSettings _settings = AppSettings.Load();
     private bool _ready;
@@ -34,6 +36,13 @@ public partial class MainWindow : Window
     private RegionCaptureWorker? _capture;
     private IScreenGrabber? _grabber;
     private ITranslator? _translator;
+    private ArabicSpeaker? _speaker;
+    private List<MonitorInfo> _monitors = new();
+    private List<GameProfile> _profiles = new();
+    private List<string> _runningExes = new();
+    private GameProfile? _activeProfile;
+    private readonly HashSet<string> _loggedBlocks = new(StringComparer.Ordinal);
+    private readonly DispatcherTimer _watcher = new() { Interval = TimeSpan.FromSeconds(2.5) };
     private bool _downloading;
     private IntPtr _hwnd;
 
@@ -54,7 +63,13 @@ public partial class MainWindow : Window
         ContinuousBox.IsChecked = _settings.Continuous;
         MasculineBox.IsChecked = _settings.Masculine;
         PreciseBox.IsChecked = _settings.Precise;
+        SpeakBox.IsChecked = _settings.Speak;
+        AutoProfileBox.IsChecked = _settings.AutoProfile;
         _masculine = _settings.Masculine;
+
+        try { _monitors = Monitors.GetAll(); } catch { }
+        MonitorBox.ItemsSource = _monitors.Select(m => m.Name).ToList();
+        MonitorBox.SelectedIndex = _monitors.Count == 0 ? -1 : Math.Clamp(_settings.MonitorIndex, 0, _monitors.Count - 1);
 
         // restore the last window size, but never bigger than the screen
         if (_settings.WindowWidth >= MinWidth && _settings.WindowHeight >= MinHeight)
@@ -66,6 +81,10 @@ public partial class MainWindow : Window
         Height = Math.Min(Height, work.Height - 20);
         _ready = true;
         UpdatePackStatus();
+        RefreshProfiles();
+        RefreshRunning();
+        _watcher.Tick += (_, _) => WatcherTick();
+        _watcher.Start();
         SourceInitialized += OnSourceInitialized;
     }
 
@@ -94,6 +113,7 @@ public partial class MainWindow : Window
         bool ok = RegisterHotKey(_hwnd, HotkeyToggle, mods, VkT);
         RegisterHotKey(_hwnd, HotkeyScan, mods, VkS);
         RegisterHotKey(_hwnd, HotkeyCards, mods, VkH);
+        RegisterHotKey(_hwnd, HotkeySpeak, mods, VkR);
         if (!ok) HotkeyText.Text = "تعذّر تسجيل الاختصارات (برنامج تاني بيستخدمها). استخدم الأزرار.";
     }
 
@@ -106,6 +126,7 @@ public partial class MainWindow : Window
                 case HotkeyToggle: handled = true; ToggleTranslation(); break;
                 case HotkeyScan: handled = true; _screen?.ScanNow(); break;
                 case HotkeyCards: handled = true; _screenWindow?.ToggleVisible(); break;
+                case HotkeySpeak: handled = true; _ = SpeakAsync(_lastArabic); break;
             }
         }
         return IntPtr.Zero;
@@ -114,6 +135,29 @@ public partial class MainWindow : Window
     private async void ToggleTranslation()
     {
         if (_pipeline == null && _screen == null) StartTranslation(); else await StopAsync();
+    }
+
+    // ---- reading the translation aloud ----
+    private ArabicSpeaker? EnsureSpeaker()
+    {
+        try { return _speaker ??= new ArabicSpeaker(); } catch { return null; }
+    }
+
+    private async Task SpeakAsync(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return;
+        try { var s = EnsureSpeaker(); if (s != null) await s.SpeakAsync(text); } catch { }
+    }
+
+    private void Speak_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_ready) return;
+        _settings.Speak = SpeakBox.IsChecked == true; _settings.Save();
+        if (!_settings.Speak) { SpeakText.Text = ""; _speaker?.Stop(); return; }
+        var s = EnsureSpeaker();
+        SpeakText.Text = s is { HasArabicVoice: true }
+            ? $"الصوت: {s.VoiceName}"
+            : "مفيش صوت عربي على جهازك. ضيفه من: Settings ← Time & language ← Speech ← Add voices ← Arabic.";
     }
 
     // ---- language packs ----
@@ -167,13 +211,130 @@ public partial class MainWindow : Window
         _settings.CaptureIndex = CaptureBox.SelectedIndex; _settings.Save();
     }
 
+    private void Monitor_Changed(object sender, SelectionChangedEventArgs e)
+    {
+        if (!_ready || MonitorBox.SelectedIndex < 0) return;
+        _settings.MonitorIndex = MonitorBox.SelectedIndex; _settings.Save();
+    }
+
     private void Continuous_Changed(object sender, RoutedEventArgs e)
     {
         if (!_ready) return;
         _settings.Continuous = ContinuousBox.IsChecked == true; _settings.Save();
     }
 
-    // ---- translation strip appearance ----
+    private void Precise_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_ready) return;
+        _settings.Precise = PreciseBox.IsChecked == true; _settings.Save();
+    }
+
+    private void AutoProfile_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_ready) return;
+        _settings.AutoProfile = AutoProfileBox.IsChecked == true; _settings.Save();
+    }
+
+    // ---- per-game profiles ----
+    private string CurrentDictionaryFile() =>
+        _activeProfile != null ? ProfileStore.DictionaryFile(_activeProfile.ExeName) : UserData.DictionaryFile;
+
+    private void RefreshProfiles()
+    {
+        _profiles = ProfileStore.LoadAll();
+        var keep = ProfileBox.SelectedIndex;
+        ProfileBox.ItemsSource = _profiles.Select(p => p.ExeName).ToList();
+        ProfileBox.SelectedIndex = _profiles.Count == 0 ? -1 : Math.Clamp(keep, 0, _profiles.Count - 1);
+        ProfileText.Text = _activeProfile != null
+            ? $"ملف اللعبة الشغال: {_activeProfile.ExeName}"
+            : _profiles.Count == 0 ? "مفيش ألعاب محفوظة لسه." : $"{_profiles.Count} لعبة محفوظة.";
+    }
+
+    private void RefreshRunning()
+    {
+        var list = ActiveWindow.RunningWindows();
+        _runningExes = list.Select(x => x.Exe).ToList();
+        RunningBox.ItemsSource = list.Select(x => $"{x.Exe} — {x.Title}").ToList();
+        if (list.Count > 0) RunningBox.SelectedIndex = 0;
+    }
+
+    private void RefreshRunning_Click(object sender, RoutedEventArgs e) => RefreshRunning();
+
+    private void SaveProfile_Click(object sender, RoutedEventArgs e)
+    {
+        int idx = RunningBox.SelectedIndex;
+        if (idx < 0 || idx >= _runningExes.Count) { ProfileText.Text = "شغّل اللعبة الأول، واضغط «تحديث القايمة»، واختارها."; return; }
+        var exe = _runningExes[idx];
+        var r = Region;
+        var p = new GameProfile
+        {
+            ExeName = exe, Title = RunningBox.SelectedItem?.ToString() ?? exe,
+            X = r.X, Y = r.Y, Width = r.Width, Height = r.Height,
+            ModeIndex = ModeBox.SelectedIndex, CaptureIndex = CaptureBox.SelectedIndex, MonitorIndex = Math.Max(0, MonitorBox.SelectedIndex),
+            SpeedIndex = SpeedBox.SelectedIndex, TextSizeIndex = TextSizeBox.SelectedIndex, PackIndex = PackBox.SelectedIndex,
+            Continuous = ContinuousBox.IsChecked == true, Masculine = MasculineBox.IsChecked == true, Precise = PreciseBox.IsChecked == true,
+            AutoStart = AutoStartBox.IsChecked == true,
+        };
+        p.Style.CopyFrom(_settings.Style);
+        try
+        {
+            ProfileStore.Save(p);
+            _activeProfile = p;
+            RefreshProfiles();
+            ProfileText.Text = $"اتحفظت إعدادات {exe}. القاموس والاصطلاحات الخاصة بيها: {Path.GetFileName(ProfileStore.DictionaryFile(exe))}";
+        }
+        catch (Exception ex) { ProfileText.Text = "فشل الحفظ: " + ex.Message; }
+    }
+
+    private void LoadProfile_Click(object sender, RoutedEventArgs e)
+    {
+        if (ProfileBox.SelectedIndex < 0 || ProfileBox.SelectedIndex >= _profiles.Count) return;
+        LoadProfile(_profiles[ProfileBox.SelectedIndex]);
+    }
+
+    private void DeleteProfile_Click(object sender, RoutedEventArgs e)
+    {
+        if (ProfileBox.SelectedIndex < 0 || ProfileBox.SelectedIndex >= _profiles.Count) return;
+        var p = _profiles[ProfileBox.SelectedIndex];
+        ProfileStore.Delete(p.ExeName);
+        if (_activeProfile?.ExeName == p.ExeName) _activeProfile = null;
+        RefreshProfiles();
+    }
+
+    private void LoadProfile(GameProfile p)
+    {
+        _activeProfile = p;
+        Volatile.Write(ref _regionBox, (object)new System.Drawing.Rectangle(p.X, p.Y, p.Width, p.Height));
+        if (p.Width >= 20 && p.Height >= 10) RegionText.Text = $"المنطقة: {p.Width}×{p.Height}";
+        _settings.X = p.X; _settings.Y = p.Y; _settings.Width = p.Width; _settings.Height = p.Height;
+        ModeBox.SelectedIndex = Math.Clamp(p.ModeIndex, 0, 1);
+        CaptureBox.SelectedIndex = Math.Clamp(p.CaptureIndex, 0, 1);
+        if (_monitors.Count > 0) MonitorBox.SelectedIndex = Math.Clamp(p.MonitorIndex, 0, _monitors.Count - 1);
+        SpeedBox.SelectedIndex = Math.Clamp(p.SpeedIndex, 0, 2);
+        TextSizeBox.SelectedIndex = Math.Clamp(p.TextSizeIndex, 0, 2);
+        PackBox.SelectedIndex = Math.Clamp(p.PackIndex, 0, 1);
+        ContinuousBox.IsChecked = p.Continuous; MasculineBox.IsChecked = p.Masculine; PreciseBox.IsChecked = p.Precise;
+        AutoStartBox.IsChecked = p.AutoStart;
+        _settings.Style.CopyFrom(p.Style);
+        _settings.Save();
+        ProfileText.Text = $"اتحمّلت إعدادات اللعبة: {p.ExeName}";
+    }
+
+    private void WatcherTick()
+    {
+        if (!_ready || AutoProfileBox.IsChecked != true || _pipeline != null || _screen != null) return;
+        var exe = ActiveWindow.ForegroundExe();
+        if (exe == null) return;
+        var p = _profiles.FirstOrDefault(x => x.ExeName.Equals(exe, StringComparison.OrdinalIgnoreCase));
+        if (p == null || _activeProfile?.ExeName == p.ExeName) return;
+        LoadProfile(p);
+        if (p.AutoStart) StartTranslation();
+    }
+
+    // ---- other windows ----
+    private void Glossary_Click(object sender, RoutedEventArgs e) => new GlossaryWindow(_settings) { Owner = this }.Show();
+    private void History_Click(object sender, RoutedEventArgs e) => new HistoryWindow(CurrentDictionaryFile) { Owner = this }.Show();
+
     private OverlayWindow EnsureOverlay()
     {
         _overlay ??= new OverlayWindow();
@@ -231,12 +392,6 @@ public partial class MainWindow : Window
             return (resolver, translator);
         }) { Owner = this };
         win.Show();
-    }
-
-    private void Precise_Changed(object sender, RoutedEventArgs e)
-    {
-        if (!_ready) return;
-        _settings.Precise = PreciseBox.IsChecked == true; _settings.Save();
     }
 
     private void OpenFolder_Click(object sender, RoutedEventArgs e)
@@ -308,8 +463,14 @@ public partial class MainWindow : Window
         var translator = new PostProcessTranslator(inner, s => _masculine ? ArabicGender.MakeMasculine(s, _masculineMap) : s);
 
         UserData.EnsureTemplates();
-        var resolver = new TranslationResolver(translator, new TranslationCache(),
-            BuiltInDictionary.Load(UserData.DictionaryFile), IdiomRewriter.Load(UserData.IdiomsFile), Phrasebook.LoadEmbedded());
+        // dictionary priority: the game's own file > the general file > ready glossaries
+        var exe = _activeProfile?.ExeName;
+        var dictionary = BuiltInDictionary.Load(UserData.DictionaryFile);
+        foreach (var kv in Glossaries.Load(_settings.Glossaries)) dictionary.TryAdd(kv.Key, kv.Value);
+        if (exe != null) foreach (var kv in BuiltInDictionary.Load(ProfileStore.DictionaryFile(exe))) dictionary[kv.Key] = kv.Value;
+        var idioms = IdiomRewriter.LoadMany(exe != null ? ProfileStore.IdiomsFile(exe) : null, UserData.IdiomsFile);
+
+        var resolver = new TranslationResolver(translator, new TranslationCache(), dictionary, idioms, Phrasebook.LoadEmbedded());
         return (resolver, translator, mode);
     }
 
@@ -357,8 +518,10 @@ public partial class MainWindow : Window
             LatencyText.Text = $"OCR {l.OcrMs:0} ms | ترجمة {l.TranslationMs:0} ms | الإجمالي {l.TotalMs:0} ms");
         p.Translated += (_, src, ar) =>
         {
+            _lastArabic = ar;
             Dispatcher.InvokeAsync(() => LastText.Text = $"المقروء: {src}\nالترجمة: {ar}");
             AppendHistory(src, ar);
+            if (_settings.Speak) _ = SpeakAsync(ar);
         };
         p.Start();
         _pipeline = p;
@@ -369,7 +532,9 @@ public partial class MainWindow : Window
 
     private void StartScreen(WindowsOcrEngine ocr, TranslationResolver resolver)
     {
-        var area = new System.Drawing.Rectangle(0, 0, GetSystemMetrics(0), GetSystemMetrics(1));   // the main screen
+        var area = _monitors.Count > 0 && MonitorBox.SelectedIndex >= 0
+            ? _monitors[Math.Min(MonitorBox.SelectedIndex, _monitors.Count - 1)].Bounds
+            : new System.Drawing.Rectangle(0, 0, GetSystemMetrics(0), GetSystemMetrics(1));
         var overlay = new WpfScreenOverlay(EnsureScreenWindow(), () => _settings.Style);
         var options = new ScreenPipelineOptions
         {
@@ -378,7 +543,12 @@ public partial class MainWindow : Window
             Settle = TimeSpan.FromMilliseconds(SpeedBox.SelectedIndex switch { 0 => 800, 2 => 350, _ => 500 }),
         };
         var sp = new ScreenPipeline(_grabber!, ocr, resolver, overlay, () => area, options, s => SetStatus(s));
-        sp.Updated += blocks => Dispatcher.InvokeAsync(() => LastText.Text = $"عدد النصوص المترجمة على الشاشة: {blocks.Count}");
+        sp.Updated += blocks =>
+        {
+            foreach (var b in blocks)
+                if (_loggedBlocks.Add(b.Block.Text)) AppendHistory(b.Block.Text, b.Arabic);     // new texts go to the history for correction
+            Dispatcher.InvokeAsync(() => LastText.Text = $"عدد النصوص المترجمة على الشاشة: {blocks.Count}");
+        };
         sp.Start();
         _screen = sp;
         if (!options.Continuous) sp.ScanNow();
@@ -406,8 +576,10 @@ public partial class MainWindow : Window
         if (s != null) await s.DisposeAsync();
         g?.Dispose();
         (_translator as IDisposable)?.Dispose(); _translator = null;
+        _speaker?.Stop();
         _overlay?.Hide();
         _screenWindow?.ClearAll();
+        _loggedBlocks.Clear();
         EngineText.Text = "";
         LastText.Text = "";
         StatusText.Text = "متوقف";
@@ -417,16 +589,19 @@ public partial class MainWindow : Window
 
     protected override void OnClosed(EventArgs e)
     {
+        _watcher.Stop();
         if (WindowState == WindowState.Normal && ActualWidth > 0)
         {
             _settings.WindowWidth = ActualWidth; _settings.WindowHeight = ActualHeight; _settings.Save();
         }
         if (_hwnd != IntPtr.Zero)
         {
-            UnregisterHotKey(_hwnd, HotkeyToggle); UnregisterHotKey(_hwnd, HotkeyScan); UnregisterHotKey(_hwnd, HotkeyCards);
+            UnregisterHotKey(_hwnd, HotkeyToggle); UnregisterHotKey(_hwnd, HotkeyScan);
+            UnregisterHotKey(_hwnd, HotkeyCards); UnregisterHotKey(_hwnd, HotkeySpeak);
         }
         _capture?.Dispose();
         _grabber?.Dispose();
+        _speaker?.Dispose();
         _overlay?.Close();
         _screenWindow?.Close();
         base.OnClosed(e);

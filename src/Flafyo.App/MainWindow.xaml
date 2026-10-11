@@ -63,7 +63,37 @@
     <Button Content="شكل الترجمة: الخط واللون والحجم والمكان" Margin="0,14,0,0" Padding="8" Click="Appearance_Click"/>
     <Button x:Name="StartButton" Content="٢) ابدأ الترجمة" Margin="0,16,0,0" Padding="10" FontSize="15" Click="Start_Click"/>
     <Button x:Name="StopButton" Content="إيقاف" Margin="0,8,0,0" Padding="10" FontSize="15" IsEnabled="False" Click="Stop_Click"/>
-    <TextBlock x:Name="HotkeyText" Text="اختصارات داخل اللعبة: Ctrl+Alt+T تشغيل/إيقاف، Ctrl+Alt+S ترجمة الشاشة الآن، Ctrl+Alt+H إخفاء/إظهار مستطيلات الترجمة" Foreground="#9AA0B4" Margin="0,12,0,0" FontSize="12" TextWrapping="Wrap"/>
+    <TextBlock x:Name="HotkeyText" Text="اختصارات داخل اللعبة: Ctrl+Alt+T تشغيل/إيقاف، Ctrl+Alt+S ترجمة الشاشة الآن، Ctrl+Alt+H إخفاء/إظهار المستطيلات، Ctrl+Alt+R قراءة آخر ترجمة بصوت" Foreground="#9AA0B4" Margin="0,12,0,0" FontSize="12" TextWrapping="Wrap"/>
+    <TextBlock Text="الشاشة (لوضع الشاشة كاملة):" Foreground="White" Margin="0,12,0,4"/>
+    <ComboBox x:Name="MonitorBox" SelectionChanged="Monitor_Changed"/>
+    <CheckBox x:Name="SpeakBox" Content="اقرأ الترجمة بصوت عربي (Ctrl+Alt+R يعيد آخر ترجمة)" Foreground="White" Margin="0,10,0,0"
+              Checked="Speak_Changed" Unchecked="Speak_Changed"/>
+    <TextBlock x:Name="SpeakText" Foreground="#9AA0B4" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0"/>
+
+    <Border BorderBrush="#2A2D3A" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,14,0,0">
+      <StackPanel>
+        <TextBlock Text="ملف اللعبة (إعدادات لكل لعبة)" Foreground="White" FontWeight="Bold"/>
+        <TextBlock x:Name="ProfileText" Foreground="#9AA0B4" Margin="0,6,0,0" TextWrapping="Wrap"/>
+        <TextBlock Text="اللعبة الشغالة دلوقتي:" Foreground="White" Margin="0,8,0,4"/>
+        <ComboBox x:Name="RunningBox"/>
+        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+          <Button Content="تحديث القايمة" Padding="8,4" Click="RefreshRunning_Click"/>
+          <Button Content="احفظ إعداداتي للعبة دي" Padding="8,4" Margin="8,0,0,0" Click="SaveProfile_Click"/>
+        </StackPanel>
+        <CheckBox x:Name="AutoStartBox" Content="وابدأ الترجمة تلقائي مع اللعبة دي" Foreground="White" Margin="0,8,0,0"/>
+        <TextBlock Text="الألعاب المحفوظة:" Foreground="White" Margin="0,10,0,4"/>
+        <ComboBox x:Name="ProfileBox"/>
+        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+          <Button Content="تحميل" Padding="10,4" Click="LoadProfile_Click"/>
+          <Button Content="حذف" Padding="10,4" Margin="8,0,0,0" Click="DeleteProfile_Click"/>
+        </StackPanel>
+        <CheckBox x:Name="AutoProfileBox" Content="حمّل إعدادات اللعبة تلقائي لما تفتحها" Foreground="White" Margin="0,10,0,0"
+                  IsChecked="True" Checked="AutoProfile_Changed" Unchecked="AutoProfile_Changed"/>
+      </StackPanel>
+    </Border>
+
+    <Button Content="قواميس جاهزة حسب نوع اللعبة" Margin="0,12,0,0" Padding="8" Click="Glossary_Click"/>
+    <Button Content="السجل وتصحيح الترجمة" Margin="0,8,0,0" Padding="8" Click="History_Click"/>
     <Button Content="ترجمة ملفات اللعبة بالذكاء الاصطناعي" Margin="0,12,0,0" Padding="8" Click="GameFiles_Click"/>
     <Button Content="فتح مجلد القاموس والاصطلاحات" Margin="0,12,0,0" Padding="8" Click="OpenFolder_Click"/>
     <TextBlock Text="الترجمة تظهر في شريط شفاف فوق منطقة النص ولا تمنع الماوس أو الكيبورد. شغّل اللعبة في وضع Windowed أو Borderless."
