@@ -111,22 +111,23 @@ public sealed class DxgiScreenGrabber : IScreenGrabber
             if (_duplication == null || !_bounds.Contains(area.X + area.Width / 2, area.Y + area.Height / 2))
                 if (!Init(area)) return false;
 
-            SharpDX.DXGI.Resource? resource;
-            try { _duplication!.AcquireNextFrame(100, out _, out resource); }
-            catch (SharpDXException ex) when (ex.ResultCode == SharpDX.DXGI.ResultCode.WaitTimeout) { return false; }      // nothing changed
-            catch (SharpDXException ex) when (ex.ResultCode == SharpDX.DXGI.ResultCode.AccessLost)
+            var result = _duplication!.TryAcquireNextFrame(100, out _, out SharpDX.DXGI.Resource? resource);
+            if (result.Failure)
             {
-                ReleaseAll();                                                                                              // re-created on the next call
+                if (result.Code == SharpDX.DXGI.ResultCode.WaitTimeout.Result.Code) return false;                          // nothing changed
+                if (result.Code == SharpDX.DXGI.ResultCode.AccessLost.Result.Code) { ReleaseAll(); return false; }          // re-created on the next call
+                LastError = "DXGI error 0x" + result.Code.ToString("X");
+                ReleaseAll();
                 return false;
             }
 
             var ctx = _device!.ImmediateContext;
             try
             {
-                using var tex = resource!.QueryInterface<Texture2D>();
+                using var tex = resource.QueryInterface<Texture2D>();
                 ctx.CopyResource(tex, _staging);
             }
-            finally { resource!.Dispose(); _duplication.ReleaseFrame(); }
+            finally { resource?.Dispose(); _duplication.ReleaseFrame(); }
 
             var map = ctx.MapSubresource(_staging, 0, MapMode.Read, MapFlags.None);
             try { return Crop(map, area, out frame); }
