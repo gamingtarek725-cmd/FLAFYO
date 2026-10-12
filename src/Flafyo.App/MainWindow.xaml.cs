@@ -516,7 +516,7 @@ public partial class MainWindow : Window
         var p = new TranslationPipeline(ocr, resolver, sink, options, s => SetStatus(s));
         p.Latency += l => Dispatcher.InvokeAsync(() =>
             LatencyText.Text = $"OCR {l.OcrMs:0} ms | ترجمة {l.TranslationMs:0} ms | الإجمالي {l.TotalMs:0} ms");
-        p.Translated += (_, src, ar) =>
+        p.Translated += (regionId, src, ar) =>
         {
             _lastArabic = ar;
             Dispatcher.InvokeAsync(() => LastText.Text = $"المقروء: {src}\nالترجمة: {ar}");
