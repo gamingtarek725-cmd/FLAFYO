@@ -40,6 +40,16 @@ public static class GameFormats
 public sealed class JsonTextFormat : IGameTextFormat
 {
     private static readonly JsonSerializerOptions Options = new() { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+
+    /// <summary>Values under these keys are data for the game (ids, paths, scene names...), never text to translate.</summary>
+    private static readonly HashSet<string> SkipKeys = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "id", "uid", "uuid", "guid", "type", "class", "tag", "tags", "path", "file", "filename", "url", "uri", "key", "event", "action",
+        "command", "script", "scene", "prefab", "asset", "assets", "icon", "image", "sprite", "texture", "sound", "sfx", "music", "bgm",
+        "font", "code", "hash", "version", "locale", "lang", "language", "format", "mime", "target", "trigger", "state", "variable",
+        "condition", "animation", "anim", "model", "material", "shader", "layer", "category", "slot", "kind",
+    };
+
     public string Name => "JSON";
     public bool Handles(string ext) => ext == ".json";
 
@@ -47,9 +57,14 @@ public sealed class JsonTextFormat : IGameTextFormat
     {
         var sb = new StringBuilder(content.Length + 64);
         int i = 0, n = content.Length;
+        string? lastKey = null;
+        int skipArray = 0;
         while (i < n)
         {
             char c = content[i];
+            if (c == '[') { if (skipArray > 0) skipArray++; else if (lastKey != null && SkipKeys.Contains(lastKey)) skipArray = 1; lastKey = null; sb.Append(c); i++; continue; }
+            if (c == ']') { if (skipArray > 0) skipArray--; sb.Append(c); i++; continue; }
+            if (c == '{' || c == ',') { lastKey = null; sb.Append(c); i++; continue; }
             if (c == '"')
             {
                 int start = i; i++;
@@ -64,7 +79,9 @@ public sealed class JsonTextFormat : IGameTextFormat
                 int j = i;
                 while (j < n && char.IsWhiteSpace(content[j])) j++;
                 bool isKey = j < n && content[j] == ':';
-                if (closed && !isKey)
+                if (isKey) lastKey = raw.ToString();
+                bool skipValue = skipArray > 0 || (lastKey != null && SkipKeys.Contains(lastKey));
+                if (closed && !isKey && !skipValue)
                 {
                     var text = Unescape(raw.ToString());
                     if (GameStringFilter.LooksTranslatable(text))

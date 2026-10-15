@@ -18,13 +18,16 @@ public sealed class GameTranslateOptions
     /// <summary>Join and reverse the Arabic letters, for engines that cannot display Arabic by themselves.</summary>
     public bool ShapeArabic { get; init; }
     public int SaveEvery { get; init; } = 100;
+    /// <summary>0 = everything. A small number gives a quick test run (the first strings of every file).</summary>
+    public int MaxStringsPerFile { get; init; }
+    public Action<string>? Log { get; init; }
 }
 
 public sealed record GameProgress(int FileIndex, int FileCount, string File, int Done, int Total, int Errors);
 
 public sealed class GameTranslationReport
 {
-    public int Files, Strings, FromMemory, Errors;
+    public int Files, Strings, FromMemory, Errors, SkippedFiles;
     public TimeSpan Elapsed;
 }
 
@@ -117,11 +120,19 @@ public sealed class GameTextTranslator
                 {
                     ct.ThrowIfCancellationRequested();
                     done++;
+                    if (opt.MaxStringsPerFile > 0 && done > opt.MaxStringsPerFile) return null;
                     var r = TranslateOne(source, opt, report, ct);
                     progress?.Report(new GameProgress(fileIndex, files.Count, f.RelativePath, done, f.StringCount, report.Errors));
                     return r;
                 });
 
+                var ext = Path.GetExtension(f.FullPath).ToLowerInvariant();
+                if (OutputValidator.Parses(ext, decoded.Text) && !OutputValidator.Parses(ext, newText))
+                {
+                    report.SkippedFiles++;                      // never hand the game a file that no longer parses
+                    opt.Log?.Invoke($"تخطيت {f.RelativePath}: الناتج مش صالح (الملف الأصلي اتحفظ زي ما هو).");
+                    continue;
+                }
                 var outPath = SafeOutputPath(outputRoot, f.RelativePath);
                 Directory.CreateDirectory(Path.GetDirectoryName(outPath)!);
                 if (outPath.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) && decoded.Encoding is not System.Text.UTF8Encoding)
@@ -258,5 +269,55 @@ public static class GameInstaller
             count++;
         }
         return count;
+    }
+}
+
+/// <summary>Checks that a translated file is still valid for the game.</summary>
+public static class OutputValidator
+{
+    public static bool Parses(string extension, string text)
+    {
+        try
+        {
+            switch (extension)
+            {
+                case ".json":
+                    using (JsonDocument.Parse(text, new JsonDocumentOptions { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip })) { }
+                    return true;
+                case ".xml":
+                case ".resx":
+                    System.Xml.Linq.XDocument.Parse(text);
+                    return true;
+                default:
+                    return true;
+            }
+        }
+        catch { return false; }
+    }
+}
+
+/// <summary>Helps pick the files that really hold the game's text, and shows a few strings so the user can judge.</summary>
+public static class GameFileHeuristics
+{
+    private static readonly HashSet<string> Hints = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "ui", "en", "eng", "english", "enus", "l10n", "i18n", "text", "texts", "lang", "langs", "language", "languages", "strings",
+        "string", "dialog", "dialogs", "dialogue", "dialogues", "subtitle", "subtitles", "message", "messages", "quest", "quests",
+        "menu", "menus", "caption", "captions", "locale", "locales", "localization", "localisation", "translation", "translations",
+    };
+
+    public static bool LooksLikeLocalization(string relativePath)
+    {
+        var tokens = Regex.Split(relativePath.ToLowerInvariant(), @"[^a-z0-9]+").Where(t => t.Length > 0);
+        return tokens.Any(t => Hints.Contains(t) || t.StartsWith("locali", StringComparison.Ordinal) || t.StartsWith("transl", StringComparison.Ordinal));
+    }
+
+    public static List<string> Sample(string path, int max)
+    {
+        var list = new List<string>();
+        var format = GameFormats.For(path, true);
+        if (format == null) return list;
+        format.Transform(TextFileIO.Read(path).Text, s => { if (list.Count < max) list.Add(s); return null; });
+        return list;
     }
 }

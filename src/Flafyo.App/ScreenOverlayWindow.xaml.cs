@@ -102,7 +102,10 @@ public sealed class WpfScreenOverlay : IScreenOverlay
     public WpfScreenOverlay(ScreenOverlayWindow window, Func<OverlayStyle> style) { _window = window; _style = style; }
 
     public void Show(IReadOnlyList<TranslatedBlock> blocks, System.Drawing.Rectangle area) =>
-        _window.Dispatcher.InvokeAsync(() => _window.ShowBlocks(blocks, area, _style()));
+        _window.Dispatcher.InvokeAsync(() =>
+        {
+            try { _window.ShowBlocks(blocks, area, _style()); } catch (Exception ex) { AppLog.Write(ex); }
+        });
 
     public void Clear() => _window.Dispatcher.InvokeAsync(() => _window.ClearAll());
 }

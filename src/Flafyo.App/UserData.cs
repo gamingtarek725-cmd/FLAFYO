@@ -10,6 +10,7 @@ internal static class UserData
     public static string DictionaryFile => Path.Combine(Dir, "dictionary.txt");
     public static string IdiomsFile => Path.Combine(Dir, "idioms.txt");
     public static string MasculineFile => Path.Combine(Dir, "masculine.txt");
+    public static string ErrorLog => Path.Combine(Dir, "error.log");
     public static string HistoryFile => Path.Combine(Dir, "history.txt");
     public static string SettingsFile => Path.Combine(Dir, "settings.json");
 

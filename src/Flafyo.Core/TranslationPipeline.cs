@@ -16,6 +16,8 @@ public sealed class PipelineOptions
     public bool MergeContinuations { get; init; } = true;
     /// <summary>The translation stays on screen this long after the text disappears (camera motion often gives empty OCR reads).</summary>
     public TimeSpan ClearDelay { get; init; } = TimeSpan.FromMilliseconds(1500);
+    /// <summary>While the picture is still changing (camera movement) the translation is never removed; this long after the last change it may be.</summary>
+    public TimeSpan MotionHold { get; init; } = TimeSpan.FromMilliseconds(2500);
 }
 
 /// <summary>
@@ -34,6 +36,7 @@ public sealed class TranslationPipeline : IAsyncDisposable
         public string? Shown;
         public string? SentenceSoFar;
         public long SentenceTicks;
+        public long LastChange;          // when the picture of this region last changed (camera motion keeps this fresh)
         public long EmptySince;          // timestamp of the first empty/garbage read in the current "text is gone?" period (0 = none)
         public int ClearScheduled;
     }
@@ -110,7 +113,8 @@ public sealed class TranslationPipeline : IAsyncDisposable
         {
             var f = await _detectQ.TakeAsync(ct).ConfigureAwait(false);
             if (!_detector.HasChanged(f)) continue;     // unchanged → no OCR, no translation
-            _regions.GetOrAdd(f.RegionId, _ => new RegionState());
+            var changed = _regions.GetOrAdd(f.RegionId, _ => new RegionState());
+            Interlocked.Exchange(ref changed.LastChange, Stopwatch.GetTimestamp());
             _ocrQ.Offer(f);                              // latest frames win; OCR in progress is never aborted by video noise
         }
     }
@@ -159,8 +163,11 @@ public sealed class TranslationPipeline : IAsyncDisposable
                 {
                     long since = Volatile.Read(ref st.EmptySince);
                     if (since == 0) break;                                   // text came back
-                    var elapsed = TimeSpan.FromSeconds((double)(Stopwatch.GetTimestamp() - since) / Stopwatch.Frequency);
-                    var remaining = _opt.ClearDelay - elapsed;
+                    long now = Stopwatch.GetTimestamp();
+                    double emptyFor = (double)(now - since) / Stopwatch.Frequency;
+                    double quietFor = (double)(now - Interlocked.Read(ref st.LastChange)) / Stopwatch.Frequency;
+                    double wait = Math.Max(_opt.ClearDelay.TotalSeconds - emptyFor, _opt.MotionHold.TotalSeconds - quietFor);
+                    var remaining = TimeSpan.FromSeconds(wait);
                     if (remaining <= TimeSpan.Zero)
                     {
                         st.LastOcrText = null;

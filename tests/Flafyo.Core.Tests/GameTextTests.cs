@@ -343,3 +343,61 @@ public class MoreFormatAndGlossaryTests
         finally { Directory.Delete(dir, true); }
     }
 }
+
+public class SafetyTests
+{
+    [Fact]
+    public void Json_technical_keys_and_their_arrays_are_never_translated()
+    {
+        var input = "{\"id\": \"Main Menu\", \"title\": \"Start Game\", \"tags\": [\"Hello there friend\"], \"text\": \"Open the door\"}";
+        var expected = "{\"id\": \"Main Menu\", \"title\": \"AR:Start Game\", \"tags\": [\"Hello there friend\"], \"text\": \"AR:Open the door\"}";
+        Assert.Equal(expected, new JsonTextFormat().Transform(input, s => "AR:" + s));
+    }
+
+    [Theory]
+    [InlineData("data/lang/en.json", true)]
+    [InlineData("ui/menu.json", true)]
+    [InlineData("Localization/strings.xml", true)]
+    [InlineData("build/config.json", false)]
+    [InlineData("Assets/Textures/button.json", false)]
+    [InlineData("readme.json", false)]
+    public void Localization_looking_files(string path, bool expected) =>
+        Assert.Equal(expected, GameFileHeuristics.LooksLikeLocalization(path));
+
+    [Fact]
+    public void Validator_catches_broken_json_and_xml()
+    {
+        Assert.True(OutputValidator.Parses(".json", "{\"a\": 1, /* c */}"));
+        Assert.False(OutputValidator.Parses(".json", "{\"a\": \"x}"));
+        Assert.True(OutputValidator.Parses(".xml", "<a><b>x</b></a>"));
+        Assert.False(OutputValidator.Parses(".xml", "<a><b>x</a>"));
+        Assert.True(OutputValidator.Parses(".csv", "anything"));
+    }
+}
+
+public class GameQuickTestTests : IDisposable
+{
+    private readonly string _root = Path.Combine(Path.GetTempPath(), "flafyo-quick-" + Guid.NewGuid().ToString("N"));
+    public GameQuickTestTests() => Directory.CreateDirectory(_root);
+    public void Dispose() { try { Directory.Delete(_root, true); } catch { } }
+
+    [Fact]
+    public async Task Quick_test_translates_only_the_first_strings_of_each_file()
+    {
+        var game = Path.Combine(_root, "g"); Directory.CreateDirectory(game);
+        File.WriteAllText(Path.Combine(game, "en.json"), "{\"a\":\"First line here\",\"b\":\"Second line here\",\"c\":\"Third line here\"}");
+        var files = GameScanner.Scan(game, null, CancellationToken.None);
+        var resolver = new TranslationResolver(new FakeTranslator(), new TranslationCache());
+        var output = Path.Combine(_root, "out");
+        await new GameTextTranslator(resolver).TranslateAsync(files, output, new GameTranslateOptions { MaxStringsPerFile = 1 }, null, CancellationToken.None);
+        Assert.Equal("{\"a\":\"AR:First line here\",\"b\":\"Second line here\",\"c\":\"Third line here\"}", File.ReadAllText(Path.Combine(output, "en.json")));
+    }
+
+    [Fact]
+    public void Sample_returns_the_first_strings()
+    {
+        var f = Path.Combine(_root, "x.json");
+        File.WriteAllText(f, "{\"a\":\"First line here\",\"b\":\"Second line here\"}");
+        Assert.Equal(new[] { "First line here" }, GameFileHeuristics.Sample(f, 1));
+    }
+}

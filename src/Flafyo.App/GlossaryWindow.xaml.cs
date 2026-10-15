@@ -20,7 +20,7 @@ public partial class GlossaryWindow : Window
             {
                 Content = $"{pack.Title}  ({count} مصطلح)",
                 Tag = pack.Id,
-                Foreground = System.Windows.Media.Brushes.White,
+                Foreground = (System.Windows.Media.Brush)Application.Current.FindResource("Ink"),
                 Margin = new Thickness(0, 4, 0, 4),
                 IsChecked = settings.Glossaries.Contains(pack.Id),
             };

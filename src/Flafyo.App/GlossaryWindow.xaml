@@ -2,10 +2,10 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="قواميس جاهزة" Icon="Assets/flafyo.ico" Width="420" Height="420" MinWidth="360"
-        Background="#0E0F14" FlowDirection="RightToLeft" WindowStartupLocation="CenterOwner">
+        Background="{StaticResource Page}" FlowDirection="RightToLeft" FontFamily="Segoe UI, Tahoma" FontSize="13" WindowStartupLocation="CenterOwner">
   <StackPanel Margin="20">
-    <TextBlock Text="قواميس جاهزة حسب نوع اللعبة" Foreground="#00D9A5" FontSize="18" FontWeight="Bold"/>
-    <TextBlock Foreground="#9AA0B4" TextWrapping="Wrap" Margin="0,6,0,12"
+    <TextBlock Text="قواميس جاهزة حسب نوع اللعبة" Foreground="{StaticResource Accent}" FontSize="18" FontWeight="Bold"/>
+    <TextBlock Foreground="{StaticResource Muted}" TextWrapping="Wrap" Margin="0,6,0,12"
                Text="مصطلحات القوائم والأسلحة والمهام وغيرها بترجمة ثابتة. بتتطبق على الكلمات والعبارات القصيرة بس، ومبتأثرش على الجمل. اختار اللي يناسب لعبتك، وهتشتغل مع أول ترجمة جاية."/>
     <StackPanel x:Name="Panel"/>
     <Button Content="إغلاق" Margin="0,16,0,0" Padding="12,6" HorizontalAlignment="Left" Click="Close_Click"/>

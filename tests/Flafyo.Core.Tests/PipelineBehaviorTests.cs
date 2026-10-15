@@ -135,3 +135,34 @@ public class OverlaySinkTests
         Assert.Equal(new[] { "ar" }, ov.Shown.ToArray());
     }
 }
+
+public class MotionTests
+{
+    private static Frame F(long id, byte fill) =>
+        new(id, 1, 64, 32, Enumerable.Repeat(fill, 64 * 32).ToArray(), Stopwatch.GetTimestamp());
+
+    private static async Task<bool> WaitUntil(Func<bool> cond, int timeoutMs = 8000)
+    {
+        var sw = Stopwatch.StartNew();
+        while (sw.ElapsedMilliseconds < timeoutMs) { if (cond()) return true; await Task.Delay(10); }
+        return cond();
+    }
+
+    [Fact]
+    public async Task Translation_stays_while_the_camera_keeps_moving_and_is_removed_only_after_things_calm_down()
+    {
+        var ocr = new FakeOcr(); var tr = new FakeTranslator(); var ov = new RecordingOverlay();
+        await using var p = new TranslationPipeline(ocr, new TranslationResolver(tr, new TranslationCache()), ov,
+            new PipelineOptions { SettleDelay = TimeSpan.FromMilliseconds(30), ClearDelay = TimeSpan.FromMilliseconds(300), MotionHold = TimeSpan.FromMilliseconds(900) });
+        p.Start();
+        ocr.ByFrame[1] = ("Hello there friend", 0);
+        for (int i = 2; i <= 40; i++) ocr.ByFrame[i] = ("", 0);          // the moving picture is unreadable
+        p.Submit(F(1, 10));
+        Assert.True(await WaitUntil(() => ov.Shown.Count == 1));
+
+        for (int i = 2; i <= 40; i++) { p.Submit(F(i, (byte)(i * 9 % 250))); await Task.Delay(50); }   // ~2 s of constant motion
+        Assert.Equal(0, ov.Clears);                                       // never flickered away during the motion
+
+        Assert.True(await WaitUntil(() => ov.Clears >= 1));               // gone once the picture is calm and there is really no text
+    }
+}

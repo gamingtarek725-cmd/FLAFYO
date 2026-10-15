@@ -123,7 +123,10 @@ public sealed class WpfOverlaySink : IOverlaySink
     public void Show(int regionId, string translated) => Show(regionId, translated, "");
 
     public void Show(int regionId, string translated, string source) =>
-        _window.Dispatcher.InvokeAsync(() => _window.ShowText(translated, source, _region()));
+        _window.Dispatcher.InvokeAsync(() =>
+        {
+            try { _window.ShowText(translated, source, _region()); } catch (Exception ex) { AppLog.Write(ex); }
+        });
 
     public void Clear(int regionId) => _window.Dispatcher.InvokeAsync(() => _window.Hide());
 }

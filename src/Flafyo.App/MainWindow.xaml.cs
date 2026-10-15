@@ -58,7 +58,7 @@ public partial class MainWindow : Window
         SpeedBox.SelectedIndex = Math.Clamp(_settings.SpeedIndex, 0, 2);
         TextSizeBox.SelectedIndex = Math.Clamp(_settings.TextSizeIndex, 0, 2);
         PackBox.SelectedIndex = Math.Clamp(_settings.PackIndex, 0, 1);
-        ModeBox.SelectedIndex = Math.Clamp(_settings.ModeIndex, 0, 1);
+        ModeIndexValue = Math.Clamp(_settings.ModeIndex, 0, 1);
         CaptureBox.SelectedIndex = Math.Clamp(_settings.CaptureIndex, 0, 1);
         ContinuousBox.IsChecked = _settings.Continuous;
         MasculineBox.IsChecked = _settings.Masculine;
@@ -89,19 +89,33 @@ public partial class MainWindow : Window
     }
 
     private System.Drawing.Rectangle Region => (System.Drawing.Rectangle)Volatile.Read(ref _regionBox);
-    private bool ScreenMode => ModeBox.SelectedIndex == 1;
+    private bool ScreenMode => ModeIndexValue == 1;
+
+    private int ModeIndexValue
+    {
+        get => ScreenRadio.IsChecked == true ? 1 : 0;
+        set { if (value == 1) ScreenRadio.IsChecked = true; else RegionRadio.IsChecked = true; }
+    }
+
+    private void SetState(bool running)
+    {
+        StateText.Text = running ? "● شغّال" : "● متوقف";
+        StateText.Foreground = (System.Windows.Media.Brush)FindResource(running ? "Ok" : "Muted");
+    }
 
     private void SetStatus(string s) => Dispatcher.InvokeAsync(() => StatusText.Text = s);
 
-    private void ShowEngine(string engine, string? error, string label) => Dispatcher.InvokeAsync(() =>
-        EngineText.Text = engine switch
-        {
-            "loading" => $"المحرك: جاري تحميل الحزمة {label}…",
-            "offline" => $"المحرك: الذكاء الاصطناعي المحلي — الحزمة {label} ✅",
-            "fallback" => $"⚠️ الحزمة {label} فشلت، فبيستخدم البديل. السبب: {error}",
-            "online" => "المحرك: ترجمة أونلاين مؤقتة (مفيش حزمة مثبتة)",
-            _ => $"⚠️ فشل تحميل المحرك: {error}"
-        });
+    private static string EngineLabel(string engine, string? error, string label) => engine switch
+    {
+        "loading" => $"المحرك: جاري تحميل الحزمة {label}…",
+        "offline" => $"المحرك: الذكاء الاصطناعي المحلي — الحزمة {label} ✅",
+        "fallback" => $"⚠️ الحزمة {label} فشلت، فبيستخدم البديل. السبب: {error}",
+        "online" => "المحرك: ترجمة أونلاين مؤقتة (مفيش حزمة مثبتة)",
+        _ => $"⚠️ فشل تحميل المحرك: {error}"
+    };
+
+    private void ShowEngine(string engine, string? error, string label) =>
+        Dispatcher.InvokeAsync(() => EngineText.Text = EngineLabel(engine, error, label));
 
     // ---- global hotkeys (registered with Windows; no keyboard hook, game input is untouched) ----
     private void OnSourceInitialized(object? sender, EventArgs e)
@@ -199,10 +213,10 @@ public partial class MainWindow : Window
         _settings.Masculine = _masculine; _settings.Save();
     }
 
-    private void Mode_Changed(object sender, SelectionChangedEventArgs e)
+    private void Mode_Changed(object sender, RoutedEventArgs e)
     {
         if (!_ready) return;
-        _settings.ModeIndex = ModeBox.SelectedIndex; _settings.Save();
+        _settings.ModeIndex = ModeIndexValue; _settings.Save();
     }
 
     private void Capture_Changed(object sender, SelectionChangedEventArgs e)
@@ -270,7 +284,7 @@ public partial class MainWindow : Window
         {
             ExeName = exe, Title = RunningBox.SelectedItem?.ToString() ?? exe,
             X = r.X, Y = r.Y, Width = r.Width, Height = r.Height,
-            ModeIndex = ModeBox.SelectedIndex, CaptureIndex = CaptureBox.SelectedIndex, MonitorIndex = Math.Max(0, MonitorBox.SelectedIndex),
+            ModeIndex = ModeIndexValue, CaptureIndex = CaptureBox.SelectedIndex, MonitorIndex = Math.Max(0, MonitorBox.SelectedIndex),
             SpeedIndex = SpeedBox.SelectedIndex, TextSizeIndex = TextSizeBox.SelectedIndex, PackIndex = PackBox.SelectedIndex,
             Continuous = ContinuousBox.IsChecked == true, Masculine = MasculineBox.IsChecked == true, Precise = PreciseBox.IsChecked == true,
             AutoStart = AutoStartBox.IsChecked == true,
@@ -307,7 +321,7 @@ public partial class MainWindow : Window
         Volatile.Write(ref _regionBox, (object)new System.Drawing.Rectangle(p.X, p.Y, p.Width, p.Height));
         if (p.Width >= 20 && p.Height >= 10) RegionText.Text = $"المنطقة: {p.Width}×{p.Height}";
         _settings.X = p.X; _settings.Y = p.Y; _settings.Width = p.Width; _settings.Height = p.Height;
-        ModeBox.SelectedIndex = Math.Clamp(p.ModeIndex, 0, 1);
+        ModeIndexValue = Math.Clamp(p.ModeIndex, 0, 1);
         CaptureBox.SelectedIndex = Math.Clamp(p.CaptureIndex, 0, 1);
         if (_monitors.Count > 0) MonitorBox.SelectedIndex = Math.Clamp(p.MonitorIndex, 0, _monitors.Count - 1);
         SpeedBox.SelectedIndex = Math.Clamp(p.SpeedIndex, 0, 2);
@@ -386,12 +400,18 @@ public partial class MainWindow : Window
 
     private void GameFiles_Click(object sender, RoutedEventArgs e)
     {
-        var win = new GameFilesWindow(_settings, () =>
+        var win = new GameFilesWindow(_settings, onEngine =>
         {
-            var (resolver, translator, _) = BuildTranslation(threads: 4, beams: 1);
+            var (resolver, translator, _) = BuildTranslation(4, 1, onEngine);
             return (resolver, translator);
         }) { Owner = this };
         win.Show();
+    }
+
+    private void OpenLog_Click(object sender, RoutedEventArgs e)
+    {
+        if (!File.Exists(UserData.ErrorLog)) { StatusText.Text = "مفيش أخطاء متسجلة. كويس!"; return; }
+        try { Process.Start(new ProcessStartInfo("notepad.exe", $"\"{UserData.ErrorLog}\"") { UseShellExecute = true }); } catch { }
     }
 
     private void OpenFolder_Click(object sender, RoutedEventArgs e)
@@ -432,7 +452,7 @@ public partial class MainWindow : Window
     private int TextScale() => TextSizeBox.SelectedIndex switch { 0 => 1, 2 => 3, _ => 2 };
 
     // ---- the translator (shared by region mode, screen mode and game files) ----
-    private (TranslationResolver Resolver, ITranslator Translator, string Mode) BuildTranslation(int threads, int beams)
+    private (TranslationResolver Resolver, ITranslator Translator, string Mode) BuildTranslation(int threads, int beams, Action<string>? onEngine = null)
     {
         // chosen pack → (if missing) the other pack → (if none) the temporary online service
         var chosen = PackBox.SelectedIndex == 1 ? LanguagePack.Heavy : LanguagePack.Light;
@@ -447,8 +467,9 @@ public partial class MainWindow : Window
             var lazy = new LazyTranslator(
                 () => pack.CreateTranslator(threads, beams),
                 () => backupInstalled ? backup.CreateTranslator(threads, beams) : new OnlineTranslator("en", "ar"));
-            lazy.EngineReady += (eng, err) => ShowEngine(eng, err, pack.ShortName);
+            lazy.EngineReady += (eng, err) => { ShowEngine(eng, err, pack.ShortName); onEngine?.Invoke(EngineLabel(eng, err, pack.ShortName)); };
             ShowEngine(lazy.Engine, lazy.Error, pack.ShortName);   // in case it finished before we subscribed
+            onEngine?.Invoke(EngineLabel(lazy.Engine, lazy.Error, pack.ShortName));
             inner = lazy; mode = "بدون إنترنت";
         }
         else
@@ -491,6 +512,7 @@ public partial class MainWindow : Window
             StatusText.Text = "حزمة OCR الإنجليزية غير مثبتة: Settings ← Time & language ← Language & region ← أضف English";
             return;
         }
+        if (screen) ocr.AutoInvert = false;     // a whole screen has light and dark text everywhere: do not invert it
 
         int threads = SpeedBox.SelectedIndex == 0 ? 1 : 2;   // few CPU threads: the game keeps priority
         int beams = SpeedBox.SelectedIndex != 0 && PreciseBox.IsChecked == true ? 3 : 1;   // beam search only on request
@@ -501,7 +523,8 @@ public partial class MainWindow : Window
         if (screen) StartScreen(ocr, resolver); else StartRegion(ocr, resolver);
 
         StatusText.Text = (screen ? "ترجمة الشاشة كاملة شغّالة — " : "الترجمة شغّالة — ") + mode;
-        StartButton.IsEnabled = false; StopButton.IsEnabled = true; SelectButton.IsEnabled = !screen; ModeBox.IsEnabled = false;
+        StartButton.IsEnabled = false; StopButton.IsEnabled = true; SelectButton.IsEnabled = !screen; ModeRadios.IsEnabled = false;
+        SetState(true);
     }
 
     private void StartRegion(WindowsOcrEngine ocr, TranslationResolver resolver)
@@ -549,6 +572,11 @@ public partial class MainWindow : Window
                 if (_loggedBlocks.Add(b.Block.Text)) AppendHistory(b.Block.Text, b.Arabic);     // new texts go to the history for correction
             Dispatcher.InvokeAsync(() => LastText.Text = $"عدد النصوص المترجمة على الشاشة: {blocks.Count}");
         };
+        sp.Scanned += (lines, blocks, ms) => Dispatcher.InvokeAsync(() =>
+        {
+            LatencyText.Text = $"آخر مسح: قرأ {lines} سطر، طلع منهم {blocks} نص (OCR {ms:0} ms)";
+            if (lines == 0) LastText.Text = "الـ OCR ما قرأش أي نص من الصورة. جرّب طريقة التصوير المتقدم، أو تأكد إن اللغة الإنجليزية مثبتة في Windows.";
+        });
         sp.Start();
         _screen = sp;
         if (!options.Continuous) sp.ScanNow();
@@ -583,7 +611,8 @@ public partial class MainWindow : Window
         EngineText.Text = "";
         LastText.Text = "";
         StatusText.Text = "متوقف";
-        StartButton.IsEnabled = true; StopButton.IsEnabled = false; SelectButton.IsEnabled = true; ModeBox.IsEnabled = true;
+        SetState(false);
+        StartButton.IsEnabled = true; StopButton.IsEnabled = false; SelectButton.IsEnabled = true; ModeRadios.IsEnabled = true;
         UpdatePackStatus();
     }
 

@@ -40,6 +40,8 @@ public sealed class ScreenPipeline : IAsyncDisposable
     private Frame? _lastFrame;
 
     public event Action<IReadOnlyList<TranslatedBlock>>? Updated;
+    /// <summary>(text lines read by OCR, blocks after grouping, OCR milliseconds) after every scan - shows what the program really saw.</summary>
+    public event Action<int, int, double>? Scanned;
     public int Scans { get; private set; }
 
     public ScreenPipeline(IScreenGrabber grabber, IOcrLayoutEngine ocr, TranslationResolver resolver, IScreenOverlay overlay,
@@ -124,12 +126,22 @@ public sealed class ScreenPipeline : IAsyncDisposable
     private async Task ScanAsync(Frame frame, CancellationToken ct)
     {
         Scans++;
+        byte max = 0;
+        for (int i = 0; i < frame.Gray.Length; i += 97) if (frame.Gray[i] > max) max = frame.Gray[i];
+        if (max < 8)
+        {
+            _log?.Invoke("الصورة سودة: اللعبة غالبًا Fullscreen. غيّر طريقة التصوير لـ «متقدم» أو شغّل اللعبة Borderless.");
+            return;
+        }
+
         IReadOnlyList<OcrTextLine> lines;
+        var sw = Stopwatch.StartNew();
         try { lines = await _ocr.RecognizeLayoutAsync(frame, ct).ConfigureAwait(false); }
         catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
         catch (Exception ex) { _log?.Invoke("OCR failed: " + ex.Message); return; }
 
         var blocks = BlockBuilder.Build(lines).Take(_opt.MaxBlocks).ToList();
+        try { Scanned?.Invoke(lines.Count, blocks.Count, sw.Elapsed.TotalMilliseconds); } catch { }
         if (blocks.Count == 0)
         {
             if (Interlocked.Read(ref _emptySince) == 0) Interlocked.Exchange(ref _emptySince, Stopwatch.GetTimestamp());
