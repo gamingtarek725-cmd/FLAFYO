@@ -83,6 +83,8 @@ public partial class MainWindow : Window
         UpdatePackStatus();
         RefreshProfiles();
         RefreshRunning();
+        RefreshBorderless();
+        RefreshBorderless();
         _watcher.Tick += (_, _) => WatcherTick();
         _watcher.Start();
         SourceInitialized += OnSourceInitialized;
@@ -272,7 +274,81 @@ public partial class MainWindow : Window
         if (list.Count > 0) RunningBox.SelectedIndex = 0;
     }
 
+    private List<(string Exe, string Title, IntPtr Hwnd)> _windowTargets = new();
+    private readonly Dictionary<IntPtr, WindowRestoreInfo> _borderless = new();
+
+    private void RefreshBorderless()
+    {
+        _windowTargets = ActiveWindow.RunningWindowsEx();
+        BorderlessBox.ItemsSource = _windowTargets.Select(x => $"{x.Exe} — {x.Title}").ToList();
+        if (_windowTargets.Count > 0) BorderlessBox.SelectedIndex = 0;
+    }
+
+    private void RefreshBorderless_Click(object sender, RoutedEventArgs e) => RefreshBorderless();
+
+    private void Borderless_Click(object sender, RoutedEventArgs e)
+    {
+        int i = BorderlessBox.SelectedIndex;
+        if (i < 0 || i >= _windowTargets.Count) { BorderlessText.Text = "شغّل اللعبة Windowed، واضغط «تحديث القايمة»، واختارها."; return; }
+        var t = _windowTargets[i];
+        var info = WindowTools.MakeBorderless(t.Hwnd);
+        if (info == null)
+        {
+            BorderlessText.Text = $"ما قدرتش أغيّر نافذة {t.Exe}. لو اللعبة شغالة بصلاحيات أعلى، شغّل البرنامج كـ Administrator.";
+            return;
+        }
+        _borderless[t.Hwnd] = info;
+        BorderlessText.Text = $"اتحوّلت {t.Exe} لشاشة كاملة بدون حدود. دلوقتي حدد منطقة النص وابدأ الترجمة.";
+    }
+
+    private void BorderlessRestore_Click(object sender, RoutedEventArgs e)
+    {
+        int i = BorderlessBox.SelectedIndex;
+        if (i < 0 || i >= _windowTargets.Count) return;
+        var t = _windowTargets[i];
+        if (_borderless.Remove(t.Hwnd, out var info)) { WindowTools.Restore(info); BorderlessText.Text = $"اترجّعت {t.Exe} زي ما كانت."; }
+        else BorderlessText.Text = "اللعبة دي ما اتحوّلتش من البرنامج.";
+    }
+
     private void RefreshRunning_Click(object sender, RoutedEventArgs e) => RefreshRunning();
+
+    // ---- borderless fullscreen for games that run in a window ----
+    private List<(string Exe, string Title, IntPtr Hwnd)> _windowTargets = new();
+    private readonly Dictionary<IntPtr, WindowRestoreInfo> _restoreInfos = new();
+
+    private void RefreshBorderless()
+    {
+        _windowTargets = ActiveWindow.RunningWindowsEx();
+        BorderlessBox.ItemsSource = _windowTargets.Select(x => $"{x.Exe} — {x.Title}").ToList();
+        if (_windowTargets.Count > 0) BorderlessBox.SelectedIndex = 0;
+    }
+
+    private void RefreshBorderless_Click(object sender, RoutedEventArgs e) => RefreshBorderless();
+
+    private void Borderless_Click(object sender, RoutedEventArgs e)
+    {
+        int idx = BorderlessBox.SelectedIndex;
+        if (idx < 0 || idx >= _windowTargets.Count) { BorderlessText.Text = "شغّل اللعبة Windowed، واضغط «تحديث القايمة»، واختارها."; return; }
+        var t = _windowTargets[idx];
+        try
+        {
+            var info = WindowTools.MakeBorderless(t.Hwnd);
+            if (info == null) { BorderlessText.Text = "معرفتش أغيّر نافذة اللعبة دي (ممكن تكون Fullscreen حصري أو عليها حماية)."; return; }
+            _restoreInfos[t.Hwnd] = info;
+            BorderlessText.Text = $"اتحوّلت {t.Exe} لشاشة كاملة بدون حدود. دلوقتي حدد منطقة النص وابدأ الترجمة.";
+        }
+        catch (Exception ex) { BorderlessText.Text = "فشل: " + ex.Message; AppLog.Write(ex); }
+    }
+
+    private void BorderlessRestore_Click(object sender, RoutedEventArgs e)
+    {
+        int idx = BorderlessBox.SelectedIndex;
+        if (idx < 0 || idx >= _windowTargets.Count) return;
+        var t = _windowTargets[idx];
+        if (!_restoreInfos.TryGetValue(t.Hwnd, out var info)) { BorderlessText.Text = "اللعبة دي ما اتحوّلتش من البرنامج ده."; return; }
+        BorderlessText.Text = WindowTools.Restore(info) ? "اترجّعت النافذة زي ما كانت." : "النافذة مبقتش موجودة.";
+        _restoreInfos.Remove(t.Hwnd);
+    }
 
     private void SaveProfile_Click(object sender, RoutedEventArgs e)
     {

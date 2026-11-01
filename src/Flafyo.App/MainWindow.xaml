@@ -123,8 +123,43 @@
               <ComboBox x:Name="MonitorBox" SelectionChanged="Monitor_Changed"/>
               <CheckBox x:Name="ContinuousBox" Content="تحديث مستمر (لو قفلته: الترجمة بتحصل لما تضغط الاختصار بس)" IsChecked="True"
                         Checked="Continuous_Changed" Unchecked="Continuous_Changed"/>
+              <Border Style="{StaticResource Card}" Margin="0,16,0,0" Background="#F8FAFF">
+                <StackPanel>
+                  <TextBlock Text="لألعاب Fullscreen: شاشة كاملة بدون حدود" Style="{StaticResource H}"/>
+                  <TextBlock Style="{StaticResource MutedText}" Margin="0,4,0,0"
+                             Text="Windows مبتسمحش لأي برنامج يرسم فوق لعبة Fullscreen الحصري أو يصوّرها. الحل: 1) شغّل اللعبة Windowed من إعداداتها. 2) اختارها هنا واضغط «حوّلها». هتبان Fullscreen كاملة، والترجمة هتشتغل (حتى لو اخترت جزء من الشاشة بس)."/>
+                  <TextBlock Text="اللعبة" Style="{StaticResource L}"/>
+                  <ComboBox x:Name="BorderlessBox"/>
+                  <WrapPanel Margin="0,8,0,0">
+                    <Button Content="تحديث القايمة" Margin="0,0,8,0" Click="RefreshBorderless_Click"/>
+                    <Button Content="حوّلها لشاشة كاملة" Margin="0,0,8,0" Click="Borderless_Click"/>
+                    <Button Content="رجّعها زي ما كانت" Click="BorderlessRestore_Click"/>
+                  </WrapPanel>
+                  <TextBlock x:Name="BorderlessText" Style="{StaticResource MutedText}" Margin="0,6,0,0"/>
+                  <TextBlock Style="{StaticResource WarnText}" Margin="0,6,0,0"
+                             Text="للألعاب الفردية. الألعاب الأونلاين اللي عليها حماية ممكن تعتبر ده تعديل. بعض الألعاب بترجّع شكلها لوحدها: كرّر الضغط."/>
+                </StackPanel>
+              </Border>
               <TextBlock x:Name="HotkeyText" Style="{StaticResource MutedText}" Margin="0,12,0,0"
                          Text="اختصارات من جوه اللعبة:&#10;Ctrl+Alt+T تشغيل / إيقاف&#10;Ctrl+Alt+S ترجمة الشاشة الآن&#10;Ctrl+Alt+H إخفاء / إظهار المستطيلات&#10;Ctrl+Alt+R قراءة آخر ترجمة بصوت"/>
+
+              <Border Style="{StaticResource Card}" Margin="0,18,0,0" Background="#F7FAFF">
+                <StackPanel>
+                  <TextBlock Text="ألعاب Fullscreen: شاشة كاملة بدون حدود" Style="{StaticResource H}"/>
+                  <TextBlock Style="{StaticResource MutedText}" Margin="0,4,0,0"
+                             Text="Windows مبتسمحش لأي برنامج يرسم الترجمة فوق Fullscreen الحصري. الحل: شغّل اللعبة Windowed من إعداداتها، وبعدين حوّلها من هنا لشاشة كاملة بدون حدود. هتبان Fullscreen بالظبط، والترجمة بتشتغل (وتقدر تختار جزء من الشاشة)."/>
+                  <TextBlock Text="اللعبة الشغالة دلوقتي" Style="{StaticResource L}"/>
+                  <ComboBox x:Name="BorderlessBox"/>
+                  <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                    <Button Content="تحديث القايمة" Click="RefreshBorderless_Click"/>
+                    <Button Content="حوّلها لشاشة كاملة" Margin="8,0,0,0" Click="Borderless_Click"/>
+                    <Button Content="رجّعها زي ما كانت" Margin="8,0,0,0" Click="BorderlessRestore_Click"/>
+                  </StackPanel>
+                  <TextBlock x:Name="BorderlessText" Style="{StaticResource MutedText}" Margin="0,8,0,0"/>
+                  <TextBlock Style="{StaticResource WarnText}" Margin="0,4,0,0"
+                             Text="للألعاب الفردية. في الألعاب الأونلاين اللي عليها حماية، تغيير شكل نافذة اللعبة ممكن يتعارض معاها."/>
+                </StackPanel>
+              </Border>
             </StackPanel>
           </TabItem>
 

@@ -34,6 +34,7 @@ public partial class GameFilesWindow : Window
         _settings = settings; _factory = factory;
         FilesList.ItemsSource = _items;
         FilesList.SelectionChanged += (_, _) => ShowPreview();
+        ProbeList.SelectionChanged += ProbeList_SelectionChanged;
         if (!string.IsNullOrEmpty(settings.GameFolder) && Directory.Exists(settings.GameFolder)) SetFolder(settings.GameFolder);
         StatusText.Text = "ابدأ باختيار مجلد اللعبة.";
     }
@@ -103,9 +104,136 @@ public partial class GameFilesWindow : Window
         finally { SetBusy(false); FilesList.Items.Refresh(); }
     }
 
+    // ---- smart probe: which files really hold the game's text ----
+    public sealed class ProbeItem
+    {
+        public ProbeHit Hit { get; }
+        public string Text => $"{Hit.Sentences} جملة   [{Hit.Kind}]   {Hit.Title}";
+        public ProbeItem(ProbeHit hit) { Hit = hit; }
+    }
+
+    private async void Probe_Click(object sender, RoutedEventArgs e)
+    {
+        if (_busy) return;
+        var folder = FolderBox.Text;
+        if (!Directory.Exists(folder)) { ProbeStatus.Text = "اختر مجلد اللعبة الأول."; return; }
+        SetBusy(true); StopButton.IsEnabled = false;
+        ProbeList.ItemsSource = null; ProbePreview.Text = ""; ProbeStatus.Text = "جاري الفحص… (ممكن ياخد دقايق في الألعاب الكبيرة)";
+        try
+        {
+            var hits = await Task.Run(() => GameProbe.Scan(folder, CancellationToken.None, msg => Dispatcher.InvokeAsync(() => ProbeStatus.Text = msg)));
+            ProbeList.ItemsSource = hits.Select(h => new ProbeItem(h)).ToList();
+            ProbeStatus.Text = hits.Count == 0
+                ? "مالقيتش نصوص إنجليزي واضحة. النصوص ممكن تكون مضغوطة أو مشفرة بصيغة مش بنعرفها. ابعتلي اسم اللعبة وملف منها وأنا أشوف."
+                : $"لقيت {hits.Count} ملف فيه نصوص. الأعلى في القايمة هو الأرجح إنه ملف اللغة. دوس على واحد تشوف نماذج منه.";
+            if (hits.Count > 0) ProbeList.SelectedIndex = 0;
+        }
+        catch (Exception ex) { ProbeStatus.Text = "فشل الفحص: " + ex.Message; AppLog.Write(ex); }
+        finally { SetBusy(false); }
+    }
+
+    private ProbeHit? SelectedHit => (ProbeList.SelectedItem as ProbeItem)?.Hit;
+
+    private void ProbeList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        var hit = SelectedHit;
+        ProbePreview.Text = hit == null ? "" : string.Join(Environment.NewLine, hit.Samples.Select(s => "• " + s));
+    }
+
+    private void ExportHit_Click(object sender, RoutedEventArgs e)
+    {
+        var hit = SelectedHit;
+        if (hit == null) { ProbeStatus.Text = "اختار ملف من القايمة الأول."; return; }
+        try
+        {
+            var file = GameProbe.Export(hit, Path.Combine(OutputBox.Text.Trim(), "_found"));
+            ProbeStatus.Text = "اتصدّرت النصوص في: " + file;
+            Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{file}\"") { UseShellExecute = true });
+        }
+        catch (Exception ex) { ProbeStatus.Text = "فشل التصدير: " + ex.Message; AppLog.Write(ex); }
+    }
+
+    private void ExtractArc_Click(object sender, RoutedEventArgs e)
+    {
+        var hit = SelectedHit;
+        if (hit == null || hit.Kind != "ARC") { ProbeStatus.Text = "اختار ملف من النوع ARC."; return; }
+        try
+        {
+            var dir = Path.Combine(OutputBox.Text.Trim(), "_extracted", Path.GetFileNameWithoutExtension(hit.FullPath));
+            int n = GameProbe.ExtractArc(hit.FullPath, dir);
+            ProbeStatus.Text = $"اتفك {n} ملف في: {dir}";
+            Process.Start(new ProcessStartInfo("explorer.exe", $"\"{dir}\"") { UseShellExecute = true });
+        }
+        catch (Exception ex) { ProbeStatus.Text = "فشل فك الأرشيف: " + ex.Message; AppLog.Write(ex); }
+    }
+
     private void SelectSuggested_Click(object sender, RoutedEventArgs e) { foreach (var i in _items) i.IsSelected = i.Suggested; FilesList.Items.Refresh(); }
     private void SelectAll_Click(object sender, RoutedEventArgs e) { foreach (var i in _items) i.IsSelected = true; FilesList.Items.Refresh(); }
     private void SelectNone_Click(object sender, RoutedEventArgs e) { foreach (var i in _items) i.IsSelected = false; FilesList.Items.Refresh(); }
+
+    public sealed class ProbeItem
+    {
+        public ProbeHit Hit { get; }
+        public string Text => $"{Hit.Sentences} جملة — [{Hit.Kind}] {Hit.Title}";
+        public ProbeItem(ProbeHit hit) => Hit = hit;
+    }
+
+    private readonly ObservableCollection<ProbeItem> _probe = new();
+    private CancellationTokenSource? _probeCts;
+
+    private async void Probe_Click(object sender, RoutedEventArgs e)
+    {
+        var folder = FolderBox.Text;
+        if (!Directory.Exists(folder)) { ProbeStatus.Text = "اختر مجلد اللعبة الأول."; return; }
+        ProbeList.ItemsSource = _probe;
+        _probe.Clear(); ProbePreview.Text = "";
+        ProbeButton.IsEnabled = false;
+        ProbeStatus.Text = "جاري الفحص… ممكن ياخد دقايق لو اللعبة كبيرة.";
+        _probeCts = new CancellationTokenSource();
+        try
+        {
+            var token = _probeCts.Token;
+            var hits = await Task.Run(() => GameProbe.Scan(folder, token, m => Dispatcher.InvokeAsync(() => ProbeStatus.Text = m)));
+            foreach (var h in hits) _probe.Add(new ProbeItem(h));
+            ProbeStatus.Text = hits.Count == 0
+                ? "ما لقيتش نصوص إنجليزي واضحة. غالبًا النصوص في صيغة مشفرة أو مضغوطة بطريقة تانية."
+                : $"لقيت {hits.Count} ملف أو جزء فيه نصوص. الأعلى في القايمة هو الأرجح إنه نصوص اللعبة.";
+        }
+        catch (OperationCanceledException) { ProbeStatus.Text = "اتوقف الفحص."; }
+        catch (Exception ex) { ProbeStatus.Text = "فشل الفحص: " + ex.Message; AppLog.Write(ex); }
+        finally { ProbeButton.IsEnabled = true; _probeCts?.Dispose(); _probeCts = null; }
+    }
+
+    private void ProbeList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        if (ProbeList.SelectedItem is ProbeItem it)
+            ProbePreview.Text = string.Join(Environment.NewLine, it.Hit.Samples.Select(s => "• " + s));
+    }
+
+    private void ExportHit_Click(object sender, RoutedEventArgs e)
+    {
+        if (ProbeList.SelectedItem is not ProbeItem it) { ProbeStatus.Text = "اختار عنصر من القايمة الأول."; return; }
+        try
+        {
+            var path = GameProbe.Export(it.Hit, Path.Combine(OutputBox.Text.Trim(), "_found"));
+            ProbeStatus.Text = "اتصدّرت النصوص في: " + path;
+            Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{path}\"") { UseShellExecute = true });
+        }
+        catch (Exception ex) { ProbeStatus.Text = "فشل التصدير: " + ex.Message; AppLog.Write(ex); }
+    }
+
+    private void ExtractArc_Click(object sender, RoutedEventArgs e)
+    {
+        if (ProbeList.SelectedItem is not ProbeItem it || it.Hit.Kind != "ARC") { ProbeStatus.Text = "اختار عنصر نوعه ARC."; return; }
+        try
+        {
+            var dir = Path.Combine(OutputBox.Text.Trim(), "_extracted", Path.GetFileNameWithoutExtension(it.Hit.FullPath));
+            int n = GameProbe.ExtractArc(it.Hit.FullPath, dir);
+            ProbeStatus.Text = $"اتفك {n} ملف في: {dir}";
+            Process.Start(new ProcessStartInfo("explorer.exe", $"\"{dir}\"") { UseShellExecute = true });
+        }
+        catch (Exception ex) { ProbeStatus.Text = "فشل الاستخراج: " + ex.Message; AppLog.Write(ex); }
+    }
 
     private static string Eta(TimeSpan t) => t.TotalHours >= 1 ? $"{(int)t.TotalHours} ساعة و{t.Minutes} دقيقة" : t.TotalMinutes >= 1 ? $"{(int)t.TotalMinutes} دقيقة" : $"{t.Seconds} ثانية";
 
@@ -222,6 +350,7 @@ public partial class GameFilesWindow : Window
     protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
     {
         _cts?.Cancel();
+        _probeCts?.Cancel();
         base.OnClosing(e);
     }
 }
