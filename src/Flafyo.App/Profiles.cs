@@ -108,24 +108,6 @@ internal static class ActiveWindow
         return list.OrderBy(x => x.Item1, StringComparer.OrdinalIgnoreCase).ToList();
     }
 
-    /// <summary>Same list, with the window handle (for making a game window borderless).</summary>
-    public static List<(string Exe, string Title, IntPtr Hwnd)> RunningWindowsEx()
-    {
-        var list = new List<(string, string, IntPtr)>();
-        foreach (var p in Process.GetProcesses())
-        {
-            try
-            {
-                if (p.Id == Environment.ProcessId || p.MainWindowHandle == IntPtr.Zero || p.MainWindowTitle.Length == 0) continue;
-                if (Ignore.Contains(p.ProcessName)) continue;
-                list.Add((p.ProcessName, p.MainWindowTitle, p.MainWindowHandle));
-            }
-            catch { }
-            finally { p.Dispose(); }
-        }
-        return list.OrderBy(x => x.Item1, StringComparer.OrdinalIgnoreCase).ToList();
-    }
-
     /// <summary>Programs with a visible window (for the "save settings for this game" list).</summary>
     public static List<(string Exe, string Title)> RunningWindows()
     {

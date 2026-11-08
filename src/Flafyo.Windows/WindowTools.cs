@@ -50,11 +50,12 @@ public static class WindowTools
         return info;
     }
 
-    public static void Restore(WindowRestoreInfo i)
+    public static bool Restore(WindowRestoreInfo i)
     {
-        if (!IsWindow(i.Hwnd)) return;
+        if (!IsWindow(i.Hwnd)) return false;
         Set(i.Hwnd, GWL_STYLE, i.Style);
         Set(i.Hwnd, GWL_EXSTYLE, i.ExStyle);
         SetWindowPos(i.Hwnd, IntPtr.Zero, i.Bounds.X, i.Bounds.Y, i.Bounds.Width, i.Bounds.Height, SWP_NOZORDER | SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+        return true;
     }
 }
