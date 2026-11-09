@@ -169,6 +169,10 @@ public partial class GameFilesWindow : Window
         catch (Exception ex) { ProbeStatus.Text = "فشل الاستخراج: " + ex.Message; AppLog.Write(ex); }
     }
 
+    private void SelectSuggested_Click(object sender, RoutedEventArgs e) { foreach (var i in _items) i.IsSelected = i.Suggested; FilesList.Items.Refresh(); }
+    private void SelectAll_Click(object sender, RoutedEventArgs e) { foreach (var i in _items) i.IsSelected = true; FilesList.Items.Refresh(); }
+    private void SelectNone_Click(object sender, RoutedEventArgs e) { foreach (var i in _items) i.IsSelected = false; FilesList.Items.Refresh(); }
+
     private static string Eta(TimeSpan t) => t.TotalHours >= 1 ? $"{(int)t.TotalHours} ساعة و{t.Minutes} دقيقة" : t.TotalMinutes >= 1 ? $"{(int)t.TotalMinutes} دقيقة" : $"{t.Seconds} ثانية";
 
     private async void Start_Click(object sender, RoutedEventArgs e)

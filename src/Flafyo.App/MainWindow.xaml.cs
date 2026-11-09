@@ -310,6 +310,8 @@ public partial class MainWindow : Window
         _restoreInfos.Remove(t.Hwnd);
     }
 
+    private void RefreshRunning_Click(object sender, RoutedEventArgs e) => RefreshRunning();
+
     private void SaveProfile_Click(object sender, RoutedEventArgs e)
     {
         int idx = RunningBox.SelectedIndex;
