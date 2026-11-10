@@ -158,15 +158,47 @@ public partial class GameFilesWindow : Window
 
     private void ExtractArc_Click(object sender, RoutedEventArgs e)
     {
-        if (ProbeList.SelectedItem is not ProbeItem it || it.Hit.Kind != "ARC") { ProbeStatus.Text = "اختار عنصر نوعه ARC."; return; }
+        if (ProbeList.SelectedItem is not ProbeItem it) { ProbeStatus.Text = "اختار عنصر من قايمة الفحص الذكي الأول (ملف كامل، مش جزء جوه أرشيف)."; return; }
+        var path = it.Hit.Entry == null ? it.Hit.FullPath : null;
+        if (path == null) { ProbeStatus.Text = "العنصر ده جزء جوه حاوية. اختار الحاوية نفسها (السطر اللي اسم الملف فيه بس من غير فاصل ›)."; return; }
         try
         {
-            var dir = Path.Combine(OutputBox.Text.Trim(), "_extracted", Path.GetFileNameWithoutExtension(it.Hit.FullPath));
-            int n = GameProbe.ExtractArc(it.Hit.FullPath, dir);
-            ProbeStatus.Text = $"اتفك {n} ملف في: {dir}";
+            var dir = Path.Combine(OutputBox.Text.Trim(), "_extracted", Path.GetFileNameWithoutExtension(path));
+            var (kind, n) = ContainerTools.Extract(path, dir);
+            ProbeStatus.Text = $"اتفك {n} ملف ({kind}) في: {dir}";
+            ExtractedFolderBox.Text = dir; ContainerFileBox.Text = path;
             Process.Start(new ProcessStartInfo("explorer.exe", $"\"{dir}\"") { UseShellExecute = true });
         }
         catch (Exception ex) { ProbeStatus.Text = "فشل الاستخراج: " + ex.Message; AppLog.Write(ex); }
+    }
+
+    private void BrowseExtracted_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.OpenFolderDialog { Title = "اختر المجلد المستخرج" };
+        if (dialog.ShowDialog(this) == true) ExtractedFolderBox.Text = dialog.FolderName;
+    }
+
+    private void BrowseContainer_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog { Title = "اختر ملف الحاوية الأصلي (.arc / .zip / .pak)" };
+        if (dialog.ShowDialog(this) == true) ContainerFileBox.Text = dialog.FileName;
+    }
+
+    private void RepackApply_Click(object sender, RoutedEventArgs e)
+    {
+        var folder = ExtractedFolderBox.Text.Trim(); var container = ContainerFileBox.Text.Trim();
+        if (!Directory.Exists(folder) || !File.Exists(container)) { StatusText.Text = "حدد المجلد المستخرج وملف الحاوية الأصلي الأول."; return; }
+        var answer = MessageBox.Show(this,
+            "هتتبدل الحاوية الأصلية بنسخة فيها الملفات المترجمة، وهيتعمل نسخة احتياطية جنبها (.flafyo_backup). تكمل؟",
+            "تأكيد", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+        if (answer != MessageBoxResult.Yes) return;
+        try
+        {
+            var rebuilt = ContainerTools.Repack(folder);
+            var backup = ContainerTools.Apply(container, rebuilt);
+            StatusText.Text = $"اتبنت الحاوية واتطبقت. النسخة الأصلية محفوظة في: {backup}";
+        }
+        catch (Exception ex) { StatusText.Text = "فشل البناء أو التطبيق: " + ex.Message; AppLog.Write(ex); }
     }
 
     private void SelectSuggested_Click(object sender, RoutedEventArgs e) { foreach (var i in _items) i.IsSelected = i.Suggested; FilesList.Items.Refresh(); }

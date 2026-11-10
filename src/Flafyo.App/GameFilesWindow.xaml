@@ -40,8 +40,10 @@
           <TextBox x:Name="ProbePreview" Height="100" Margin="0,8,0,0" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FlowDirection="LeftToRight" Padding="6"/>
           <WrapPanel Margin="0,8,0,0">
             <Button Content="تصدير نصوص العنصر المحدد" Margin="0,0,8,0" Click="ExportHit_Click"/>
-            <Button Content="استخراج الأرشيف" Click="ExtractArc_Click"/>
+            <Button Content="استخراج الحاوية (ARC / ZIP / .pak)" Click="ExtractArc_Click"/>
           </WrapPanel>
+          <TextBlock Style="{StaticResource MutedText}" Margin="0,6,0,0"
+                     Text="بعد الاستخراج: افحص المجلد الناتج من قسم «مجلد اللعبة» فوق، وحدد ملفاته وترجمها زي أي ملف عادي."/>
         </StackPanel>
       </Border>
 
@@ -94,6 +96,21 @@
             <Button x:Name="ApplyButton" Content="تطبيق على اللعبة (مع نسخة احتياطية)" Margin="0,0,8,8" Click="Apply_Click"/>
             <Button Content="استرجاع الأصل" Margin="0,0,8,8" Click="Restore_Click"/>
           </WrapPanel>
+
+          <TextBlock Text="لو ترجمت ملفات جوه حاوية (ARC/ZIP/.pak) مستخرجة" Style="{StaticResource L}"/>
+          <TextBlock Style="{StaticResource MutedText}" Margin="0,2,0,0"
+                     Text="حدد المجلد اللي استخرجته فوق (مش الأصلي، المجلد اللي فيه الملفات الفرعية)، وحدد ملف الحاوية الأصلي، وهو هيبني حاوية جديدة بنفس الترتيب وبعد كده يستبدل الأصلي (مع نسخة احتياطية)."/>
+          <Grid Margin="0,8,0,0">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <TextBox x:Name="ExtractedFolderBox" IsReadOnly="True" Padding="6"/>
+            <Button Grid.Column="1" Content="اختر المجلد المستخرج" Margin="8,0,0,0" Click="BrowseExtracted_Click"/>
+          </Grid>
+          <Grid Margin="0,8,0,0">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <TextBox x:Name="ContainerFileBox" IsReadOnly="True" Padding="6"/>
+            <Button Grid.Column="1" Content="اختر ملف الحاوية الأصلي" Margin="8,0,0,0" Click="BrowseContainer_Click"/>
+          </Grid>
+          <Button Content="ابني الحاوية وطبّقها على اللعبة" Margin="0,10,0,0" Click="RepackApply_Click"/>
         </StackPanel>
       </Border>
 
