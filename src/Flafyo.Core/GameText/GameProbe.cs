@@ -46,8 +46,46 @@ public static class BinaryTextMiner
         results.Add(new FoundText(t, offset, utf16));
     }
 
-    /// <summary>A "sentence" has at least three words.</summary>
-    public static bool IsSentence(string s) => s.Count(c => c == ' ') >= 2;
+    /// <summary>A "sentence" has at least four words (binary garbage rarely lines up three spaces by chance).</summary>
+    public static bool IsSentence(string s) => s.Count(c => c == ' ') >= 3;
+
+    // Real English sentences almost always contain one of these; random bytes that happen to look printable almost never do.
+    // This is the main thing that keeps binary game resources (models, audio, compiled code) from being mistaken for dialogue.
+    private static readonly HashSet<string> CommonWords = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "the","and","you","your","to","of","is","in","a","an","that","it","this","with","for","on","we","as","at","by",
+        "but","not","are","was","were","have","has","had","will","would","can","could","from","my","me","he","she",
+        "they","them","his","her","our","us","be","been","do","does","did","what","when","where","how","why","who",
+        "if","then","than","so","out","up","down","now","all","no","yes","get","got","just","there","here","about",
+    };
+
+    public static bool HasCommonWord(string s)
+    {
+        foreach (var raw in s.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var w = raw.Trim('.', ',', '!', '?', ':', ';', '"', ''', '(', ')');
+            if (CommonWords.Contains(w)) return true;
+        }
+        return false;
+    }
+
+    /// <summary>The stricter check actually used to decide whether a found string is real dialogue/text, not binary noise.</summary>
+    public static bool IsRealSentence(string s) => IsSentence(s) && HasCommonWord(s);
+
+    /// <summary>Fraction of bytes that look like normal text (a cheap way to skip binary files before the expensive scan).</summary>
+    public static double PrintableRatio(byte[] data, int maxSamples = 200_000)
+    {
+        if (data.Length == 0) return 0;
+        int stride = Math.Max(1, data.Length / maxSamples);
+        int printable = 0, n = 0;
+        for (int i = 0; i < data.Length; i += stride)
+        {
+            byte b = data[i];
+            if ((b >= 0x20 && b < 0x7F) || b == 9 || b == 10 || b == 13) printable++;
+            n++;
+        }
+        return n == 0 ? 0 : (double)printable / n;
+    }
 }
 
 public sealed record ProbeHit(string FullPath, string? Entry, string Kind, int Sentences, int Strings,
@@ -131,10 +169,14 @@ public static class GameProbe
         Add(hits, file, null, "ملف", data, minSentences);
     }
 
+    /// <summary>Below this, a file is almost certainly binary data, not text — skipped before the (slow, noise-prone) string scan.</summary>
+    private const double MinPrintableRatio = 0.55;
+
     private static void Add(List<ProbeHit> hits, string file, string? entry, string kind, byte[] data, int minSentences)
     {
+        if (BinaryTextMiner.PrintableRatio(data) < MinPrintableRatio) return;    // binary resource (model, audio, texture, compiled code...)
         var found = BinaryTextMiner.Extract(data);
-        var sentences = found.Where(f => BinaryTextMiner.IsSentence(f.Text)).ToList();
+        var sentences = found.Where(f => BinaryTextMiner.IsRealSentence(f.Text)).ToList();
         if (sentences.Count < minSentences) return;
         hits.Add(new ProbeHit(file, entry, kind, sentences.Count, found.Count,
             sentences.Take(8).Select(s => s.Text).ToList(), found));

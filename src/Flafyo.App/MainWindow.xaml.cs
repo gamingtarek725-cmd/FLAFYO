@@ -79,6 +79,7 @@ public partial class MainWindow : Window
         var work = SystemParameters.WorkArea;
         Width = Math.Min(Width, work.Width - 20);
         Height = Math.Min(Height, work.Height - 20);
+        LoadAiSettingsIntoUi();
         _ready = true;
         UpdatePackStatus();
         RefreshProfiles();
@@ -205,6 +206,65 @@ public partial class MainWindow : Window
     {
         if (!_ready) return;
         _settings.PackIndex = PackBox.SelectedIndex; _settings.Save();
+    }
+
+    private bool _aiTested;
+
+    private void LoadAiSettingsIntoUi()
+    {
+        AiProviderBox.SelectedIndex = Math.Clamp(_settings.AiProviderIndex, 0, 1);
+        AiKeyBox.Password = _settings.AiApiKey;
+        AiModelBox.Text = _settings.AiModel;
+        AiUrlBox.Text = _settings.AiBaseUrl;
+        UseAiBox.IsChecked = _settings.UseAiApi;
+    }
+
+    private void SaveAiSettings()
+    {
+        _settings.AiProviderIndex = AiProviderBox.SelectedIndex;
+        _settings.AiApiKey = AiKeyBox.Password;
+        _settings.AiModel = AiModelBox.Text.Trim();
+        _settings.AiBaseUrl = AiUrlBox.Text.Trim();
+        _settings.Save();
+    }
+
+    private void AiSetting_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_ready) return;
+        _aiTested = false;
+        SaveAiSettings();
+    }
+
+    private AiApiTranslator? BuildAiTranslator(out string? error)
+    {
+        error = null;
+        var key = AiKeyBox.Password.Trim(); var model = AiModelBox.Text.Trim();
+        if (key.Length == 0) { error = "حط مفتاح API الأول."; return null; }
+        if (model.Length == 0) { error = "حط اسم النموذج اللي عايز تستخدمه."; return null; }
+        var provider = AiProviderBox.SelectedIndex == 1 ? AiProvider.Anthropic : AiProvider.OpenAiCompatible;
+        return new AiApiTranslator(provider, key, model, AiUrlBox.Text.Trim());
+    }
+
+    private async void AiTest_Click(object sender, RoutedEventArgs e)
+    {
+        SaveAiSettings();
+        using var tr = BuildAiTranslator(out var error);
+        if (tr == null) { AiStatusText.Text = "⚠️ " + error; return; }
+        AiStatusText.Text = "جاري الاختبار…";
+        try
+        {
+            var result = await tr.TranslateAsync("Hello, traveler.", CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(30));
+            _aiTested = !string.IsNullOrWhiteSpace(result);
+            AiStatusText.Text = _aiTested ? $"✅ الاتصال شغّال. مثال: «{result}»" : "⚠️ الخدمة رجّعت رد فاضي.";
+        }
+        catch (Exception ex) { _aiTested = false; AiStatusText.Text = "⚠️ فشل الاتصال: " + ex.Message; }
+    }
+
+    private void UseAi_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_ready) return;
+        _settings.UseAiApi = UseAiBox.IsChecked == true; _settings.Save();
+        if (_settings.UseAiApi && !_aiTested) AiStatusText.Text = "اضغط «اربط الحساب واختبر الاتصال» الأول عشان تتأكد إنه شغال.";
     }
 
     private void Masculine_Changed(object sender, RoutedEventArgs e)
@@ -492,6 +552,15 @@ public partial class MainWindow : Window
     // ---- the translator (shared by region mode, screen mode and game files) ----
     private (TranslationResolver Resolver, ITranslator Translator, string Mode) BuildTranslation(int threads, int beams, Action<string>? onEngine = null)
     {
+        if (_settings.UseAiApi && _settings.AiApiKey.Length > 0 && _settings.AiModel.Length > 0)
+        {
+            var provider = _settings.AiProviderIndex == 1 ? AiProvider.Anthropic : AiProvider.OpenAiCompatible;
+            var apiTranslator = new AiApiTranslator(provider, _settings.AiApiKey, _settings.AiModel, _settings.AiBaseUrl);
+            ShowEngine("offline", null, provider == AiProvider.Anthropic ? "Anthropic (حسابك)" : "OpenAI (حسابك)");
+            onEngine?.Invoke(EngineLabel("offline", null, provider == AiProvider.Anthropic ? "Anthropic (حسابك)" : "OpenAI (حسابك)"));
+            return BuildWithInner(apiTranslator, "عن طريق حسابك");
+        }
+
         // chosen pack → (if missing) the other pack → (if none) the temporary online service
         var chosen = PackBox.SelectedIndex == 1 ? LanguagePack.Heavy : LanguagePack.Light;
         var other = chosen.Kind == PackKind.Heavy ? LanguagePack.Light : LanguagePack.Heavy;
@@ -516,7 +585,11 @@ public partial class MainWindow : Window
             ShowEngine("online", null, "");
             mode = "بالإنترنت (مؤقتًا)";
         }
+        return BuildWithInner(inner, mode);
+    }
 
+    private (TranslationResolver Resolver, ITranslator Translator, string Mode) BuildWithInner(ITranslator inner, string mode)
+    {
         // the user's own masculine.txt is added to the built-in list
         try { _masculineMap = ArabicGender.ParseUserFile(File.ReadAllLines(UserData.MasculineFile)); } catch { }
         var translator = new PostProcessTranslator(inner, s => _masculine ? ArabicGender.MakeMasculine(s, _masculineMap) : s);

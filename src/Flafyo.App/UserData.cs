@@ -55,6 +55,11 @@ public sealed class AppSettings
     public bool Speak { get; set; }
     public bool AutoProfile { get; set; } = true;
     public List<string> Glossaries { get; set; } = new();
+    public int AiProviderIndex { get; set; }
+    public string AiApiKey { get; set; } = "";
+    public string AiModel { get; set; } = "";
+    public string AiBaseUrl { get; set; } = "";
+    public bool UseAiApi { get; set; }
     public double WindowWidth { get; set; }
     public double WindowHeight { get; set; }
 

@@ -105,6 +105,29 @@
                 <ComboBoxItem Content="صغير (تكبير أكتر قبل القراءة)"/>
               </ComboBox>
 
+              <Border Style="{StaticResource Card}" Margin="0,16,0,0" Background="#F7FAFF">
+                <StackPanel>
+                  <TextBlock Text="أو: ترجمة بحسابك الخاص في موقع ذكاء اصطناعي" Style="{StaticResource H}"/>
+                  <TextBlock Style="{StaticResource MutedText}" Margin="0,4,0,0"
+                             Text="بدل الحزمتين فوق، تقدر تستخدم مفتاح API بتاعك من OpenAI أو أي خدمة متوافقة معاها، أو من Anthropic (Claude). المفتاح بيتحفظ على جهازك بس، ومش بيروح لحد غير الموقع اللي اخترته، وهتدفع حسب استخدامك في حسابك هناك."/>
+                  <TextBlock Text="الخدمة" Style="{StaticResource L}"/>
+                  <ComboBox x:Name="AiProviderBox" SelectedIndex="0" SelectionChanged="AiSetting_Changed">
+                    <ComboBoxItem Content="OpenAI أو خدمة متوافقة معاها"/>
+                    <ComboBoxItem Content="Anthropic (Claude)"/>
+                  </ComboBox>
+                  <TextBlock Text="مفتاح API" Style="{StaticResource L}"/>
+                  <PasswordBox x:Name="AiKeyBox" Padding="7" PasswordChanged="AiSetting_Changed"/>
+                  <TextBlock Text="اسم النموذج (مثال: gpt-4o-mini أو claude-3-5-sonnet-latest)" Style="{StaticResource L}"/>
+                  <TextBox x:Name="AiModelBox" Padding="7" TextChanged="AiSetting_Changed"/>
+                  <TextBlock Text="رابط مخصص (اختياري، لخدمة متوافقة مع OpenAI غير openai.com نفسها)" Style="{StaticResource L}"/>
+                  <TextBox x:Name="AiUrlBox" Padding="7" TextChanged="AiSetting_Changed"/>
+                  <Button Content="اربط الحساب واختبر الاتصال" Margin="0,10,0,0" Click="AiTest_Click"/>
+                  <TextBlock x:Name="AiStatusText" Style="{StaticResource MutedText}" Margin="0,6,0,0"/>
+                  <CheckBox x:Name="UseAiBox" Content="استخدم حساب الذكاء الاصطناعي ده بدل الحزمتين فوق" Margin="0,10,0,0"
+                            Checked="UseAi_Changed" Unchecked="UseAi_Changed"/>
+                </StackPanel>
+              </Border>
+
               <Button Content="قواميس جاهزة حسب نوع اللعبة" Margin="0,16,0,0" Click="Glossary_Click"/>
               <Button Content="فتح مجلد القاموس والاصطلاحات" Margin="0,8,0,0" Click="OpenFolder_Click"/>
             </StackPanel>
