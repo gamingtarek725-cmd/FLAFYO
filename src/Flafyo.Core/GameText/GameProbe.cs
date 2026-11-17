@@ -63,7 +63,7 @@ public static class BinaryTextMiner
     {
         foreach (var raw in s.Split(' ', StringSplitOptions.RemoveEmptyEntries))
         {
-            var w = raw.Trim('.', ',', '!', '?', ':', ';', '"', ''', '(', ')');
+            var w = raw.Trim('.', ',', '!', '?', ':', ';', '"', '\'', '(', ')');
             if (CommonWords.Contains(w)) return true;
         }
         return false;
