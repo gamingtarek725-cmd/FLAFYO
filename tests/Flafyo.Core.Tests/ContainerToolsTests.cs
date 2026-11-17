@@ -28,7 +28,7 @@ public class ContainerToolsTests : IDisposable
         var (kind, count) = ContainerTools.Extract(arcPath, Path.Combine(_root, "x"));
         Assert.Equal(ContainerKind.Arc, kind); Assert.Equal(1, count);
 
-        var extractedFile = Directory.GetFiles(Path.Combine(_root, "x"), "*.json")[0];
+        var extractedFile = Directory.GetFiles(Path.Combine(_root, "x"), "*.json", SearchOption.AllDirectories)[0];
         Assert.Equal("{\"greet\":\"Hello there friend\"}", File.ReadAllText(extractedFile));
         File.WriteAllText(extractedFile, "{\"greet\":\"مرحبا بك يا صديقي\"}");
 

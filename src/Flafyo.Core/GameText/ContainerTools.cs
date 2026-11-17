@@ -122,14 +122,20 @@ public static class ContainerTools
         return true;
     }
 
+    /// <summary>Keeps the entry's own folders (so files that belong together stay together) and only makes the FILE NAME
+    /// unique by numbering it — numbering the whole path instead would split one shared folder into several numbered ones.</summary>
     private static string SafeRelativePath(string entryName, int index, string fallbackSuffix)
     {
         var cleaned = entryName.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
-        var parts = cleaned.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries)
-            .Select(p => new string(p.Select(c => Path.GetInvalidFileNameChars().Contains(c) ? '_' : c).ToArray()));
-        var rel = string.Join(Path.DirectorySeparatorChar, parts);
-        if (rel.Length == 0) rel = $"entry_{index}{fallbackSuffix}";
-        else if (!Path.HasExtension(rel)) rel += fallbackSuffix;
-        return $"{index:D4}_{rel}";
+        var segments = cleaned.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries)
+            .Select(p => new string(p.Select(c => Path.GetInvalidFileNameChars().Contains(c) ? '_' : c).ToArray()))
+            .ToList();
+        var fileName = segments.Count > 0 ? segments[^1] : "";
+        if (fileName.Length == 0) fileName = "entry" + fallbackSuffix;
+        else if (!Path.HasExtension(fileName)) fileName += fallbackSuffix;
+        fileName = $"{index:D4}_{fileName}";
+        return segments.Count > 1
+            ? Path.Combine(string.Join(Path.DirectorySeparatorChar, segments.Take(segments.Count - 1)), fileName)
+            : fileName;
     }
 }
