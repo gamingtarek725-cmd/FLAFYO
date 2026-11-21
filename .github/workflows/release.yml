@@ -1,0 +1,37 @@
+name: publish Windows release
+on:
+  push:
+    tags:
+      - "v*"
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Run tests
+        run: dotnet test tests/Flafyo.Core.Tests -c Release
+      - name: Set release version
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart("v")
+          [xml]$project = Get-Content src/Flafyo.App/Flafyo.App.csproj
+          $project.Project.PropertyGroup.Version = $version
+          $project.Save("src/Flafyo.App/Flafyo.App.csproj")
+          (Get-Content installer/FLAFYO.iss) -replace 'AppVersion=.*', "AppVersion=$version" | Set-Content installer/FLAFYO.iss
+      - name: Publish application
+        run: dotnet publish src/Flafyo.App/Flafyo.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish
+      - name: Build installer
+        shell: pwsh
+        run: |
+          choco install innosetup -y --no-progress
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" installer\FLAFYO.iss
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: installer-out/FLAFYO-GAME-TRANSLATOR-Setup.exe

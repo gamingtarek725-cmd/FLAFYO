@@ -22,14 +22,51 @@
           <TextBlock Text="مترجم الألعاب" FontSize="19" FontWeight="Bold" Foreground="{StaticResource Ink}"/>
           <TextBlock Text="FLAFYO GAME TRANSLATOR" Style="{StaticResource MutedText}" FlowDirection="LeftToRight" HorizontalAlignment="Right"/>
         </StackPanel>
-        <Border Grid.Column="2" CornerRadius="14" Background="#1B2942" Padding="12,7" VerticalAlignment="Center">
+        <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left">
+          <Button x:Name="CheckUpdatesButton" Content="تحديث التطبيق" Padding="12,7" Margin="0,0,0,6" Click="CheckUpdates_Click"/>
+          <TextBlock x:Name="UpdateStatusText" Text="الإصدار 0.3.1" Foreground="{StaticResource Muted}" FontSize="10" TextAlignment="Center" Margin="0,0,0,5"/>
+          <Border CornerRadius="14" Background="#1B2942" Padding="12,7" HorizontalAlignment="Center">
           <TextBlock x:Name="StateText" Text="● جاهز" Foreground="{StaticResource Muted}" FontWeight="SemiBold"/>
         </Border>
+          </StackPanel>
       </Grid>
     </Border>
 
     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
       <StackPanel Margin="22">
+        <!-- FLAFYO dashboard -->
+        <Border Background="#111B2D" BorderBrush="{StaticResource Line}" BorderThickness="1" CornerRadius="18" Padding="18" Margin="0,0,0,14">
+          <StackPanel>
+            <Grid Margin="0,0,0,14">
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+              <StackPanel>
+                <TextBlock Text="Game Translator" FontSize="22" FontWeight="Bold" Foreground="{StaticResource Ink}" FlowDirection="LeftToRight" HorizontalAlignment="Right"/>
+                <TextBlock Text="منصة ترجمة وتعريب الألعاب" Style="{StaticResource MutedText}" Margin="0,5,0,0" HorizontalAlignment="Right"/>
+              </StackPanel>
+              <Border Grid.Column="1" Background="#173D3B" CornerRadius="12" Padding="10,5" VerticalAlignment="Top">
+                <TextBlock Text="تصميم مقترح" Foreground="#45D6A0" FontSize="10" FontWeight="Bold"/>
+              </Border>
+            </Grid>
+            <UniformGrid Columns="2" Rows="2">
+              <Button Content="⛶&#10;الترجمة الفورية&#10;OCR و Overlay" Click="DashboardLive_Click" Margin="4" Padding="18,16" FontSize="15" Background="#1C2B45" BorderBrush="#2B4265" MinHeight="92"/>
+              <Button Content="▱&#10;تعريب الألعاب&#10;تحليل الملفات" Click="DashboardFiles_Click" Margin="4" Padding="18,16" FontSize="15" Background="#1C2B45" BorderBrush="#2B4265" MinHeight="92"/>
+              <Button Content="文&#10;إدارة اللغات&#10;حزم Offline" Click="DashboardLanguages_Click" Margin="4" Padding="18,16" FontSize="15" Background="#1C2B45" BorderBrush="#2B4265" MinHeight="92"/>
+              <Button Content="⌘&#10;إعدادات الألعاب&#10;ملفات مستقلة" Click="DashboardGameSettings_Click" Margin="4" Padding="18,16" FontSize="15" Background="#1C2B45" BorderBrush="#2B4265" MinHeight="92"/>
+            </UniformGrid>
+            <Border Background="#1C2B45" CornerRadius="12" Padding="14" Margin="4,10,4,0">
+              <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <StackPanel>
+                  <TextBlock Text="حالة محرك الترجمة" FontSize="15" FontWeight="Bold" Foreground="{StaticResource Ink}"/>
+                  <TextBlock x:Name="DashboardEngineStatus" Text="OCR · Translation · Overlay · Offline" Style="{StaticResource MutedText}" Margin="0,5,0,0"/>
+                </StackPanel>
+                <Border Grid.Column="1" Background="#16483D" CornerRadius="10" Padding="9,5" VerticalAlignment="Center">
+                  <TextBlock x:Name="DashboardState" Text="جاهز" Foreground="#42D6A0" FontWeight="SemiBold"/>
+                </Border>
+              </Grid>
+            </Border>
+          </StackPanel>
+        </Border>
 
         <!-- status + start -->
         <Border Style="{StaticResource Card}">
@@ -73,7 +110,7 @@
         </Border>
 
         <!-- settings tabs -->
-        <TabControl Padding="0" Margin="0,0,0,12">
+        <TabControl x:Name="SettingsTabs" Padding="0" Margin="0,0,0,12">
 
           <TabItem Header="محرك الترجمة">
             <StackPanel Margin="14">

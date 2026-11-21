@@ -9,7 +9,7 @@
     <RootNamespace>Flafyo.Desktop</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\flafyo.ico</ApplicationIcon>
-    <Version>0.3.0</Version>
+    <Version>0.3.1</Version>
     <Copyright>© 2026 FLAFYO. All rights reserved.</Copyright>
   </PropertyGroup>
   <ItemGroup>
