@@ -104,6 +104,27 @@ public class ArcAndProbeTests : IDisposable
     }
 
     [Fact]
+    public void Probe_skips_files_larger_than_the_configured_scan_limit()
+    {
+        var content = Encoding.ASCII.GetBytes(string.Join(" ", Enumerable.Repeat(
+            "Find the golden key before midnight.", 12)));
+        File.WriteAllBytes(Path.Combine(_root, "oversized.txt"), content);
+
+        var hits = GameProbe.Scan(_root, CancellationToken.None, maxFileBytes: 100);
+
+        Assert.Empty(hits);
+    }
+
+    [Fact]
+    public void Probe_honors_cancellation_before_scanning()
+    {
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        Assert.Throws<OperationCanceledException>(() => GameProbe.Scan(_root, cts.Token));
+    }
+
+    [Fact]
     public void Probe_ranks_files_and_archive_entries_and_ignores_pictures_and_media()
     {
         var pic = new byte[8000]; new Random(2).NextBytes(pic);

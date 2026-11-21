@@ -171,7 +171,9 @@ public partial class GameFilesWindow : Window
     {
         if (ProbeList.SelectedItem is ProbeItem it)
         {
-            var preview = it.Hit.All.Take(24)
+            var preview = it.Hit.All
+                .Where(s => BinaryTextMiner.IsRealSentence(s.Text))
+                .Take(24)
                 .Select(s => $"[{s.Offset:X8} | {s.EncodingName}] {s.Text}");
             ProbePreview.Text = string.Join(Environment.NewLine, preview);
         }

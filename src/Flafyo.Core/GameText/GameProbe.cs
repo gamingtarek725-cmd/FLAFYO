@@ -147,13 +147,30 @@ public static class GameProbe
             var dir = stack.Pop();
             try
             {
+                // Do not follow directory junctions/symlinks: they can escape the selected game
+                // folder or create recursive loops during a whole-folder scan.
                 foreach (var sub in Directory.EnumerateDirectories(dir))
-                    if (!Path.GetFileName(sub).Equals("FLAFYO_backup", StringComparison.OrdinalIgnoreCase)) stack.Push(sub);
+                {
+                    ct.ThrowIfCancellationRequested();
+                    try
+                    {
+                        var attributes = File.GetAttributes(sub);
+                        if ((attributes & FileAttributes.ReparsePoint) == 0 &&
+                            !Path.GetFileName(sub).Equals("FLAFYO_backup", StringComparison.OrdinalIgnoreCase))
+                            stack.Push(sub);
+                    }
+                    catch (IOException) { }
+                    catch (UnauthorizedAccessException) { }
+                }
                 foreach (var file in Directory.EnumerateFiles(dir))
                 {
                     ct.ThrowIfCancellationRequested();
                     if (++seen % 20 == 0) progress?.Invoke($"فحصت {seen} ملف… (لقيت {hits.Count} ملف فيه نصوص)");
-                    try { ScanFile(file, hits, maxFileBytes, minSentences, ct); }
+                    try
+                    {
+                        if ((File.GetAttributes(file) & FileAttributes.ReparsePoint) != 0) continue;
+                        ScanFile(file, hits, maxFileBytes, minSentences, ct);
+                    }
                     catch (OperationCanceledException) { throw; }
                     catch { /* an unreadable file is simply skipped */ }
                 }
@@ -168,11 +185,14 @@ public static class GameProbe
     private static void ScanFile(string file, List<ProbeHit> hits, long maxFileBytes, int minSentences, CancellationToken ct)
     {
         var info = new FileInfo(file);
-        if (info.Length == 0 || info.Length > maxFileBytes) return;
+        if (!info.Exists || info.Length == 0 || info.Length > maxFileBytes || info.Length > int.MaxValue) return;
         var ext = info.Extension;
         if (SkipExt.Contains(ext)) return;
 
-        var data = File.ReadAllBytes(file);
+        // FileInfo.Length can become stale if another process changes the file during a scan.
+        // Read incrementally and enforce the same cap against the actual bytes received.
+        var data = ReadBoundedFile(file, maxFileBytes, ct);
+        if (data == null || data.Length == 0) return;
         if (ArcArchive.IsArc(data))
         {
             var arc = ArcArchive.Parse(data);
@@ -219,6 +239,27 @@ public static class GameProbe
             return;
         }
         Add(hits, file, null, "ملف", data, minSentences);
+    }
+
+    private static byte[]? ReadBoundedFile(string path, long maxBytes, CancellationToken ct)
+    {
+        if (maxBytes <= 0 || maxBytes > int.MaxValue) maxBytes = int.MaxValue;
+        using var input = new FileStream(path, FileMode.Open, FileAccess.Read,
+            FileShare.Read, bufferSize: 81920, options: FileOptions.SequentialScan);
+        if (input.Length == 0 || input.Length > maxBytes) return null;
+
+        using var output = new MemoryStream((int)Math.Min(input.Length, 4 * 1024 * 1024));
+        var buffer = new byte[81920];
+        long total = 0;
+        int read;
+        while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+        {
+            ct.ThrowIfCancellationRequested();
+            total += read;
+            if (total > maxBytes) return null;
+            output.Write(buffer, 0, read);
+        }
+        return output.ToArray();
     }
 
     /// <summary>Below this, a file is almost certainly binary data, not text — skipped before the (slow, noise-prone) string scan.</summary>
