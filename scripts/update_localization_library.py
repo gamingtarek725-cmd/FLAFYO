@@ -91,6 +91,7 @@ def main():
             display_title = re.sub(r"^\s*جديد\s*", "", display_title, flags=re.I)
             display_title = re.sub(r"^\d+", "", display_title).strip()
             display_title = re.sub(r"\s*\d+(?:\.\d+)?\s*K?\s*تحميل\s*$", "", display_title, flags=re.I).strip()
+            display_title = re.sub(r"\d+\s*تحميل.*$", "", display_title).strip()
             entries.append({
                 "title": (display_title or title)[:180],
                 "sourceUrl": absolute,
@@ -103,9 +104,17 @@ def main():
                 "publishedAt": ""
             })
     entries.sort(key=lambda item: (item["sourceName"], item["title"].casefold()))
+    previous = {}
+    if OUTPUT.exists():
+        try:
+            previous = json.loads(OUTPUT.read_text(encoding="utf-8"))
+        except Exception:
+            previous = {}
+    unchanged = previous.get("entries") == entries and previous.get("sourceCount") == len(SOURCES)
+    generated_at = previous.get("generatedAt") if unchanged and previous.get("generatedAt") else dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
     catalog = {
         "schemaVersion": 1,
-        "generatedAt": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
+        "generatedAt": generated_at,
         "sourceCount": len(SOURCES),
         "entries": entries[:1200]
     }
