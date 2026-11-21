@@ -117,9 +117,9 @@
             <Button Content="استرجاع الأصل" Margin="0,0,8,8" Click="Restore_Click"/>
           </WrapPanel>
 
-          <TextBlock Text="لو ترجمت ملفات جوه حاوية (ARC/ZIP/.pak) مستخرجة" Style="{StaticResource L}"/>
+          <TextBlock Text="إعادة بناء الحاوية بأمان (ARC / ZIP / .pak)" Style="{StaticResource L}"/>
           <TextBlock Style="{StaticResource MutedText}" Margin="0,2,0,0"
-                     Text="حدد المجلد اللي استخرجته فوق (مش الأصلي، المجلد اللي فيه الملفات الفرعية)، وحدد ملف الحاوية الأصلي، وهو هيبني حاوية جديدة بنفس الترتيب وبعد كده يستبدل الأصلي (مع نسخة احتياطية)."/>
+                     Text="أولًا ابنِ نسخة منفصلة وتأكد منها. لن يتم استبدال ملف اللعبة الأصلي إلا بعد الضغط على زر التطبيق المنفصل والتأكيد."/>
           <Grid Margin="0,8,0,0">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
             <TextBox x:Name="ExtractedFolderBox" IsReadOnly="True" Padding="6"/>
@@ -130,7 +130,10 @@
             <TextBox x:Name="ContainerFileBox" IsReadOnly="True" Padding="6"/>
             <Button Grid.Column="1" Content="اختر ملف الحاوية الأصلي" Margin="8,0,0,0" Click="BrowseContainer_Click"/>
           </Grid>
-          <Button Content="ابني الحاوية وطبّقها على اللعبة" Margin="0,10,0,0" Click="RepackApply_Click"/>
+          <Button Content="١) ابنِ نسخة حاوية منفصلة" Margin="0,10,0,0" Click="RepackApply_Click"/>
+          <TextBlock Text="مسار النسخة الجديدة" Style="{StaticResource L}" Margin="0,8,0,0"/>
+          <TextBox x:Name="RebuiltContainerBox" IsReadOnly="True" Padding="6"/>
+          <Button Content="٢) تطبيق النسخة على الأصل (مع نسخة احتياطية)" Margin="0,8,0,0" Click="ApplyRebuiltContainer_Click"/>
         </StackPanel>
       </Border>
 
