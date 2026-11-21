@@ -107,7 +107,30 @@ public class ContainerToolsTests : IDisposable
         }
         var output = Path.Combine(_root, "safe-output");
         Assert.Throws<InvalidDataException>(() => ContainerTools.Extract(archive, output));
+        Assert.False(Directory.Exists(output)); // failed extraction must not leave a partial destination folder
+        Assert.False(Directory.EnumerateDirectories(_root, ".flafyo-extract-*").Any());
         Assert.False(File.Exists(Path.Combine(_root, "escaped.txt")));
+    }
+
+    [Fact]
+    public void Extraction_refuses_nonempty_destination_without_touching_existing_files()
+    {
+        var archive = Path.Combine(_root, "valid.zip");
+        using (var zip = ZipFile.Open(archive, ZipArchiveMode.Create))
+        {
+            var entry = zip.CreateEntry("safe.txt");
+            using var writer = new StreamWriter(entry.Open());
+            writer.Write("archive data");
+        }
+
+        var output = Path.Combine(_root, "existing");
+        Directory.CreateDirectory(output);
+        var marker = Path.Combine(output, "keep.txt");
+        File.WriteAllText(marker, "user data");
+
+        Assert.Throws<IOException>(() => ContainerTools.Extract(archive, output));
+        Assert.Equal("user data", File.ReadAllText(marker));
+        Assert.False(File.Exists(Path.Combine(output, "safe.txt")));
     }
 
     [Fact]

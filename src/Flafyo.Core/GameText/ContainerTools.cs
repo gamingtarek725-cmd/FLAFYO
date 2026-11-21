@@ -27,6 +27,29 @@ public static class ContainerTools
     /// <summary>Unpacks every entry into a folder, plus an index file that Repack needs to rebuild the same container later.</summary>
     public static (ContainerKind Kind, int Count) Extract(string containerPath, string outputFolder)
     {
+        var target = Path.GetFullPath(outputFolder);
+        var parent = Path.GetDirectoryName(target) ?? throw new InvalidDataException("مجلد الاستخراج غير صالح.");
+        Directory.CreateDirectory(parent);
+        if (Directory.Exists(target) && Directory.EnumerateFileSystemEntries(target).Any())
+            throw new IOException("مجلد الاستخراج موجود وغير فارغ؛ اختر مجلدًا جديدًا حتى لا يتم استبدال ملفاتك.");
+
+        var staging = Path.Combine(parent, ".flafyo-extract-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            var result = ExtractIntoFolder(containerPath, staging);
+            if (Directory.Exists(target)) Directory.Delete(target);
+            Directory.Move(staging, target);
+            return result;
+        }
+        catch
+        {
+            if (Directory.Exists(staging)) Directory.Delete(staging, recursive: true);
+            throw;
+        }
+    }
+
+    private static (ContainerKind Kind, int Count) ExtractIntoFolder(string containerPath, string outputFolder)
+    {
         var info = new FileInfo(containerPath);
         if (!info.Exists) throw new FileNotFoundException("ملف الحاوية غير موجود.", containerPath);
         if (info.Length > MaxContainerBytes) throw new InvalidDataException("حجم الحاوية أكبر من حد الاستخراج الآمن (512 MiB).");
