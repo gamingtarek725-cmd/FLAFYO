@@ -18,7 +18,7 @@ SOURCES = [
     ("Muarrab", "https://muarrab.com/en/patches/home/"),
     ("Ta3reb", "https://ta3reb.com/"),
 ]
-VERSION_RE = re.compile(r"(?i)\\bv\\s*\\d+(?:\\.\\d+){1,3}|\\b\\d+\\.\\d+\\.\\d+(?:\\.\\d+)?\\b")
+VERSION_RE = re.compile(r"(?i)\bv\s*\d+(?:\.\d+){1,3}|\b\d+\.\d+\.\d+(?:\.\d+)?\b")
 
 class LinkParser(HTMLParser):
     def __init__(self):
