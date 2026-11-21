@@ -247,7 +247,7 @@ public partial class GameFilesWindow : Window
 
         var replacement = ProbeReplacementText.Text;
         _pendingProbeEdits[item.Found.Offset] = new TextByteReplacement(
-            item.Found.Offset, item.Found.ByteLength, item.Found.EncodingName, replacement);
+            item.Found.Offset, item.Found.ByteLength, item.Found.EncodingName, replacement, item.Found.Text);
         ProbeEditStatus.Text = $"تمت إضافة التعديل للقائمة. عدد التعديلات: {_pendingProbeEdits.Count}. سيتم التحقق من الترميز والطول عند حفظ النسخة.";
     }
 
