@@ -242,6 +242,10 @@
                 <Button Content="تحميل" Click="LoadProfile_Click"/>
                 <Button Content="حذف" Margin="8,0,0,0" Click="DeleteProfile_Click"/>
               </StackPanel>
+              <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                <Button Content="تصدير الإعدادات" Click="ExportProfile_Click"/>
+                <Button Content="استيراد إعدادات" Margin="8,0,0,0" Click="ImportProfile_Click"/>
+              </StackPanel>
               <CheckBox x:Name="AutoProfileBox" Content="حمّل إعدادات اللعبة تلقائي لما تفتحها" IsChecked="True"
                         Checked="AutoProfile_Changed" Unchecked="AutoProfile_Changed"/>
 
