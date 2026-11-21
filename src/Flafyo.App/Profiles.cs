@@ -48,6 +48,8 @@ internal static class ProfileStore
             {
                 try
                 {
+                    var info = new FileInfo(f);
+                    if (info.Length <= 0 || info.Length > MaxImportBytes) continue;
                     var p = JsonSerializer.Deserialize<GameProfile>(File.ReadAllText(f));
                     if (p != null && Validate(p, out _)) list.Add(p);
                 }
