@@ -42,20 +42,16 @@ internal sealed class LocalizationCatalogService
         try
         {
             if (!File.Exists(CachePath)) return null;
-            return JsonSerializer.Deserialize<Catalog>(File.ReadAllText(CachePath), Options);
+            var cached = JsonSerializer.Deserialize<Catalog>(File.ReadAllText(CachePath), Options);
+            return cached == null ? null : NormalizeCatalog(cached);
         }
         catch { return null; }
     }
 
-    internal static async Task<Catalog> FetchAsync()
+    private static Catalog NormalizeCatalog(Catalog catalog)
     {
-        using var response = await Http.GetAsync(CatalogUrl);
-        response.EnsureSuccessStatusCode();
-        var json = await response.Content.ReadAsStringAsync();
-        var catalog = JsonSerializer.Deserialize<Catalog>(json, Options)
-                      ?? throw new InvalidDataException("Invalid localization catalog.");
         var allowed = new[] { "ta3reebat.com", "muarrab.com", "ta3reb.com" };
-        catalog.Entries = catalog.Entries
+        catalog.Entries = (catalog.Entries ?? new List<Entry>())
             .Where(e =>
                 !string.IsNullOrWhiteSpace(e.Title) &&
                 !string.IsNullOrWhiteSpace(e.SourceName) &&
@@ -66,7 +62,6 @@ internal sealed class LocalizationCatalogService
                 !uri.AbsolutePath.TrimEnd('/').EndsWith("/home", StringComparison.OrdinalIgnoreCase))
             .Select(e =>
             {
-                // Some source pages expose URL-encoded titles instead of readable game names.
                 try { e.Title = Uri.UnescapeDataString(e.Title.Replace("+", " ")); } catch { }
                 e.Title = e.Title.Trim();
                 e.UpdateType = string.IsNullOrWhiteSpace(e.UpdateType) ? "listing" : e.UpdateType.Trim().ToLowerInvariant();
@@ -79,8 +74,19 @@ internal sealed class LocalizationCatalogService
             .OrderByDescending(e => e.UpdateType.Equals("update", StringComparison.OrdinalIgnoreCase))
             .ThenBy(e => e.Title, StringComparer.OrdinalIgnoreCase)
             .ToList();
+        return catalog;
+    }
+
+    internal static async Task<Catalog> FetchAsync()
+    {
+        using var response = await Http.GetAsync(CatalogUrl);
+        response.EnsureSuccessStatusCode();
+        var json = await response.Content.ReadAsStringAsync();
+        var catalog = JsonSerializer.Deserialize<Catalog>(json, Options)
+                      ?? throw new InvalidDataException("Invalid localization catalog.");
+        catalog = NormalizeCatalog(catalog);
         Directory.CreateDirectory(Path.GetDirectoryName(CachePath)!);
-        await File.WriteAllTextAsync(CachePath, json);
+        await File.WriteAllTextAsync(CachePath, JsonSerializer.Serialize(catalog, Options));
         return catalog;
     }
 }
