@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Flafyo.Core.GameText;
 
-public sealed record FoundText(string Text, long Offset, bool Utf16, string EncodingName = "ASCII / UTF-8");
+public sealed record FoundText(string Text, long Offset, bool Utf16, string EncodingName = "ASCII / UTF-8", int ByteLength = 0);
 
 /// <summary>Finds readable English text inside any binary data (like the "strings" tool, but only keeps real sentences).</summary>
 public static class BinaryTextMiner
@@ -21,7 +21,7 @@ public static class BinaryTextMiner
             if (!Printable(d[i])) { i++; continue; }
             int start = i;
             while (i < n && Printable(d[i])) i++;
-            if (i - start >= minChars) Add(results, Encoding.ASCII.GetString(d.Slice(start, i - start)), start, false, minChars);
+            if (i - start >= minChars) Add(results, Encoding.ASCII.GetString(d.Slice(start, i - start)), start, false, minChars, "ASCII / UTF-8", i - start);
         }
 
         // UTF-16 little-endian text (ASCII-range characters followed by zero bytes).
@@ -32,7 +32,7 @@ public static class BinaryTextMiner
                 int e = s;
                 while (e + 1 < n && Printable(d[e]) && d[e + 1] == 0) e += 2;
                 if ((e - s) / 2 >= minChars)
-                    Add(results, Encoding.Unicode.GetString(d.Slice(s, e - s)), s, true, minChars, "UTF-16 LE");
+                    Add(results, Encoding.Unicode.GetString(d.Slice(s, e - s)), s, true, minChars, "UTF-16 LE", e - s);
                 s = e;
             }
             else s++;
@@ -46,7 +46,7 @@ public static class BinaryTextMiner
                 int e = s;
                 while (e + 1 < n && d[e] == 0 && Printable(d[e + 1])) e += 2;
                 if ((e - s) / 2 >= minChars)
-                    Add(results, Encoding.BigEndianUnicode.GetString(d.Slice(s, e - s)), s, true, minChars, "UTF-16 BE");
+                    Add(results, Encoding.BigEndianUnicode.GetString(d.Slice(s, e - s)), s, true, minChars, "UTF-16 BE", e - s);
                 s = e;
             }
             else s++;
@@ -55,11 +55,11 @@ public static class BinaryTextMiner
     }
 
     private static void Add(List<FoundText> results, string raw, long offset, bool utf16, int minChars,
-        string encodingName = "ASCII / UTF-8")
+        string encodingName = "ASCII / UTF-8", int byteLength = 0)
     {
         var t = TextNormalizer.Normalize(raw);
         if (t.Length < minChars || !t.Contains(' ') || !TextQuality.LooksLikeText(t)) return;
-        results.Add(new FoundText(t, offset, utf16, encodingName));
+        results.Add(new FoundText(t, offset, utf16, encodingName, byteLength));
     }
 
     /// <summary>A "sentence" has at least four words (binary garbage rarely lines up three spaces by chance).</summary>
@@ -282,7 +282,7 @@ public static class GameProbe
         var name = Path.GetFileNameWithoutExtension(hit.FullPath) + (hit.Entry == null ? "" : "_" + Path.GetFileName(hit.Entry.Replace('\\', '/').Split(' ')[0]));
         name = new string(name.Select(c => Path.GetInvalidFileNameChars().Contains(c) ? '_' : c).ToArray());
         var path = Path.Combine(folder, name + ".txt");
-        File.WriteAllLines(path, hit.All.Select(f => $"{f.Offset:X8}\t{f.EncodingName}\t{f.Text}"), new UTF8Encoding(false));
+        File.WriteAllLines(path, hit.All.Select(f => $"{f.Offset:X8}\t{f.ByteLength}\t{f.EncodingName}\t{f.Text}"), new UTF8Encoding(false));
         return path;
     }
 
