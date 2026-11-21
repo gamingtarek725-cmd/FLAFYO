@@ -18,7 +18,7 @@ SOURCES = [
     ("Muarrab", "https://muarrab.com/en/patches/home/"),
     ("Ta3reb", "https://ta3reb.com/"),
 ]
-VERSION_RE = re.compile(r"(?i)v?\d+(?:\.\d+){1,3}")
+VERSION_RE = re.compile(r"(?i)\\bv\\s*\\d+(?:\\.\\d+){1,3}|\\b\\d+\\.\\d+\\.\\d+(?:\\.\\d+)?\\b")
 
 class LinkParser(HTMLParser):
     def __init__(self):
@@ -66,18 +66,22 @@ def main():
             path = parsed.path.rstrip("/")
             if path in ("", "/", "/en", "/en/patches/home"):
                 continue
+            if source_name == "Muarrab" and ("/tags/" in path or "/teams/" in path):
+                continue
             relevant = (
                 source_name == "Ta3reebat" and (
                     "/translations/" in path or "تعريب" in title or "→" in title or "جديد" in title
                 )
                 or source_name == "Muarrab" and "/patches/" in path
-                or source_name == "Ta3reb" and ("تعريب" in title or "/translation" in path)
+                or source_name == "Ta3reb" and ("تعريب" in title or "/game/" in path)
             )
             if not relevant or absolute in seen:
                 continue
             seen.add(absolute)
             versions = VERSION_RE.findall(title)
             is_new = bool(re.search(r"جديد|new release|first release|إصدار أول", title, re.I))
+            is_update = bool(re.search(r"تحديث|updated|update|→", title, re.I))
+            update_type = "new" if is_new else ("update" if is_update else "listing")
             entries.append({
                 "title": title[:180],
                 "sourceUrl": absolute,
@@ -85,7 +89,7 @@ def main():
                 "platform": "",
                 "gameVersion": "",
                 "translationVersion": " / ".join(versions[-2:]) if versions else "",
-                "updateType": "new" if is_new else "update",
+                "updateType": update_type,
                 "summary": title[:500],
                 "publishedAt": ""
             })

@@ -181,7 +181,7 @@ public partial class LocalizationLibraryWindow : Window
             Title = x.Title,
             Subtitle = string.Join(" · ", new[] { x.Platform, x.GameVersion, x.TranslationVersion }
                 .Where(v => !string.IsNullOrWhiteSpace(v))),
-            KindLabel = (x.UpdateType == "new" ? "تعريب جديد" : "تحديث تعريب") + " · " + x.SourceName,
+            KindLabel = (x.UpdateType == "new" ? "تعريب جديد" : x.UpdateType == "update" ? "تحديث تعريب" : "صفحة تعريب") + " · " + x.SourceName,
             Category = "تعريبات موثقة",
             Info = string.IsNullOrWhiteSpace(x.Summary) ? "تم اكتشاف صفحة تعريب من المصدر." : x.Summary,
             Install = "تعليمات التثبيت التفصيلية تُراجع في صفحة المصدر؛ تختلف الطريقة حسب اللعبة وإصدارها.",
