@@ -35,7 +35,6 @@ public partial class GameFilesWindow : Window
         _settings = settings; _factory = factory;
         FilesList.ItemsSource = _items;
         FilesList.SelectionChanged += (_, _) => ShowPreview();
-        ProbeList.SelectionChanged += ProbeList_SelectionChanged;
         ProbeEditList.ItemsSource = _probeTexts;
         if (!string.IsNullOrEmpty(settings.GameFolder) && Directory.Exists(settings.GameFolder)) SetFolder(settings.GameFolder);
         StatusText.Text = "ابدأ باختيار مجلد اللعبة.";
