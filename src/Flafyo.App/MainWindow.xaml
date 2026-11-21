@@ -208,6 +208,7 @@
 
               <TextBlock Text="ملفات اللعبة" Style="{StaticResource L}" Margin="0,20,0,4"/>
               <Button Content="ترجمة ملفات اللعبة بالذكاء الاصطناعي" Click="GameFiles_Click"/>
+              <Button Content="مكتبة التعريبات العربية للألعاب" Click="GameLibrary_Click"/>
 
               <TextBlock Text="مشاكل؟" Style="{StaticResource L}" Margin="0,20,0,4"/>
               <Button Content="فتح سجل الأخطاء" Click="OpenLog_Click"/>

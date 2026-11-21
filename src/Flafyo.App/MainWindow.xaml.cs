@@ -496,6 +496,12 @@ public partial class MainWindow : Window
         win.Show();
     }
 
+    private void GameLibrary_Click(object sender, RoutedEventArgs e)
+    {
+        var win = new LocalizationLibraryWindow { Owner = this };
+        win.Show();
+    }
+
     private void GameFiles_Click(object sender, RoutedEventArgs e)
     {
         var win = new GameFilesWindow(_settings, onEngine =>
