@@ -73,6 +73,31 @@ public class ContainerToolsTests : IDisposable
     }
 
     [Fact]
+    public void Zip_extraction_rejects_parent_directory_traversal()
+    {
+        var archive = Path.Combine(_root, "unsafe.zip");
+        using (var zip = ZipFile.Open(archive, ZipArchiveMode.Create))
+        {
+            var entry = zip.CreateEntry("../escaped.txt");
+            using var writer = new StreamWriter(entry.Open());
+            writer.Write("must not escape");
+        }
+        var output = Path.Combine(_root, "safe-output");
+        Assert.Throws<InvalidDataException>(() => ContainerTools.Extract(archive, output));
+        Assert.False(File.Exists(Path.Combine(_root, "escaped.txt")));
+    }
+
+    [Fact]
+    public void Zip_repack_rejects_tampered_index_paths()
+    {
+        var folder = Path.Combine(_root, "tampered");
+        Directory.CreateDirectory(folder);
+        File.WriteAllLines(Path.Combine(folder, "_flafyo_container.txt"),
+            new[] { "FLAFYO_CONTAINER_V1", "Zip", "../outside.txt" });
+        Assert.Throws<InvalidDataException>(() => ContainerTools.Repack(folder));
+    }
+
+    [Fact]
     public void Non_container_bytes_are_rejected() =>
         Assert.Throws<InvalidDataException>(() => ContainerTools.Extract(WriteRandom(), Path.Combine(_root, "z")));
 

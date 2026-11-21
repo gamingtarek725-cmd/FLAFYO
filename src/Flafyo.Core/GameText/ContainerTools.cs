@@ -12,6 +12,10 @@ public enum ContainerKind { None, Arc, Zip }
 public static class ContainerTools
 {
     private const string IndexFile = "_flafyo_container.txt";
+    private const long MaxContainerBytes = 512L * 1024 * 1024;
+    private const long MaxExtractedBytes = 512L * 1024 * 1024;
+    private const long MaxEntryBytes = 128L * 1024 * 1024;
+    private const int MaxEntries = 10000;
 
     public static ContainerKind Detect(byte[] data)
     {
@@ -23,6 +27,9 @@ public static class ContainerTools
     /// <summary>Unpacks every entry into a folder, plus an index file that Repack needs to rebuild the same container later.</summary>
     public static (ContainerKind Kind, int Count) Extract(string containerPath, string outputFolder)
     {
+        var info = new FileInfo(containerPath);
+        if (!info.Exists) throw new FileNotFoundException("ملف الحاوية غير موجود.", containerPath);
+        if (info.Length > MaxContainerBytes) throw new InvalidDataException("حجم الحاوية أكبر من حد الاستخراج الآمن (512 MiB).");
         var data = File.ReadAllBytes(containerPath);
         var kind = Detect(data);
         Directory.CreateDirectory(outputFolder);
@@ -47,15 +54,20 @@ public static class ContainerTools
         {
             using var zip = new ZipArchive(new MemoryStream(data), ZipArchiveMode.Read);
             int n = 0;
+            long total = 0;
             foreach (var e in zip.Entries)
             {
-                if (e.FullName.EndsWith('/') || e.Length == 0 && e.Name.Length == 0) continue;   // a folder entry
-                var rel = e.FullName.Replace('/', Path.DirectorySeparatorChar);
-                var dest = Path.Combine(outputFolder, rel);
+                if (++n > MaxEntries) throw new InvalidDataException("الأرشيف يحتوي على أكثر من 10,000 عنصر.");
+                if (e.FullName.EndsWith('/') || e.Length == 0 && e.Name.Length == 0) { n--; continue; }
+                if (e.Length < 0 || e.Length > MaxEntryBytes || (total += e.Length) > MaxExtractedBytes)
+                    throw new InvalidDataException("الحجم غير المضغوط للأرشيف يتجاوز حدود الاستخراج الآمن.");
+                var rel = NormalizeArchivePath(e.FullName);
+                var dest = ResolveSafePath(outputFolder, rel);
                 Directory.CreateDirectory(Path.GetDirectoryName(dest)!);
-                using (var s = e.Open()) using (var f = File.Create(dest)) s.CopyTo(f);
+                using var input = e.Open();
+                using var output = new FileStream(dest, FileMode.CreateNew, FileAccess.Write, FileShare.None);
+                CopyBounded(input, output, MaxEntryBytes);
                 index.Add(rel.Replace(Path.DirectorySeparatorChar, '/'));
-                n++;
             }
             File.WriteAllLines(Path.Combine(outputFolder, IndexFile), index);
             return (kind, n);
@@ -85,7 +97,7 @@ public static class ContainerTools
                     RawName = raw, Name = System.Text.Encoding.Latin1.GetString(raw, 0, len),
                     TypeHash = Convert.ToUInt32(p[2], 16), SizeAndFlags = Convert.ToUInt32(p[3], 16),
                 };
-                files.Add((template, File.ReadAllBytes(Path.Combine(extractedFolder, p[0]))));
+                files.Add((template, File.ReadAllBytes(ResolveSafePath(extractedFolder, NormalizeArchivePath(p[0])))));
             }
             return ArcArchive.Build(7, files);
         }
@@ -93,12 +105,21 @@ public static class ContainerTools
         {
             using var ms = new MemoryStream();
             using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
-                foreach (var rel in lines.Skip(2))
+                int count = 0;
+                long total = 0;
+                foreach (var rawRel in lines.Skip(2))
                 {
-                    var entry = zip.CreateEntry(rel, CompressionLevel.Optimal);
-                    using var s = entry.Open();
-                    using var f = File.OpenRead(Path.Combine(extractedFolder, rel.Replace('/', Path.DirectorySeparatorChar)));
-                    f.CopyTo(s);
+                    if (++count > MaxEntries) throw new InvalidDataException("الفهرس يحتوي على أكثر من 10,000 عنصر.");
+                    var rel = NormalizeArchivePath(rawRel);
+                    var source = ResolveSafePath(extractedFolder, rel);
+                    if (!File.Exists(source)) throw new FileNotFoundException("ملف ZIP غير موجود.", source);
+                    var length = new FileInfo(source).Length;
+                    if (length > MaxEntryBytes || (total += length) > MaxExtractedBytes)
+                        throw new InvalidDataException("حجم ملفات ZIP يتجاوز الحدود الآمنة.");
+                    var entry = zip.CreateEntry(rel.Replace(Path.DirectorySeparatorChar, '/'), CompressionLevel.Optimal);
+                    using var output = entry.Open();
+                    using var input = File.OpenRead(source);
+                    CopyBounded(input, output, MaxEntryBytes);
                 }
             return ms.ToArray();
         }
@@ -109,8 +130,14 @@ public static class ContainerTools
     public static string Apply(string originalContainerPath, byte[] rebuilt)
     {
         var backup = originalContainerPath + ".flafyo_backup";
+        var temp = originalContainerPath + ".flafyo_tmp";
         if (!File.Exists(backup)) File.Copy(originalContainerPath, backup);
-        File.WriteAllBytes(originalContainerPath, rebuilt);
+        try
+        {
+            File.WriteAllBytes(temp, rebuilt);
+            File.Move(temp, originalContainerPath, overwrite: true);
+        }
+        finally { if (File.Exists(temp)) File.Delete(temp); }
         return backup;
     }
 
@@ -120,6 +147,41 @@ public static class ContainerTools
         if (!File.Exists(backup)) return false;
         File.Copy(backup, originalContainerPath, overwrite: true);
         return true;
+    }
+
+    private static string NormalizeArchivePath(string relativePath)
+    {
+        if (string.IsNullOrWhiteSpace(relativePath)) throw new InvalidDataException("مسار عنصر الأرشيف فارغ.");
+        var normalized = relativePath.Replace('\\', '/');
+        if (normalized.StartsWith('/') || Path.IsPathRooted(normalized) ||
+            normalized.Split('/').Any(part => part == ".." || part == "." || part.Contains(':')))
+            throw new InvalidDataException("الأرشيف يحتوي على مسار غير آمن: " + relativePath);
+        var segments = normalized.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        if (segments.Length == 0) throw new InvalidDataException("مسار عنصر الأرشيف غير صالح.");
+        return Path.Combine(segments);
+    }
+
+    private static string ResolveSafePath(string root, string relativePath)
+    {
+        var fullRoot = Path.GetFullPath(root);
+        var fullPath = Path.GetFullPath(Path.Combine(fullRoot, relativePath));
+        var prefix = fullRoot.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+        if (!fullPath.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidDataException("مسار الملف يخرج من مجلد الاستخراج.");
+        return fullPath;
+    }
+
+    private static void CopyBounded(Stream input, Stream output, long limit)
+    {
+        var buffer = new byte[81920];
+        long copied = 0;
+        int read;
+        while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+        {
+            copied += read;
+            if (copied > limit) throw new InvalidDataException("تجاوز عنصر الأرشيف حد الحجم أثناء الاستخراج.");
+            output.Write(buffer, 0, read);
+        }
     }
 
     /// <summary>Keeps the entry's own folders (so files that belong together stay together) and only makes the FILE NAME
