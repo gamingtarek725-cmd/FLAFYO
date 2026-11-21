@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="FLAFYO GAME TRANSLATOR" Icon="Assets/flafyo.ico"
-        Width="600" Height="820" MinWidth="500" MinHeight="560" ResizeMode="CanResize"
+        Width="900" Height="900" MinWidth="720" MinHeight="650" ResizeMode="CanResize"
         Background="{StaticResource Page}" FlowDirection="RightToLeft" FontFamily="Segoe UI, Tahoma" FontSize="13"
         WindowStartupLocation="CenterScreen">
   <Grid>
@@ -12,7 +12,7 @@
     </Grid.RowDefinitions>
 
     <!-- header -->
-    <Border Grid.Row="0" Background="White" BorderBrush="{StaticResource Line}" BorderThickness="0,0,0,1" Padding="18,10">
+    <Border Grid.Row="0" Background="#111A2D" BorderBrush="{StaticResource Line}" BorderThickness="0,0,0,1" Padding="24,16">
       <Grid>
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
@@ -22,14 +22,14 @@
           <TextBlock Text="مترجم الألعاب" FontSize="19" FontWeight="Bold" Foreground="{StaticResource Ink}"/>
           <TextBlock Text="FLAFYO GAME TRANSLATOR" Style="{StaticResource MutedText}" FlowDirection="LeftToRight" HorizontalAlignment="Right"/>
         </StackPanel>
-        <Border Grid.Column="2" CornerRadius="14" Background="#F0F3F8" Padding="12,5" VerticalAlignment="Center">
+        <Border Grid.Column="2" CornerRadius="14" Background="#1B2942" Padding="12,7" VerticalAlignment="Center">
           <TextBlock x:Name="StateText" Text="● جاهز" Foreground="{StaticResource Muted}" FontWeight="SemiBold"/>
         </Border>
       </Grid>
     </Border>
 
     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-      <StackPanel Margin="18">
+      <StackPanel Margin="22">
 
         <!-- status + start -->
         <Border Style="{StaticResource Card}">
@@ -105,7 +105,7 @@
                 <ComboBoxItem Content="صغير (تكبير أكتر قبل القراءة)"/>
               </ComboBox>
 
-              <Border Style="{StaticResource Card}" Margin="0,16,0,0" Background="#F7FAFF">
+              <Border Style="{StaticResource Card}" Margin="0,16,0,0" Background="#17233A">
                 <StackPanel>
                   <TextBlock Text="أو: ترجمة بحسابك الخاص في موقع ذكاء اصطناعي" Style="{StaticResource H}"/>
                   <TextBlock Style="{StaticResource MutedText}" Margin="0,4,0,0"
@@ -146,7 +146,7 @@
               <ComboBox x:Name="MonitorBox" SelectionChanged="Monitor_Changed"/>
               <CheckBox x:Name="ContinuousBox" Content="تحديث مستمر (لو قفلته: الترجمة بتحصل لما تضغط الاختصار بس)" IsChecked="True"
                         Checked="Continuous_Changed" Unchecked="Continuous_Changed"/>
-              <Border Style="{StaticResource Card}" Margin="0,16,0,0" Background="#F8FAFF">
+              <Border Style="{StaticResource Card}" Margin="0,16,0,0" Background="#17233A">
                 <StackPanel>
                   <TextBlock Text="لألعاب Fullscreen: شاشة كاملة بدون حدود" Style="{StaticResource H}"/>
                   <TextBlock Style="{StaticResource MutedText}" Margin="0,4,0,0"
