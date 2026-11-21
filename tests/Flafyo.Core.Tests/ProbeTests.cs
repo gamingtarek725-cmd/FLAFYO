@@ -152,8 +152,8 @@ public class ArcAndProbeTests : IDisposable
     {
         var sentence = "Find the golden key before midnight.";
         var ascii = BinaryTextMiner.Extract(Encoding.ASCII.GetBytes(sentence)).Single();
-        var little = BinaryTextMiner.Extract(Encoding.Unicode.GetBytes(sentence)).Single();
-        var big = BinaryTextMiner.Extract(Encoding.BigEndianUnicode.GetBytes(sentence)).Single();
+        var little = BinaryTextMiner.Extract(Encoding.Unicode.GetBytes(sentence)).Single(f => f.EncodingName == "UTF-16 LE");
+        var big = BinaryTextMiner.Extract(Encoding.BigEndianUnicode.GetBytes(sentence)).Single(f => f.EncodingName == "UTF-16 BE");
 
         Assert.Equal(Encoding.ASCII.GetByteCount(sentence), ascii.ByteLength);
         Assert.Equal(Encoding.Unicode.GetByteCount(sentence), little.ByteLength);
