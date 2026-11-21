@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -24,6 +25,8 @@ public partial class LocalizationLibraryWindow : Window
     }
 
     private readonly ObservableCollection<LibraryEntry> _visible = new();
+    private readonly System.Collections.Generic.List<LibraryEntry> _remoteCatalog = new();
+    private bool _refreshing;
     private readonly LibraryEntry[] _catalog =
     {
         new()
@@ -136,13 +139,67 @@ public partial class LocalizationLibraryWindow : Window
         EntriesList.ItemsSource = _visible;
         RefreshList();
         if (_visible.Count > 0) EntriesList.SelectedIndex = 0;
+        ApplyCatalog(LocalizationCatalogService.LoadCache());
+        Loaded += async (_, _) => await RefreshCatalogAsync();
+    }
+
+    private async void RefreshLibrary_Click(object sender, RoutedEventArgs e) => await RefreshCatalogAsync();
+
+    private async Task RefreshCatalogAsync()
+    {
+        if (_refreshing) return;
+        _refreshing = true;
+        RefreshButton.IsEnabled = false;
+        UpdateStatus.Text = "جارٍ فحص مصادر التعريبات...";
+        try
+        {
+            var catalog = await LocalizationCatalogService.FetchAsync();
+            ApplyCatalog(catalog);
+            UpdateStatus.Text = DateTimeOffset.TryParse(catalog.GeneratedAt, out var stamp)
+                ? "آخر تحديث للمكتبة: " + stamp.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                : "تم تحديث المكتبة بنجاح.";
+        }
+        catch
+        {
+            UpdateStatus.Text = _remoteCatalog.Count > 0
+                ? "تعذر الاتصال الآن؛ يتم عرض آخر نسخة محفوظة."
+                : "تعذر الاتصال بالمكتبة؛ تحقق من الإنترنت وحاول مرة أخرى.";
+        }
+        finally
+        {
+            _refreshing = false;
+            RefreshButton.IsEnabled = true;
+            RefreshList();
+        }
+    }
+
+    private void ApplyCatalog(LocalizationCatalogService.Catalog? catalog)
+    {
+        if (catalog == null) return;
+        var entries = catalog.Entries.Select(x => new LibraryEntry
+        {
+            Title = x.Title,
+            Subtitle = string.Join(" · ", new[] { x.Platform, x.GameVersion, x.TranslationVersion }
+                .Where(v => !string.IsNullOrWhiteSpace(v))),
+            KindLabel = (x.UpdateType == "new" ? "تعريب جديد" : "تحديث تعريب") + " · " + x.SourceName,
+            Category = "تعريبات موثقة",
+            Info = string.IsNullOrWhiteSpace(x.Summary) ? "تم اكتشاف صفحة تعريب من المصدر." : x.Summary,
+            Install = "تعليمات التثبيت التفصيلية تُراجع في صفحة المصدر؛ تختلف الطريقة حسب اللعبة وإصدارها.",
+            Notes = "اكتُشف هذا الإدخال آليًا. لم يختبر FLAFYO التوافق أو ملف التعريب. راجع صفحة المصدر قبل التثبيت.",
+            SourceUrl = x.SourceUrl,
+            SourceName = x.SourceName,
+            IsDirectory = false
+        }).ToList();
+        _remoteCatalog.Clear();
+        _remoteCatalog.AddRange(entries);
+        RefreshList();
     }
 
     private void RefreshList()
     {
         var query = SearchBox?.Text?.Trim() ?? "";
         var category = (CategoryBox?.SelectedItem as ComboBoxItem)?.Content?.ToString();
-        var filtered = _catalog.Where(x =>
+        var filtered = _catalog.Concat(_remoteCatalog).Where(x =>
             (string.IsNullOrWhiteSpace(category) || category == "كل المصادر" || x.Category == category) &&
             (string.IsNullOrWhiteSpace(query) ||
              x.Title.Contains(query, StringComparison.OrdinalIgnoreCase) ||

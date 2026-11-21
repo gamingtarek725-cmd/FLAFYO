@@ -14,11 +14,17 @@
       <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
 
-    <StackPanel Grid.Row="0" Margin="0,0,0,14">
-      <TextBlock Text="مكتبة التعريبات العربية" FontSize="23" FontWeight="Bold" Foreground="{StaticResource Ink}"/>
-      <TextBlock Text="ابحث عن تعريب لعبتك، راجع التوافق وطريقة التثبيت، ثم انتقل إلى صفحة صاحب التعريب أو مصدره الأصلي."
-                 Style="{StaticResource MutedText}" Margin="0,5,0,0"/>
-    </StackPanel>
+    <Grid Grid.Row="0" Margin="0,0,0,14">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+      <StackPanel>
+        <TextBlock Text="مكتبة التعريبات العربية" FontSize="23" FontWeight="Bold" Foreground="{StaticResource Ink}"/>
+        <TextBlock Text="ابحث عن تعريب لعبتك، راجع التوافق وطريقة التثبيت، ثم انتقل إلى صفحة صاحب التعريب أو مصدره الأصلي."
+                   Style="{StaticResource MutedText}" Margin="0,5,0,0"/>
+        <TextBlock x:Name="UpdateStatus" Text="سيتم فحص آخر تحديثات المكتبة عند فتح القسم" Style="{StaticResource MutedText}" Margin="0,5,0,0"/>
+      </StackPanel>
+      <Button x:Name="RefreshButton" Grid.Column="1" Content="تحديث الآن" Style="{StaticResource PrimaryButton}"
+              VerticalAlignment="Center" Margin="12,0,0,0" Padding="16,10" Click="RefreshLibrary_Click"/>
+    </Grid>
 
     <Grid Grid.Row="1" Margin="0,0,0,12">
       <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="190"/></Grid.ColumnDefinitions>
