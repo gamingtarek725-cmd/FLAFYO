@@ -18,7 +18,7 @@ public partial class MainWindow
     private static HttpClient CreateUpdateHttpClient()
     {
         var client = new HttpClient { Timeout = TimeSpan.FromMinutes(5) };
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("FLAFYO-Game-Translator/0.3.1");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("FLAFYO-Game-Translator/0.3.2");
         client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
         return client;
     }
