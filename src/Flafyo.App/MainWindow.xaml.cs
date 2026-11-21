@@ -49,6 +49,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        UpdateStatusText.Text = $"الإصدار {typeof(MainWindow).Assembly.GetName().Version?.ToString(3) ?? "غير معروف"}";
         UserData.EnsureTemplates();
         if (_settings.Width >= 20 && _settings.Height >= 10)
         {
