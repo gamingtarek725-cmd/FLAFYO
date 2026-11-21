@@ -691,8 +691,11 @@ public partial class MainWindow : Window
         };
         sp.Scanned += (lines, blocks, ms) => Dispatcher.InvokeAsync(() =>
         {
-            LatencyText.Text = $"آخر مسح: قرأ {lines} سطر، طلع منهم {blocks} نص (OCR {ms:0} ms)";
             if (lines == 0) LastText.Text = "الـ OCR ما قرأش أي نص من الصورة. جرّب طريقة التصوير المتقدم، أو تأكد إن اللغة الإنجليزية مثبتة في Windows.";
+        });
+        sp.Performance += (lines, blocks, ocrMs, translationMs, totalMs) => Dispatcher.InvokeAsync(() =>
+        {
+            LatencyText.Text = $"LIVE | OCR {ocrMs:0} ms | ترجمة {translationMs:0} ms | الإجمالي {totalMs:0} ms | النصوص {blocks}";
         });
         sp.Start();
         _screen = sp;

@@ -42,6 +42,8 @@ public sealed class ScreenPipeline : IAsyncDisposable
     public event Action<IReadOnlyList<TranslatedBlock>>? Updated;
     /// <summary>(text lines read by OCR, blocks after grouping, OCR milliseconds) after every scan - shows what the program really saw.</summary>
     public event Action<int, int, double>? Scanned;
+    /// <summary>Per-scan timing: OCR, translation, and total elapsed milliseconds. Useful for measuring live-mode performance on real games.</summary>
+    public event Action<int, int, double, double, double>? Performance;
     public int Scans { get; private set; }
 
     public ScreenPipeline(IScreenGrabber grabber, IOcrLayoutEngine ocr, TranslationResolver resolver, IScreenOverlay overlay,
@@ -123,8 +125,15 @@ public sealed class ScreenPipeline : IAsyncDisposable
         }
     }
 
+    private void ReportPerformance(int lines, int blocks, double ocrMs, Stopwatch total, Stopwatch? translation)
+    {
+        try { Performance?.Invoke(lines, blocks, ocrMs, translation?.Elapsed.TotalMilliseconds ?? 0, total.Elapsed.TotalMilliseconds); }
+        catch { /* diagnostics must never interrupt the game translation worker */ }
+    }
+
     private async Task ScanAsync(Frame frame, CancellationToken ct)
     {
+        var total = Stopwatch.StartNew();
         Scans++;
         byte max = 0;
         for (int i = 0; i < frame.Gray.Length; i += 97) if (frame.Gray[i] > max) max = frame.Gray[i];
@@ -140,18 +149,25 @@ public sealed class ScreenPipeline : IAsyncDisposable
         catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
         catch (Exception ex) { _log?.Invoke("OCR failed: " + ex.Message); return; }
 
+        var ocrMs = sw.Elapsed.TotalMilliseconds;
         var blocks = BlockBuilder.Build(lines).Take(_opt.MaxBlocks).ToList();
-        try { Scanned?.Invoke(lines.Count, blocks.Count, sw.Elapsed.TotalMilliseconds); } catch { }
+        try { Scanned?.Invoke(lines.Count, blocks.Count, ocrMs); } catch { }
         if (blocks.Count == 0)
         {
             if (Interlocked.Read(ref _emptySince) == 0) Interlocked.Exchange(ref _emptySince, Stopwatch.GetTimestamp());
+            ReportPerformance(lines.Count, 0, ocrMs, total, null);
             return;
         }
         Interlocked.Exchange(ref _emptySince, 0);
-        if (SameLayout(blocks, _lastBlocks)) return;               // nothing really changed → keep what is shown (no flicker)
+        if (SameLayout(blocks, _lastBlocks))
+        {
+            ReportPerformance(lines.Count, blocks.Count, ocrMs, total, null);
+            return;               // nothing really changed → keep what is shown (no flicker)
+        }
 
         var area = _area();
         var translated = new List<TranslatedBlock>();
+        var translation = Stopwatch.StartNew();
         long lastPublish = Stopwatch.GetTimestamp();
         foreach (var block in blocks)
         {
@@ -170,8 +186,10 @@ public sealed class ScreenPipeline : IAsyncDisposable
                 lastPublish = Stopwatch.GetTimestamp();
             }
         }
+        translation.Stop();
         Publish(translated, area);
         _lastBlocks = blocks;
+        ReportPerformance(lines.Count, blocks.Count, ocrMs, total, translation);
     }
 
     private void Publish(List<TranslatedBlock> blocks, Rectangle area)
