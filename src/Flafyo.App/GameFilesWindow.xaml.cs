@@ -216,9 +216,9 @@ public partial class GameFilesWindow : Window
             }
             else
             {
-                foreach (var found in it.Hit.All.Where(s => BinaryTextMiner.IsRealSentence(s.Text) && s.ByteLength > 0))
+                foreach (var found in it.Hit.All.Where(s => BinaryTextMiner.IsRealSentence(s.Text) && s.ByteLength > 0).Take(500))
                     _probeTexts.Add(new ProbeEditItem(found));
-                ProbeEditStatus.Text = $"تم تحميل {_probeTexts.Count} نص قابل للمراجعة من ملف مستقل. اختر نصًا لبدء التعديل.";
+                ProbeEditStatus.Text = $"تم تحميل {_probeTexts.Count} نص كحد أقصى للواجهة من ملف مستقل. اختر نصًا لبدء التعديل.";
             }
         }
     }
