@@ -52,7 +52,7 @@ public sealed class GameFileFormatAnalyzerTests : IDisposable
         var report = GameFileFormatAnalyzer.Analyze(path);
 
         Assert.Contains("غير معروف", report.Kind);
-        Assert.Contains(report.Warnings, w => w.Contains("متخصصًا"));
+        Assert.Contains(report.Warnings, w => w.Contains("لا يمكن تحديد طريقة فكها"));
     }
 
     [Fact]
