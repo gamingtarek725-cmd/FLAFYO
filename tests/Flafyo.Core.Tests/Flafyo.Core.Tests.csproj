@@ -10,5 +10,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/Flafyo.Core/Flafyo.Core.csproj" />
+    <Compile Include="../../src/Flafyo.App/Profiles.cs" Link="App/Profiles.cs" />
+    <Compile Include="../../src/Flafyo.App/UserData.cs" Link="App/UserData.cs" />
   </ItemGroup>
 </Project>
