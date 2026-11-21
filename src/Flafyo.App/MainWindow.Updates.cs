@@ -33,7 +33,7 @@ public partial class MainWindow
                 "https://api.github.com/repos/gamingtarek725-cmd/FLAFYO/releases/latest");
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                UpdateStatusText.Text = "لا توجد نسخة منشورة للتحديث بعد.";
+                UpdateStatusText.Text = "لا يوجد إصدار منشور على GitHub حتى الآن؛ لذلك التحديث التلقائي غير متاح حاليًا.";
                 return;
             }
             response.EnsureSuccessStatusCode();
