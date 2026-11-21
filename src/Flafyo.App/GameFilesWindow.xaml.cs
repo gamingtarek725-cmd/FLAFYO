@@ -104,6 +104,35 @@ public partial class GameFilesWindow : Window
         finally { SetBusy(false); FilesList.Items.Refresh(); }
     }
 
+
+    // Read-only format analysis: never extracts, executes, or modifies the selected file.
+    private void AnalyzeFormat_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = "اختر ملف التعريب أو ملفًا من ملفات اللعبة لتحليل صيغته",
+            Filter = "كل الملفات (*.*)|*.*",
+            CheckFileExists = true,
+            Multiselect = false
+        };
+        if (Directory.Exists(FolderBox.Text)) dialog.InitialDirectory = FolderBox.Text;
+        if (dialog.ShowDialog(this) != true) return;
+
+        try
+        {
+            var report = GameFileFormatAnalyzer.Analyze(dialog.FileName);
+            ProbeStatus.Text = report.Summary;
+            ProbePreview.Text = report.Details;
+            Log("تحليل صيغة (قراءة فقط): " + dialog.FileName);
+        }
+        catch (Exception ex)
+        {
+            ProbeStatus.Text = "تعذّر تحليل الملف: " + ex.Message;
+            ProbePreview.Text = "";
+            AppLog.Write(ex);
+        }
+    }
+
     // ---- smart probe: which files really hold the game's text ----
     public sealed class ProbeItem
     {
