@@ -355,19 +355,96 @@ public partial class GameFilesWindow : Window
 
     private void RepackApply_Click(object sender, RoutedEventArgs e)
     {
-        var folder = ExtractedFolderBox.Text.Trim(); var container = ContainerFileBox.Text.Trim();
-        if (!Directory.Exists(folder) || !File.Exists(container)) { StatusText.Text = "حدد المجلد المستخرج وملف الحاوية الأصلي الأول."; return; }
-        var answer = MessageBox.Show(this,
-            "هتتبدل الحاوية الأصلية بنسخة فيها الملفات المترجمة، وهيتعمل نسخة احتياطية جنبها (.flafyo_backup). تكمل؟",
-            "تأكيد", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-        if (answer != MessageBoxResult.Yes) return;
+        var folder = ExtractedFolderBox.Text.Trim();
+        var container = ContainerFileBox.Text.Trim();
+        var outputRoot = OutputBox.Text.Trim();
+        if (!Directory.Exists(folder) || !File.Exists(container))
+        {
+            StatusText.Text = "حدد المجلد المستخرج وملف الحاوية الأصلي الأول.";
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(outputRoot))
+        {
+            StatusText.Text = "حدد مجلد الناتج أولًا لحفظ نسخة الحاوية الجديدة.";
+            return;
+        }
+
+        string? verificationFolder = null;
+        string? verificationArchive = null;
         try
         {
+            var originalKind = ContainerTools.Detect(File.ReadAllBytes(container));
             var rebuilt = ContainerTools.Repack(folder);
-            var backup = ContainerTools.Apply(container, rebuilt);
-            StatusText.Text = $"اتبنت الحاوية واتطبقت. النسخة الأصلية محفوظة في: {backup}";
+            if (ContainerTools.Detect(rebuilt) != originalKind)
+                throw new InvalidDataException("نوع الحاوية الناتجة لا يطابق نوع الملف الأصلي.");
+
+            // Re-open the rebuilt archive through the normal bounded extractor before making it available.
+            verificationFolder = Path.Combine(Path.GetTempPath(), "flafyo-verify-" + Guid.NewGuid().ToString("N"));
+            verificationArchive = Path.Combine(Path.GetTempPath(), "flafyo-verify-" + Guid.NewGuid().ToString("N") + Path.GetExtension(container));
+            File.WriteAllBytes(verificationArchive, rebuilt);
+            var (_, verifiedCount) = ContainerTools.Extract(verificationArchive, verificationFolder);
+            if (verifiedCount == 0)
+                throw new InvalidDataException("الحاوية الناتجة لا تحتوي على عناصر قابلة للتحقق.");
+
+            var outputFolder = Path.Combine(outputRoot, "_rebuilt_containers");
+            Directory.CreateDirectory(outputFolder);
+            var outputPath = Path.Combine(outputFolder,
+                Path.GetFileNameWithoutExtension(container) + ".flafyo-rebuilt-" +
+                DateTime.Now.ToString("yyyyMMdd-HHmmss") + "-" + Guid.NewGuid().ToString("N")[..8] +
+                Path.GetExtension(container));
+            using (var stream = new FileStream(outputPath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                stream.Write(rebuilt, 0, rebuilt.Length);
+
+            RebuiltContainerBox.Text = outputPath;
+            StatusText.Text = $"تم إنشاء نسخة حاوية منفصلة والتحقق من {verifiedCount} عنصر. الأصل لم يتغير. راجع النسخة قبل التطبيق.";
+            Log("تم إنشاء نسخة حاوية منفصلة: " + outputPath);
         }
-        catch (Exception ex) { StatusText.Text = "فشل البناء أو التطبيق: " + ex.Message; AppLog.Write(ex); }
+        catch (Exception ex)
+        {
+            RebuiltContainerBox.Text = "";
+            StatusText.Text = "فشل بناء أو التحقق من النسخة: " + ex.Message;
+            AppLog.Write(ex);
+        }
+        finally
+        {
+            if (verificationArchive != null && File.Exists(verificationArchive))
+                try { File.Delete(verificationArchive); } catch { }
+            if (verificationFolder != null && Directory.Exists(verificationFolder))
+                try { Directory.Delete(verificationFolder, true); } catch { }
+        }
+    }
+
+    private void ApplyRebuiltContainer_Click(object sender, RoutedEventArgs e)
+    {
+        var original = ContainerFileBox.Text.Trim();
+        var rebuilt = RebuiltContainerBox.Text.Trim();
+        if (!File.Exists(original) || !File.Exists(rebuilt))
+        {
+            StatusText.Text = "أنشئ نسخة حاوية منفصلة وتأكد من تحديد الملف الأصلي أولًا.";
+            return;
+        }
+
+        try
+        {
+            var originalKind = ContainerTools.Detect(File.ReadAllBytes(original));
+            var rebuiltKind = ContainerTools.Detect(File.ReadAllBytes(rebuilt));
+            if (originalKind == ContainerKind.None || rebuiltKind != originalKind)
+                throw new InvalidDataException("نوع النسخة الجديدة لا يطابق نوع الحاوية الأصلية.");
+
+            var answer = MessageBox.Show(this,
+                "سيتم استبدال الحاوية الأصلية بالنسخة التي أنشأتها. ستُحفظ نسخة احتياطية بجوار الأصل باسم .flafyo_backup. تأكد أن اللعبة مغلقة. هل تريد المتابعة؟",
+                "تأكيد تطبيق التعديل", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (answer != MessageBoxResult.Yes) return;
+
+            var backup = ContainerTools.Apply(original, File.ReadAllBytes(rebuilt));
+            StatusText.Text = $"تم تطبيق النسخة. النسخة الاحتياطية للأصل: {backup}";
+            Log("تم تطبيق الحاوية المعدلة بعد التأكيد: " + original);
+        }
+        catch (Exception ex)
+        {
+            StatusText.Text = "تعذر تطبيق النسخة: " + ex.Message;
+            AppLog.Write(ex);
+        }
     }
 
     private void SelectSuggested_Click(object sender, RoutedEventArgs e) { foreach (var i in _items) i.IsSelected = i.Suggested; FilesList.Items.Refresh(); }
