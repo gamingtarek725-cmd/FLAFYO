@@ -75,6 +75,35 @@ public class ArcAndProbeTests : IDisposable
     }
 
     [Fact]
+    public void Arc_parse_rejects_declared_oversized_entries()
+    {
+        var bytes = ArcArchive.Build(7, new[] { (Template("oversized", 1), TextBlob()) });
+        BitConverter.GetBytes(128u * 1024 * 1024 + 1).CopyTo(bytes, 8 + 72);
+
+        Assert.Throws<InvalidDataException>(() => ArcArchive.Parse(bytes));
+    }
+
+    [Fact]
+    public void Probe_detects_zip_container_by_signature_even_with_pak_extension()
+    {
+        using var stream = new MemoryStream();
+        using (var zip = new System.IO.Compression.ZipArchive(stream, System.IO.Compression.ZipArchiveMode.Create, leaveOpen: true))
+        {
+            var entry = zip.CreateEntry("lang/en/dialogue.txt");
+            using var output = entry.Open();
+            var text = TextBlob();
+            output.Write(text, 0, text.Length);
+        }
+
+        File.WriteAllBytes(Path.Combine(_root, "bundle.pak"), stream.ToArray());
+        var hits = GameProbe.Scan(_root, CancellationToken.None);
+
+        var hit = Assert.Single(hits);
+        Assert.Equal("ZIP", hit.Kind);
+        Assert.Equal("lang/en/dialogue.txt", hit.Entry);
+    }
+
+    [Fact]
     public void Probe_ranks_files_and_archive_entries_and_ignores_pictures_and_media()
     {
         var pic = new byte[8000]; new Random(2).NextBytes(pic);
