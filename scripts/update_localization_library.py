@@ -12,13 +12,25 @@ from urllib.parse import urljoin, urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "data" / "localization-library.json"
-UA = "FLAFYO-LibraryBot/1.0 (+https://github.com/gamingtarek725-cmd/FLAFYO)"
+UA = "FLAFYO-LibraryBot/1.1 (+https://github.com/gamingtarek-cmd/FLAFYO)"
 SOURCES = [
     ("Ta3reebat", "https://ta3reebat.com/"),
     ("Muarrab", "https://muarrab.com/en/patches/home/"),
     ("Ta3reb", "https://ta3reb.com/"),
 ]
-VERSION_RE = re.compile(r"(?i)\bv\s*\d+(?:\.\d+){1,3}|\b\d+\.\d+\.\d+(?:\.\d+)?\b")
+PLATFORM_TOKENS = ("PC", "PS5", "PS4", "PS3", "Xbox", "Switch", "Android")
+TITLE_OVERRIDES = {
+    "007-first-light": "007 First Light",
+    "a-plague-tale-innocence": "A Plague Tale: Innocence",
+    "grand-theft-auto-v": "Grand Theft Auto V",
+    "red-dead-redemption-2": "Red Dead Redemption 2",
+    "resident-evil-4-ultimate-hd-edition": "Resident Evil 4 Ultimate HD Edition",
+    "the-last-of-us-2": "The Last of Us Part II",
+    "the-witcher-3": "The Witcher 3: Wild Hunt",
+    "it-takes-two": "It Takes Two",
+    "lies-of-p": "Lies of P",
+    "hollow-knight-silksong": "Hollow Knight: Silksong",
+}
 
 class LinkParser(HTMLParser):
     def __init__(self):
@@ -33,7 +45,7 @@ class LinkParser(HTMLParser):
             self.active["text"] += data
     def handle_endtag(self, tag):
         if tag.lower() == "a" and self.active is not None:
-            self.active["text"] = re.sub(r"\s+", " ", html.unescape(self.active["text"])).strip()
+            self.active["text"] = re.sub(r"\\s+", " ", html.unescape(self.active["text"])).strip()
             self.links.append(self.active)
             self.active = None
 
@@ -42,6 +54,17 @@ def fetch(url):
     with urllib.request.urlopen(request, timeout=25) as response:
         charset = response.headers.get_content_charset() or "utf-8"
         return response.read(8_000_000).decode(charset, errors="replace")
+
+def title_from_slug(path: str, fallback: str) -> str:
+    slug = path.rstrip("/").split("/")[-1].lower()
+    if slug in TITLE_OVERRIDES:
+        return TITLE_OVERRIDES[slug]
+    # URL slugs are more stable than link text polluted by badges, view counts and platform labels.
+    words = re.sub(r"[-_]+", " ", slug).strip()
+    words = re.sub(r"(?i)^ta3reeb( of)? ", "", words)
+    if not words or words in {"home", "patches", "game", "translations"}:
+        return fallback[:180]
+    return words.title()[:180]
 
 def main():
     entries, seen = [], set()
@@ -54,8 +77,8 @@ def main():
             continue
         base_host = urlparse(listing_url).hostname
         for link in parser.links:
-            title, href = link["text"], link["href"]
-            if not title or not href or href.startswith(("#", "javascript:", "mailto:")):
+            raw_title, href = link["text"], link["href"]
+            if not raw_title or not href or href.startswith(("#", "javascript:", "mailto:")):
                 continue
             absolute = urljoin(listing_url, href).split("#", 1)[0]
             parsed = urlparse(absolute)
@@ -68,39 +91,32 @@ def main():
                 continue
             if source_name == "Muarrab" and ("/tags/" in path or "/teams/" in path):
                 continue
-            relevant = (
-                source_name == "Ta3reebat" and (
-                    "/translations/" in path or "تعريب" in title or "→" in title or "جديد" in title
-                )
+            is_game_page = (
+                source_name == "Ta3reebat" and "/translations/" in path
                 or source_name == "Muarrab" and "/patches/" in path
-                or source_name == "Ta3reb" and ("تعريب" in title or "/game/" in path)
+                or source_name == "Ta3reb" and "/game/" in path
             )
-            if not relevant or absolute in seen:
+            if not is_game_page or absolute in seen:
                 continue
             seen.add(absolute)
-            arrow_versions = re.search(r"(\d+(?:\.\d+){1,3})\s*→\s*(\d+(?:\.\d+){1,3})", title)
-            prefixed_version = re.search(r"(?i)\bv\s*(\d+(?:\.\d+){1,3})", title)
+            arrow_versions = re.search(r"(\\d+(?:\\.\\d+){1,3})\\s*→\\s*(\\d+(?:\\.\\d+){1,3})", raw_title)
+            prefixed_version = re.search(r"(?i)\\bv\\s*(\\d+(?:\\.\\d+){1,3})", raw_title)
             translation_version = arrow_versions.group(2) if arrow_versions else (prefixed_version.group(1) if prefixed_version else "")
-            is_new = bool(re.match(r"^\s*جديد\b", title)) or bool(re.search(r"جديد\s+الإصدار\s+الأول", title, re.I))
-            is_update = bool(arrow_versions) or bool(re.search(r"محدّث|محدث|تحديث", title, re.I))
+            is_new = bool(re.match(r"^\\s*جديد\\b", raw_title)) or bool(re.search(r"جديد\\s+الإصدار\\s+الأول", raw_title, re.I))
+            is_update = bool(arrow_versions) or bool(re.search(r"محدّث|محدث|تحديث", raw_title, re.I))
             update_type = "new" if is_new else ("update" if is_update else "listing")
-            display_title = title
-            if arrow_versions:
-                display_title = title[:arrow_versions.start()].strip()
-            display_title = re.sub(r"^\s*محدّث\s*[·:-]?\s*v?\d+(?:\.\d+){1,3}\s*", "", display_title, flags=re.I)
-            display_title = re.sub(r"^\s*جديد\s*", "", display_title, flags=re.I)
-            display_title = re.sub(r"^\d+", "", display_title).strip()
-            display_title = re.sub(r"\s*\d+(?:\.\d+)?\s*K?\s*تحميل\s*$", "", display_title, flags=re.I).strip()
-            display_title = re.sub(r"\d+\s*تحميل.*$", "", display_title).strip()
+            title = title_from_slug(path, raw_title)
+            platforms = [token for token in PLATFORM_TOKENS
+                         if re.search(rf"(?<![A-Za-z0-9]){re.escape(token)}(?![A-Za-z0-9])", raw_title, re.I)]
             entries.append({
-                "title": (display_title or title)[:180],
+                "title": title,
                 "sourceUrl": absolute,
                 "sourceName": source_name,
-                "platform": "PC" if re.search(r"\bPC\b", title, re.I) else "",
+                "platform": ", ".join(platforms),
                 "gameVersion": "",
                 "translationVersion": translation_version,
                 "updateType": update_type,
-                "summary": title[:500],
+                "summary": raw_title[:500],
                 "publishedAt": ""
             })
     entries.sort(key=lambda item: (item["sourceName"], item["title"].casefold()))
@@ -113,14 +129,14 @@ def main():
     unchanged = previous.get("entries") == entries and previous.get("sourceCount") == len(SOURCES)
     generated_at = previous.get("generatedAt") if unchanged and previous.get("generatedAt") else dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
     catalog = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "generatedAt": generated_at,
         "sourceCount": len(SOURCES),
         "entries": entries[:1200]
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"Indexed {len(catalog['entries'])} public source pages.")
+    OUTPUT.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+    print(f"Indexed {len(catalog['entries'])} public game pages from {len(SOURCES)} source sites.")
 
 if __name__ == "__main__":
     main()
