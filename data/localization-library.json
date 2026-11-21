@@ -1,19 +1,8 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-21T11:22:28+00:00",
+  "generatedAt": "2026-11-21T11:23:10+00:00",
   "sourceCount": 3,
   "entries": [
-    {
-      "title": "007 First Light",
-      "sourceUrl": "https://muarrab.com/patches/007-first-light/",
-      "sourceName": "Muarrab",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "",
-      "updateType": "listing",
-      "summary": "007 First Light",
-      "publishedAt": ""
-    },
     {
       "title": "A Plague Tale Innocence",
       "sourceUrl": "https://muarrab.com/patches/a-plague-tale-innocence/",
@@ -34,6 +23,17 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "Control Resonant",
+      "publishedAt": ""
+    },
+    {
+      "title": "First Light",
+      "sourceUrl": "https://muarrab.com/patches/007-first-light/",
+      "sourceName": "Muarrab",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "",
+      "updateType": "listing",
+      "summary": "007 First Light",
       "publishedAt": ""
     },
     {
@@ -73,7 +73,7 @@
       "title": "In Arabic Subtitled AI Action-adventure PC 1666: Amsterdam 2026 Community Dhahab Store, شبكة ترس",
       "sourceUrl": "https://muarrab.com/patches/1666-amsterdam/",
       "sourceName": "Muarrab",
-      "platform": "",
+      "platform": "PC",
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
@@ -172,9 +172,9 @@
       "title": "القوائم والحوارات CUSA10812 + V1.01 تعريب لعبة A Plague Tale Innocence PC PS4 عرض التعريب",
       "sourceUrl": "https://ta3reb.com/game/%D8%AA%D8%B9%D8%B1%D9%8A%D8%A8-%D9%84%D8%B9%D8%A8%D8%A9-a-plague-tale-innocence",
       "sourceName": "Ta3reb",
-      "platform": "",
+      "platform": "PC",
       "gameVersion": "",
-      "translationVersion": "V1.01",
+      "translationVersion": "1.01",
       "updateType": "listing",
       "summary": "القوائم والحوارات CUSA10812 + V1.01 تعريب لعبة A Plague Tale Innocence PC PS4 عرض التعريب",
       "publishedAt": ""
@@ -183,9 +183,9 @@
       "title": "القوائم والحوارات V 1.0.42 تعريب لعبة 1 Red Dead Redemption PC عرض التعريب",
       "sourceUrl": "https://ta3reb.com/game/%D8%AA%D8%B9%D8%B1%D9%8A%D8%A8-%D9%84%D8%B9%D8%A8%D8%A9-1-red-dead-redemption",
       "sourceName": "Ta3reb",
-      "platform": "",
+      "platform": "PC",
       "gameVersion": "",
-      "translationVersion": "V 1.0.42",
+      "translationVersion": "1.0.42",
       "updateType": "listing",
       "summary": "القوائم والحوارات V 1.0.42 تعريب لعبة 1 Red Dead Redemption PC عرض التعريب",
       "publishedAt": ""
@@ -196,7 +196,7 @@
       "sourceName": "Ta3reb",
       "platform": "",
       "gameVersion": "",
-      "translationVersion": "V1.02",
+      "translationVersion": "1.02",
       "updateType": "listing",
       "summary": "القوائم والحوارات V1.02 تعريب لعبة Uncharted The Nathan Drake Collection PS4 عرض التعريب",
       "publishedAt": ""
@@ -205,9 +205,9 @@
       "title": "القوائم والحوارات V1.03 + CUSA00325 تعريب لعبة Outlast PC PS4 عرض التعريب",
       "sourceUrl": "https://ta3reb.com/game/%D8%AA%D8%B9%D8%B1%D9%8A%D8%A8-%D9%84%D8%B9%D8%A8%D8%A9-outlast",
       "sourceName": "Ta3reb",
-      "platform": "",
+      "platform": "PC",
       "gameVersion": "",
-      "translationVersion": "V1.03",
+      "translationVersion": "1.03",
       "updateType": "listing",
       "summary": "القوائم والحوارات V1.03 + CUSA00325 تعريب لعبة Outlast PC PS4 عرض التعريب",
       "publishedAt": ""
@@ -216,9 +216,9 @@
       "title": "القوائم والحوارات V1.03 + CUSA16742 + V1.0.0.4 تعريب لعبة It Takes Two PC PS4 عرض التعريب",
       "sourceUrl": "https://ta3reb.com/game/%D8%AA%D8%B9%D8%B1%D9%8A%D8%A8-%D9%84%D8%B9%D8%A8%D8%A9-it-takes-two",
       "sourceName": "Ta3reb",
-      "platform": "",
+      "platform": "PC",
       "gameVersion": "",
-      "translationVersion": "V1.03 / V1.0.0.4",
+      "translationVersion": "1.03",
       "updateType": "listing",
       "summary": "القوائم والحوارات V1.03 + CUSA16742 + V1.0.0.4 تعريب لعبة It Takes Two PC PS4 عرض التعريب",
       "publishedAt": ""
@@ -227,9 +227,9 @@
       "title": "القوائم والحوارات V1.15 + CUSA00133 تعريب لعبة BATMAN ARKHAM KNIGHT PC PS4 عرض التعريب",
       "sourceUrl": "https://ta3reb.com/game/%D8%AA%D8%B9%D8%B1%D9%8A%D8%A8-%D9%84%D8%B9%D8%A8%D8%A9-batman-arkham-knight",
       "sourceName": "Ta3reb",
-      "platform": "",
+      "platform": "PC",
       "gameVersion": "",
-      "translationVersion": "V1.15",
+      "translationVersion": "1.15",
       "updateType": "listing",
       "summary": "القوائم والحوارات V1.15 + CUSA00133 تعريب لعبة BATMAN ARKHAM KNIGHT PC PS4 عرض التعريب",
       "publishedAt": ""
@@ -260,9 +260,9 @@
       "title": "تعريب رسمي 🌟 CUSA05574 + V4.04 تعريب لعبة The Witcher 3 PC PS4 عرض التعريب",
       "sourceUrl": "https://ta3reb.com/game/%D8%AA%D8%B9%D8%B1%D9%8A%D8%A8-%D9%84%D8%B9%D8%A8%D8%A9-the-witcher-3",
       "sourceName": "Ta3reb",
-      "platform": "",
+      "platform": "PC",
       "gameVersion": "",
-      "translationVersion": "V4.04",
+      "translationVersion": "4.04",
       "updateType": "listing",
       "summary": "تعريب رسمي 🌟 CUSA05574 + V4.04 تعريب لعبة The Witcher 3 PC PS4 عرض التعريب",
       "publishedAt": ""
@@ -273,7 +273,7 @@
       "sourceName": "Ta3reb",
       "platform": "",
       "gameVersion": "",
-      "translationVersion": "V1.17",
+      "translationVersion": "1.17",
       "updateType": "listing",
       "summary": "تعريب رسمي 🌟 CUSA11995 + V1.17 تعريب لعبة Marvels Spider Man PS4 عرض التعريب",
       "publishedAt": ""
@@ -284,7 +284,7 @@
       "sourceName": "Ta3reb",
       "platform": "",
       "gameVersion": "",
-      "translationVersion": "V1.08",
+      "translationVersion": "1.08",
       "updateType": "listing",
       "summary": "تعريب لعبة Lies of P القوائم والحوارات CUSA36848 + V1.08",
       "publishedAt": ""
@@ -295,7 +295,7 @@
       "sourceName": "Ta3reb",
       "platform": "",
       "gameVersion": "",
-      "translationVersion": "V1.00",
+      "translationVersion": "1.00",
       "updateType": "listing",
       "summary": "تعريب لعبة Winning Eleven 49 القوائم والحوارات SLPM66374 + V1.00",
       "publishedAt": ""
@@ -411,73 +411,7 @@
       "publishedAt": ""
     },
     {
-      "title": "10Sons Of The Forestأبناء الغابة381تحميل",
-      "sourceUrl": "https://ta3reebat.com/translations/sons-of-the-forest/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "",
-      "updateType": "listing",
-      "summary": "10Sons Of The Forestأبناء الغابة381تحميل",
-      "publishedAt": ""
-    },
-    {
-      "title": "1Phantom Blade Zeroفانتوم بليد زيرو4.4K تحميل",
-      "sourceUrl": "https://ta3reebat.com/translations/phantom-blade-zero/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "",
-      "updateType": "listing",
-      "summary": "1Phantom Blade Zeroفانتوم بليد زيرو4.4K تحميل",
-      "publishedAt": ""
-    },
-    {
-      "title": "2The Last of Us™ Part Iذا لاست أوف أس™ الجزء الأول1.1K تحميل",
-      "sourceUrl": "https://ta3reebat.com/translations/the-last-of-us-part-i/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "",
-      "updateType": "listing",
-      "summary": "2The Last of Us™ Part Iذا لاست أوف أس™ الجزء الأول1.1K تحميل",
-      "publishedAt": ""
-    },
-    {
-      "title": "3Grand Theft Auto V Enhancedجراند ثيفت أوتو 5867 تحميل",
-      "sourceUrl": "https://ta3reebat.com/translations/grand-theft-auto-v-enhanced/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "",
-      "updateType": "listing",
-      "summary": "3Grand Theft Auto V Enhancedجراند ثيفت أوتو 5867 تحميل",
-      "publishedAt": ""
-    },
-    {
-      "title": "4Moon Sweepersكاسحات القمر540تحميل",
-      "sourceUrl": "https://ta3reebat.com/translations/moon-sweepers/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "",
-      "updateType": "listing",
-      "summary": "4Moon Sweepersكاسحات القمر540تحميل",
-      "publishedAt": ""
-    },
-    {
-      "title": "5Grand Theft Auto IV: The Complete Editionجراند ثفت أوتو 4: النسخة الكاملة539تحميل",
-      "sourceUrl": "https://ta3reebat.com/translations/grand-theft-auto-iv-the-complete-edition/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "",
-      "updateType": "listing",
-      "summary": "5Grand Theft Auto IV: The Complete Editionجراند ثفت أوتو 4: النسخة الكاملة539تحميل",
-      "publishedAt": ""
-    },
-    {
-      "title": "6A Way Outطريق للخروج480تحميل",
+      "title": "A Way Outطريق للخروج",
       "sourceUrl": "https://ta3reebat.com/translations/a-way-out/",
       "sourceName": "Ta3reebat",
       "platform": "",
@@ -485,50 +419,6 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "6A Way Outطريق للخروج480تحميل",
-      "publishedAt": ""
-    },
-    {
-      "title": "7 Days to Dieسفن دي تو داي64 تحميلأكتوبر 2026PC · 825 KB",
-      "sourceUrl": "https://ta3reebat.com/translations/7-days-to-die/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "",
-      "updateType": "listing",
-      "summary": "7 Days to Dieسفن دي تو داي64 تحميلأكتوبر 2026PC · 825 KB",
-      "publishedAt": ""
-    },
-    {
-      "title": "7Devil May Cry 5ديفل ماي كراي 5393تحميل",
-      "sourceUrl": "https://ta3reebat.com/translations/devil-may-cry-5/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "",
-      "updateType": "listing",
-      "summary": "7Devil May Cry 5ديفل ماي كراي 5393تحميل",
-      "publishedAt": ""
-    },
-    {
-      "title": "8Stardew Valleyستارديو فالي388تحميل",
-      "sourceUrl": "https://ta3reebat.com/translations/stardew-valley/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "",
-      "updateType": "listing",
-      "summary": "8Stardew Valleyستارديو فالي388تحميل",
-      "publishedAt": ""
-    },
-    {
-      "title": "9The Walking Dead The Telltale Definitive Seriesالموتى السائرون: سلسلة تلتيل النهائية381تحميل",
-      "sourceUrl": "https://ta3reebat.com/translations/the-walking-dead-the-telltale-definitive-series/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "",
-      "updateType": "listing",
-      "summary": "9The Walking Dead The Telltale Definitive Seriesالموتى السائرون: سلسلة تلتيل النهائية381تحميل",
       "publishedAt": ""
     },
     {
@@ -576,6 +466,17 @@
       "publishedAt": ""
     },
     {
+      "title": "Aniimoأنيمو170 تحميلأكتوبر 2026PC · 30.33 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/aniimo/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.6",
+      "updateType": "update",
+      "summary": "محدّث · v1.6Aniimoأنيمو170 تحميلأكتوبر 2026PC · 30.33 MB",
+      "publishedAt": ""
+    },
+    {
       "title": "ARMORED CORE™ VI FIRES OF RUBICON™أرمورد كور™ 6 نيران روبيكون™28 تحميلأكتوبر 2026PC · 7.14 MB",
       "sourceUrl": "https://ta3reebat.com/translations/armored-core-vi-fires-of-rubicon/",
       "sourceName": "Ta3reebat",
@@ -598,6 +499,50 @@
       "publishedAt": ""
     },
     {
+      "title": "Attack on Titan / A.O.T. Wings of Freedomهجوم العمالقة / A.O.T. أجنحة الحرية89 تحميلأكتوبر 2026PC · 5.59 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/attack-on-titan-a-o-t-wings-of-freedom/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.2",
+      "updateType": "update",
+      "summary": "محدّث · v1.2Attack on Titan / A.O.T. Wings of Freedomهجوم العمالقة / A.O.T. أجنحة الحرية89 تحميلأكتوبر 2026PC · 5.59 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Attack on Titan 2 - A.O.T.2هجوم العمالقة 2 - A.O.T.2111 تحميلأكتوبر 2026PC · 2.72 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/attack-on-titan-2-a-o-t-2/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.4",
+      "updateType": "update",
+      "summary": "محدّث · v1.4Attack on Titan 2 - A.O.T.2هجوم العمالقة 2 - A.O.T.2111 تحميلأكتوبر 2026PC · 2.72 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Baldur's Gate 3بالدورز كيت 3227 تحميلأكتوبر 2026PC · 34.77 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/baldurs-gate-3/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "2.3",
+      "updateType": "update",
+      "summary": "محدّث · v2.3Baldur's Gate 3بالدورز كيت 3227 تحميلأكتوبر 2026PC · 34.77 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Barotraumaبارو-تروما24 تحميلنوفمبر 2026PC · 1.70 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/barotrauma/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Barotraumaبارو-تروما24 تحميلنوفمبر 2026PC · 1.70 MB",
+      "publishedAt": ""
+    },
+    {
       "title": "Batman: Arkham Asylum Game of the Year Editionباتمان: مصح أركام - نسخة لعبة العام119 تحميلنوفمبر 2026PC · 5.22 MB",
       "sourceUrl": "https://ta3reebat.com/translations/batman-arkham-asylum-game-of-the-year-edition/",
       "sourceName": "Ta3reebat",
@@ -617,6 +562,50 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "Batman: Arkham City - Game of the Year Editionباتمان: أركام سيتي - إصدار لعبة العام166 تحميلنوفمبر 2026PC · 6.07 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Batman: Arkham Knightباتمان: أركام نايت169 تحميلنوفمبر 2026PC · 12.93 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/batman-arkham-knight/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Batman: Arkham Knightباتمان: أركام نايت169 تحميلنوفمبر 2026PC · 12.93 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Batman: Arkham Originsباتمان: أركام أوريجنز91 تحميلنوفمبر 2026PC · 8.15 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/batman-arkham-origins/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Batman: Arkham Originsباتمان: أركام أوريجنز91 تحميلنوفمبر 2026PC · 8.15 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Beyond Two Soulsما وراء الروحين78 تحميلأكتوبر 2026PC · 409.81 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/beyond-two-souls/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Beyond Two Soulsما وراء الروحين78 تحميلأكتوبر 2026PC · 409.81 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Big Ambitionsطموحات كبيرة111 تحميلأكتوبر 2026PC · 1.48 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/big-ambitions/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Big Ambitionsطموحات كبيرة111 تحميلأكتوبر 2026PC · 1.48 MB",
       "publishedAt": ""
     },
     {
@@ -675,6 +664,28 @@
       "publishedAt": ""
     },
     {
+      "title": "Borderlands 2بوردرلاندز 266 تحميلنوفمبر 2026PC · 14.78 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/borderlands-2/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Borderlands 2بوردرلاندز 266 تحميلنوفمبر 2026PC · 14.78 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Borderlands 3بوردرلاندز 387 تحميلأكتوبر 2026PC · 5.31 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/borderlands-3/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Borderlands 3بوردرلاندز 387 تحميلأكتوبر 2026PC · 5.31 MB",
+      "publishedAt": ""
+    },
+    {
       "title": "Borderlands 4بوردرلاندز 4190 تحميلأكتوبر 2026PC · 14.38 MB",
       "sourceUrl": "https://ta3reebat.com/translations/borderlands-4/",
       "sourceName": "Ta3reebat",
@@ -719,12 +730,12 @@
       "publishedAt": ""
     },
     {
-      "title": "Castlevania: Belmont's Curse1.0→1.1يعمل على آخر تحديث للعبة: أداة التثبيت كانت ترفض بعد التحديث بأن «اللعبة غير متوافقة»21 نوفمبر 2026",
+      "title": "Castlevania: Belmont's Curse",
       "sourceUrl": "https://ta3reebat.com/translations/castlevania-belmonts-curse/",
       "sourceName": "Ta3reebat",
       "platform": "",
       "gameVersion": "",
-      "translationVersion": "",
+      "translationVersion": "1.1",
       "updateType": "update",
       "summary": "Castlevania: Belmont's Curse1.0→1.1يعمل على آخر تحديث للعبة: أداة التثبيت كانت ترفض بعد التحديث بأن «اللعبة غير متوافقة»21 نوفمبر 2026",
       "publishedAt": ""
@@ -738,6 +749,17 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "Cities: Skylines IIسيتيز: سكاي لاينز 282 تحميلأكتوبر 2026PC · 0.60 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Cities: Skylinesالمدن: سكايلاينز84 تحميلأكتوبر 2026PC · 1.69 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/cities-skylines/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.2",
+      "updateType": "update",
+      "summary": "محدّث · v1.2Cities: Skylinesالمدن: سكايلاينز84 تحميلأكتوبر 2026PC · 1.69 MB",
       "publishedAt": ""
     },
     {
@@ -763,6 +785,28 @@
       "publishedAt": ""
     },
     {
+      "title": "Conan Exiles Enhancedتعزيز كونان المنفيين104 تحميلأكتوبر 2026PC · 5.97 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/conan-exiles-enhanced/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.2",
+      "updateType": "update",
+      "summary": "محدّث · v1.2Conan Exiles Enhancedتعزيز كونان المنفيين104 تحميلأكتوبر 2026PC · 5.97 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "CONTROL Resonantكنترول: صدى الاضطراب123 تحميلأكتوبر 2026PC · 4.43 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/control-resonant/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.0.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.0.1CONTROL Resonantكنترول: صدى الاضطراب123 تحميلأكتوبر 2026PC · 4.43 MB",
+      "publishedAt": ""
+    },
+    {
       "title": "Coral Islandجزيرة المرجان41 تحميلنوفمبر 2026PC · 5.72 MB",
       "sourceUrl": "https://ta3reebat.com/translations/coral-island/",
       "sourceName": "Ta3reebat",
@@ -782,6 +826,28 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "Core Keeperكور كيبر27 تحميلأكتوبر 2026PC · 0.46 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "CRACKكراك65 تحميلأكتوبر 2026PC · 1.07 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/crack/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1CRACKكراك65 تحميلأكتوبر 2026PC · 1.07 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Cronos: The New Dawnكرونوس: الفجر الجديد90 تحميلأكتوبر 2026PC · 2.30 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/cronos-the-new-dawn/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Cronos: The New Dawnكرونوس: الفجر الجديد90 تحميلأكتوبر 2026PC · 2.30 MB",
       "publishedAt": ""
     },
     {
@@ -829,6 +895,17 @@
       "publishedAt": ""
     },
     {
+      "title": "DAVE THE DIVERديف ذا دايفر225 تحميلأكتوبر 2026PC · 2.88 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/dave-the-diver/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.2",
+      "updateType": "update",
+      "summary": "محدّث · v1.2DAVE THE DIVERديف ذا دايفر225 تحميلأكتوبر 2026PC · 2.88 MB",
+      "publishedAt": ""
+    },
+    {
       "title": "Days Goneأيام مضت179 تحميلنوفمبر 2026PC · 29.32 MB",
       "sourceUrl": "https://ta3reebat.com/translations/days-gone/",
       "sourceName": "Ta3reebat",
@@ -840,6 +917,17 @@
       "publishedAt": ""
     },
     {
+      "title": "Days to Dieسفن دي تو داي64 تحميلأكتوبر 2026PC · 825 KB",
+      "sourceUrl": "https://ta3reebat.com/translations/7-days-to-die/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "",
+      "updateType": "listing",
+      "summary": "7 Days to Dieسفن دي تو داي64 تحميلأكتوبر 2026PC · 825 KB",
+      "publishedAt": ""
+    },
+    {
       "title": "Dead Cellsالخلايا الميتة208 تحميلأكتوبر 2026PC · 3.05 MB",
       "sourceUrl": "https://ta3reebat.com/translations/dead-cells/",
       "sourceName": "Ta3reebat",
@@ -848,6 +936,17 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "Dead Cellsالخلايا الميتة208 تحميلأكتوبر 2026PC · 3.05 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Dead Spaceديد سبيس188 تحميلأكتوبر 2026PC · 778 KB",
+      "sourceUrl": "https://ta3reebat.com/translations/dead-space/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.3",
+      "updateType": "update",
+      "summary": "محدّث · v1.3Dead Spaceديد سبيس188 تحميلأكتوبر 2026PC · 778 KB",
       "publishedAt": ""
     },
     {
@@ -881,6 +980,17 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "Deus Ex: Human Revolution - Director's Cutدس إكس: هيومان ريفوليوشن40 تحميلأكتوبر 2026PC · 2.50 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Devil May Cry 5ديفل ماي كراي",
+      "sourceUrl": "https://ta3reebat.com/translations/devil-may-cry-5/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "",
+      "updateType": "listing",
+      "summary": "7Devil May Cry 5ديفل ماي كراي 5393تحميل",
       "publishedAt": ""
     },
     {
@@ -928,13 +1038,13 @@
       "publishedAt": ""
     },
     {
-      "title": "DREADMOOR1.0→1.1تعريب نصوص تحديث اللعبة الأخير (19 نوفمبر): خيارات الإعدادات الجديدة، رسائل جديدة، والأسماء التي غيّرها المطورون في المهام والحوار21 نوفمبر 2026",
+      "title": "DREADMOOR",
       "sourceUrl": "https://ta3reebat.com/translations/dreadmoor/",
       "sourceName": "Ta3reebat",
       "platform": "",
       "gameVersion": "",
-      "translationVersion": "",
-      "updateType": "new",
+      "translationVersion": "1.1",
+      "updateType": "update",
       "summary": "DREADMOOR1.0→1.1تعريب نصوص تحديث اللعبة الأخير (19 نوفمبر): خيارات الإعدادات الجديدة، رسائل جديدة، والأسماء التي غيّرها المطورون في المهام والحوار21 نوفمبر 2026",
       "publishedAt": ""
     },
@@ -950,6 +1060,17 @@
       "publishedAt": ""
     },
     {
+      "title": "Enshroudedإنشرودد216 تحميلأكتوبر 2026PC · 8.10 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/enshrouded/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.2",
+      "updateType": "update",
+      "summary": "محدّث · v1.2Enshroudedإنشرودد216 تحميلأكتوبر 2026PC · 8.10 MB",
+      "publishedAt": ""
+    },
+    {
       "title": "Enter the Gungeonادخل زنزانة الأسلحة29 تحميلنوفمبر 2026PC · 1.21 MB",
       "sourceUrl": "https://ta3reebat.com/translations/enter-the-gungeon/",
       "sourceName": "Ta3reebat",
@@ -961,13 +1082,46 @@
       "publishedAt": ""
     },
     {
+      "title": "Factorioفاكتوريو33 تحميلأكتوبر 2026PC · 1.05 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/factorio/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.2",
+      "updateType": "update",
+      "summary": "محدّث · v1.2Factorioفاكتوريو33 تحميلأكتوبر 2026PC · 1.05 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Fallout 4فال آوت 4115 تحميلأكتوبر 2026PC · 5.61 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/fallout-4/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.2",
+      "updateType": "update",
+      "summary": "محدّث · v1.2Fallout 4فال آوت 4115 تحميلأكتوبر 2026PC · 5.61 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Fallout 76فال آوت 7644 تحميلأكتوبر 2026PC · 9.79 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/fallout-76/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Fallout 76فال آوت 7644 تحميلأكتوبر 2026PC · 9.79 MB",
+      "publishedAt": ""
+    },
+    {
       "title": "Fallout: New Vegasفول أوت: فيغاس الجديدة56 تحميلنوفمبر 2026PC · 4.61 MB",
       "sourceUrl": "https://ta3reebat.com/translations/fallout-new-vegas/",
       "sourceName": "Ta3reebat",
       "platform": "",
       "gameVersion": "",
       "translationVersion": "",
-      "updateType": "new",
+      "updateType": "listing",
       "summary": "Fallout: New Vegasفول أوت: فيغاس الجديدة56 تحميلنوفمبر 2026PC · 4.61 MB",
       "publishedAt": ""
     },
@@ -1005,6 +1159,17 @@
       "publishedAt": ""
     },
     {
+      "title": "Far Cry 4فار كراي 4282 تحميلأكتوبر 2026PC · 2.67 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/far-cry-4/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Far Cry 4فار كراي 4282 تحميلأكتوبر 2026PC · 2.67 MB",
+      "publishedAt": ""
+    },
+    {
       "title": "Far Cryفار كراي54 تحميلأكتوبر 2026PC · 0.63 MB",
       "sourceUrl": "https://ta3reebat.com/translations/far-cry/",
       "sourceName": "Ta3reebat",
@@ -1013,6 +1178,17 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "Far Cryفار كراي54 تحميلأكتوبر 2026PC · 0.63 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Fields of Mistriaحقول ميستريا80 تحميلنوفمبر 2026PC · 2.64 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/fields-of-mistria/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Fields of Mistriaحقول ميستريا80 تحميلنوفمبر 2026PC · 2.64 MB",
       "publishedAt": ""
     },
     {
@@ -1049,6 +1225,39 @@
       "publishedAt": ""
     },
     {
+      "title": "First Light007: الضوء الأول294 تحميلأكتوبر 2026PC · 51.47 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/007-first-light/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.3007",
+      "updateType": "update",
+      "summary": "محدّث · v1.3007 First Light007: الضوء الأول294 تحميلأكتوبر 2026PC · 51.47 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Frostpunk 2فروستبانك 2102 تحميلأكتوبر 2026PC · 6.80 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/frostpunk-2/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Frostpunk 2فروستبانك 2102 تحميلأكتوبر 2026PC · 6.80 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Frostpunkفروست بانك210 تحميلأكتوبر 2026PC · 10.76 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/frostpunk/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.3",
+      "updateType": "update",
+      "summary": "محدّث · v1.3Frostpunkفروست بانك210 تحميلأكتوبر 2026PC · 10.76 MB",
+      "publishedAt": ""
+    },
+    {
       "title": "Goat Simulator 3محاكاة الماعز 334 تحميلأكتوبر 2026PC · 4.70 MB",
       "sourceUrl": "https://ta3reebat.com/translations/goat-simulator-3/",
       "sourceName": "Ta3reebat",
@@ -1068,6 +1277,28 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "God of Warإله الحرب91 تحميلنوفمبر 2026PC · 3.48 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Grand Theft Auto IV: The Complete Editionجراند ثفت أوتو 4: النسخة الكاملة",
+      "sourceUrl": "https://ta3reebat.com/translations/grand-theft-auto-iv-the-complete-edition/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "",
+      "updateType": "listing",
+      "summary": "5Grand Theft Auto IV: The Complete Editionجراند ثفت أوتو 4: النسخة الكاملة539تحميل",
+      "publishedAt": ""
+    },
+    {
+      "title": "Grand Theft Auto V Enhancedجراند ثيفت أوتو",
+      "sourceUrl": "https://ta3reebat.com/translations/grand-theft-auto-v-enhanced/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "",
+      "updateType": "listing",
+      "summary": "3Grand Theft Auto V Enhancedجراند ثيفت أوتو 5867 تحميل",
       "publishedAt": ""
     },
     {
@@ -1104,6 +1335,17 @@
       "publishedAt": ""
     },
     {
+      "title": "Graveyard Keeperحارس المقبرة48 تحميلنوفمبر 2026PC · 1.36 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/graveyard-keeper/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Graveyard Keeperحارس المقبرة48 تحميلنوفمبر 2026PC · 1.36 MB",
+      "publishedAt": ""
+    },
+    {
       "title": "Green Hellالجحيم الأخضر62 تحميلأكتوبر 2026PC · 0.82 MB",
       "sourceUrl": "https://ta3reebat.com/translations/green-hell/",
       "sourceName": "Ta3reebat",
@@ -1112,6 +1354,17 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "Green Hellالجحيم الأخضر62 تحميلأكتوبر 2026PC · 0.82 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Grim Dawnالفجر القاتم49 تحميلأكتوبر 2026PC · 2.19 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/grim-dawn/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Grim Dawnالفجر القاتم49 تحميلأكتوبر 2026PC · 2.19 MB",
       "publishedAt": ""
     },
     {
@@ -1126,6 +1379,17 @@
       "publishedAt": ""
     },
     {
+      "title": "Hadesهادس160 تحميلسبتمبر 2026PC · 3.97 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/hades/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "2.1",
+      "updateType": "update",
+      "summary": "محدّث · v2.1Hadesهادس160 تحميلسبتمبر 2026PC · 3.97 MB",
+      "publishedAt": ""
+    },
+    {
       "title": "Halo: The Master Chief Collectionهالو: مجموعة ماستر تشيف52 تحميلنوفمبر 2026PC · 36.34 MB",
       "sourceUrl": "https://ta3reebat.com/translations/halo-the-master-chief-collection/",
       "sourceName": "Ta3reebat",
@@ -1134,6 +1398,28 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "Halo: The Master Chief Collectionهالو: مجموعة ماستر تشيف52 تحميلنوفمبر 2026PC · 36.34 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "HITMAN World of Assassinationالقاتل المأجور: عالم الاغتيال196 تحميلأكتوبر 2026PC · 4.09 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/hitman-world-of-assassination/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1HITMAN World of Assassinationالقاتل المأجور: عالم الاغتيال196 تحميلأكتوبر 2026PC · 4.09 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Hollow Knight Silksongهولو نايت سيلك سونغ192 تحميلأكتوبر 2026PC · 9.53 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/hollow-knight-silksong/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Hollow Knight Silksongهولو نايت سيلك سونغ192 تحميلأكتوبر 2026PC · 9.53 MB",
       "publishedAt": ""
     },
     {
@@ -1159,6 +1445,17 @@
       "publishedAt": ""
     },
     {
+      "title": "House Flipper 2هاوس فليبر 272 تحميلأكتوبر 2026PC · 3.43 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/house-flipper-2/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1House Flipper 2هاوس فليبر 272 تحميلأكتوبر 2026PC · 3.43 MB",
+      "publishedAt": ""
+    },
+    {
       "title": "ICARUSإيكاروس40 تحميلأكتوبر 2026PC · 2.57 MB",
       "sourceUrl": "https://ta3reebat.com/translations/icarus/",
       "sourceName": "Ta3reebat",
@@ -1181,6 +1478,17 @@
       "publishedAt": ""
     },
     {
+      "title": "It Takes Twoات تكس تو306 تحميلأكتوبر 2026PC · 831 KB",
+      "sourceUrl": "https://ta3reebat.com/translations/it-takes-two/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.0.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.0.1It Takes Twoات تكس تو306 تحميلأكتوبر 2026PC · 831 KB",
+      "publishedAt": ""
+    },
+    {
       "title": "Judgmentجاجمنت163 تحميلأكتوبر 2026PC · 9.01 MB",
       "sourceUrl": "https://ta3reebat.com/translations/judgment/",
       "sourceName": "Ta3reebat",
@@ -1200,6 +1508,17 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "Jurassic World Evolution 3جوراسيك وورلد إيفوليوشن 344 تحميلنوفمبر 2026PC · 3.92 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Kingdom Come Deliveranceكينغدوم كام: ديليفرانس173 تحميلأكتوبر 2026PC · 27.09 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/kingdom-come-deliverance/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.7",
+      "updateType": "update",
+      "summary": "محدّث · v1.7Kingdom Come Deliveranceكينغدوم كام: ديليفرانس173 تحميلأكتوبر 2026PC · 27.09 MB",
       "publishedAt": ""
     },
     {
@@ -1233,6 +1552,17 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "Lies of P\"أكاذيب بينوكيو48 تحميلأكتوبر 2026PC · 2.05 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Life is Strange - Episode 1لايف إز سترينج - الحلقة الأولى175 تحميلأكتوبر 2026PC · 1.35 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/life-is-strange-episode-1/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Life is Strange - Episode 1لايف إز سترينج - الحلقة الأولى175 تحميلأكتوبر 2026PC · 1.35 MB",
       "publishedAt": ""
     },
     {
@@ -1291,6 +1621,17 @@
       "publishedAt": ""
     },
     {
+      "title": "Lost Judgmentلوست جاجمنت122 تحميلأكتوبر 2026PC · 57.27 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/lost-judgment/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.2",
+      "updateType": "update",
+      "summary": "محدّث · v1.2Lost Judgmentلوست جاجمنت122 تحميلأكتوبر 2026PC · 57.27 MB",
+      "publishedAt": ""
+    },
+    {
       "title": "Mafia Definitive Editionمافيا: الإصدار النهائي228 تحميلأكتوبر 2026PC · 7.31 MB",
       "sourceUrl": "https://ta3reebat.com/translations/mafia-definitive-edition/",
       "sourceName": "Ta3reebat",
@@ -1299,6 +1640,28 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "Mafia Definitive Editionمافيا: الإصدار النهائي228 تحميلأكتوبر 2026PC · 7.31 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Mafia II: Definitive Editionمافيا II: الإصدار النهائي249 تحميلأكتوبر 2026PC · 1.2 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/mafia-ii-definitive-edition/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.3",
+      "updateType": "update",
+      "summary": "محدّث · v1.3Mafia II: Definitive Editionمافيا II: الإصدار النهائي249 تحميلأكتوبر 2026PC · 1.2 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Mafia III: Definitive Editionمافيا 3: الطبعة النهائية332 تحميلأكتوبر 2026PC · 3.83 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/mafia-iii-definitive-edition/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.2",
+      "updateType": "update",
+      "summary": "محدّث · v1.2Mafia III: Definitive Editionمافيا 3: الطبعة النهائية332 تحميلأكتوبر 2026PC · 3.83 MB",
       "publishedAt": ""
     },
     {
@@ -1332,6 +1695,17 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "Marvel’s Spider-Man Remasteredالرجل العنكبوت من مارفل: النسخة المُحسَّنة191 تحميلنوفمبر 2026PC · 7.48 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Marvel’s Spider-Man: Miles Moralesالرجل العنكبوت من مارفل: مايلز موراليس107 تحميلنوفمبر 2026PC · 5.39 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/marvels-spider-man-miles-morales/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Marvel’s Spider-Man: Miles Moralesالرجل العنكبوت من مارفل: مايلز موراليس107 تحميلنوفمبر 2026PC · 5.39 MB",
       "publishedAt": ""
     },
     {
@@ -1379,6 +1753,50 @@
       "publishedAt": ""
     },
     {
+      "title": "Metro Exodusمترو إكسودس114 تحميلأكتوبر 2026PC · 5.28 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/metro-exodus/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Metro Exodusمترو إكسودس114 تحميلأكتوبر 2026PC · 5.28 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Middle-earth: Shadow of Mordorالأرض الوسطى: ظل موردور185 تحميلأكتوبر 2026PC · 1.70 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/middle-earth-shadow-of-mordor/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.0.4",
+      "updateType": "update",
+      "summary": "محدّث · v1.0.4Middle-earth: Shadow of Mordorالأرض الوسطى: ظل موردور185 تحميلأكتوبر 2026PC · 1.70 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Moon Sweepersكاسحات القمر",
+      "sourceUrl": "https://ta3reebat.com/translations/moon-sweepers/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "",
+      "updateType": "listing",
+      "summary": "4Moon Sweepersكاسحات القمر540تحميل",
+      "publishedAt": ""
+    },
+    {
+      "title": "Mortal Shell IIمورتال شل II62 تحميلنوفمبر 2026PC · 2.73 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/mortal-shell-ii/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Mortal Shell IIمورتال شل II62 تحميلنوفمبر 2026PC · 2.73 MB",
+      "publishedAt": ""
+    },
+    {
       "title": "NieR Replicant ver.1.22474487139نير ريبليكانت النسخة 1.2247448713944 تحميلأكتوبر 2026PC · 6.83 MB",
       "sourceUrl": "https://ta3reebat.com/translations/nier-replicant-ver-1-22474487139/",
       "sourceName": "Ta3reebat",
@@ -1398,6 +1816,17 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "NieRAutomata™نير: أوتوماتا60 تحميلأكتوبر 2026PC · 48.88 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Nioh 2 – The Complete Editionنيو 2 - الإصدار الكامل107 تحميلأكتوبر 2026PC · 30.41 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/nioh-2-the-complete-edition/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Nioh 2 – The Complete Editionنيو 2 - الإصدار الكامل107 تحميلأكتوبر 2026PC · 30.41 MB",
       "publishedAt": ""
     },
     {
@@ -1467,6 +1896,28 @@
       "publishedAt": ""
     },
     {
+      "title": "Ori and the Will of the Wispsأوري ووصية الأرواح123 تحميلأكتوبر 2026PC · 2.96 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/ori-and-the-will-of-the-wisps/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Ori and the Will of the Wispsأوري ووصية الأرواح123 تحميلأكتوبر 2026PC · 2.96 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Outlast 2أوت لاست 2127 تحميلأكتوبر 2026PC · 1.62 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/outlast-2/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Outlast 2أوت لاست 2127 تحميلأكتوبر 2026PC · 1.62 MB",
+      "publishedAt": ""
+    },
+    {
       "title": "Outlastأوت لاست202 تحميلأكتوبر 2026PC · 1.84 MB",
       "sourceUrl": "https://ta3reebat.com/translations/outlast/",
       "sourceName": "Ta3reebat",
@@ -1522,6 +1973,50 @@
       "publishedAt": ""
     },
     {
+      "title": "Persona 3 Reloadبيرسونا 3 ريلود186 تحميلأكتوبر 2026PC · 15.58 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/persona-3-reload/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Persona 3 Reloadبيرسونا 3 ريلود186 تحميلأكتوبر 2026PC · 15.58 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Persona 5 Royalبيرسونا 5 رويال247 تحميلأكتوبر 2026PC · 49.39 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/persona-5-royal/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.2",
+      "updateType": "update",
+      "summary": "محدّث · v1.2Persona 5 Royalبيرسونا 5 رويال247 تحميلأكتوبر 2026PC · 49.39 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Phantom Blade Zeroفانتوم بليد زيرو",
+      "sourceUrl": "https://ta3reebat.com/translations/phantom-blade-zero/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "",
+      "updateType": "listing",
+      "summary": "1Phantom Blade Zeroفانتوم بليد زيرو4.4K تحميل",
+      "publishedAt": ""
+    },
+    {
+      "title": "Planet Zoo 2كوكب حديقة الحيوان 2249 تحميلأكتوبر 2026PC · 2.87 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/planet-zoo-2/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.2",
+      "updateType": "update",
+      "summary": "محدّث · v1.2Planet Zoo 2كوكب حديقة الحيوان 2249 تحميلأكتوبر 2026PC · 2.87 MB",
+      "publishedAt": ""
+    },
+    {
       "title": "Planet Zooكوكب حديقة الحيوان34 تحميلنوفمبر 2026PC · 4.43 MB",
       "sourceUrl": "https://ta3reebat.com/translations/planet-zoo/",
       "sourceName": "Ta3reebat",
@@ -1555,13 +2050,13 @@
       "publishedAt": ""
     },
     {
-      "title": "Probably Stolen - Cyberpunk Shopkeeper Sim1.1→1.2يعمل على آخر تحديث للعبة: تعريب كل النصوص الجديدة التي كانت تظهر بالإنجليزية (حوارات لو وإليانور وسيربيكو، خيارات الإعدادات الجديدة",
+      "title": "Probably Stolen - Cyberpunk Shopkeeper Sim",
       "sourceUrl": "https://ta3reebat.com/translations/probably-stolen-cyberpunk-shopkeeper-sim/",
       "sourceName": "Ta3reebat",
       "platform": "",
       "gameVersion": "",
-      "translationVersion": "",
-      "updateType": "new",
+      "translationVersion": "1.2",
+      "updateType": "update",
       "summary": "Probably Stolen - Cyberpunk Shopkeeper Sim1.1→1.2يعمل على آخر تحديث للعبة: تعريب كل النصوص الجديدة التي كانت تظهر بالإنجليزية (حوارات لو وإليانور وسيربيكو، خيارات الإعدادات الجديدة، رسائل شاشة المودات، أسماء فريق العمل، عناصر جديدة)21 نوفمبر 2026",
       "publishedAt": ""
     },
@@ -1585,6 +2080,39 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "Raftطوف61 تحميلنوفمبر 2026PC · 1.82 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Ready or Notمستعد أم لا167 تحميلأكتوبر 2026PC · 8.28 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/ready-or-not/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Ready or Notمستعد أم لا167 تحميلأكتوبر 2026PC · 8.28 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Red Dead Redemption 2ريد ديد ريدمبشن 2374 تحميلأكتوبر 2026PC · 9.64 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/red-dead-redemption-2/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Red Dead Redemption 2ريد ديد ريدمبشن 2374 تحميلأكتوبر 2026PC · 9.64 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Red Dead Redemptionريد ديد ريدمبشن200 تحميلأكتوبر 2026PC · 32.90 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/red-dead-redemption/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Red Dead Redemptionريد ديد ريدمبشن200 تحميلأكتوبر 2026PC · 32.90 MB",
       "publishedAt": ""
     },
     {
@@ -1618,6 +2146,28 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "Resident Evil 5ريزدنت إيفل 5220 تحميلأكتوبر 2026PC · 14.07 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Resident Evil 6الشر المقيم 6184 تحميلأكتوبر 2026PC · 1.98 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/resident-evil-6/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Resident Evil 6الشر المقيم 6184 تحميلأكتوبر 2026PC · 1.98 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Resident Evil Revelationsريزيدنت إيفل ريفيليشنز151 تحميلأكتوبر 2026PC · 18.51 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/resident-evil-revelations/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Resident Evil Revelationsريزيدنت إيفل ريفيليشنز151 تحميلأكتوبر 2026PC · 18.51 MB",
       "publishedAt": ""
     },
     {
@@ -1742,6 +2292,17 @@
       "publishedAt": ""
     },
     {
+      "title": "Shift At Midnightنوبة عمل في منتصف الليل148 تحميلنوفمبر 2026PC · 990 KB",
+      "sourceUrl": "https://ta3reebat.com/translations/shift-at-midnight/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.0.2",
+      "updateType": "update",
+      "summary": "محدّث · v1.0.2Shift At Midnightنوبة عمل في منتصف الليل148 تحميلنوفمبر 2026PC · 990 KB",
+      "publishedAt": ""
+    },
+    {
       "title": "Sifuسيفو149 تحميلأكتوبر 2026PC · 6.83 MB",
       "sourceUrl": "https://ta3reebat.com/translations/sifu/",
       "sourceName": "Ta3reebat",
@@ -1808,6 +2369,39 @@
       "publishedAt": ""
     },
     {
+      "title": "Slay the Spireسلاي ذَ سباير58 تحميلنوفمبر 2026PC · 1.38 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/slay-the-spire/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.2",
+      "updateType": "update",
+      "summary": "محدّث · v1.2Slay the Spireسلاي ذَ سباير58 تحميلنوفمبر 2026PC · 1.38 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Sleeping Dogs: Definitive Editionالكلاب النائمة: الطبعة النهائية162 تحميلنوفمبر 2026PC · 2.40 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/sleeping-dogs-definitive-edition/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Sleeping Dogs: Definitive Editionالكلاب النائمة: الطبعة النهائية162 تحميلنوفمبر 2026PC · 2.40 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Sons Of The Forestأبناء الغابة",
+      "sourceUrl": "https://ta3reebat.com/translations/sons-of-the-forest/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "",
+      "updateType": "listing",
+      "summary": "10Sons Of The Forestأبناء الغابة381تحميل",
+      "publishedAt": ""
+    },
+    {
       "title": "Split Fictionالخيال المنقسم241 تحميلأكتوبر 2026PC · 1.18 MB",
       "sourceUrl": "https://ta3reebat.com/translations/split-fiction/",
       "sourceName": "Ta3reebat",
@@ -1816,6 +2410,39 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "Split Fictionالخيال المنقسم241 تحميلأكتوبر 2026PC · 1.18 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Star Wars Outlawsستار وورز: أوتلوز186 تحميلأكتوبر 2026PC · 7.35 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/star-wars-outlaws/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "2.4",
+      "updateType": "update",
+      "summary": "محدّث · v2.4Star Wars Outlawsستار وورز: أوتلوز186 تحميلأكتوبر 2026PC · 7.35 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Stardew Valleyستارديو فالي",
+      "sourceUrl": "https://ta3reebat.com/translations/stardew-valley/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "",
+      "updateType": "listing",
+      "summary": "8Stardew Valleyستارديو فالي388تحميل",
+      "publishedAt": ""
+    },
+    {
+      "title": "Starfieldستار فيلد88 تحميلأكتوبر 2026PC · 7.66 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/starfield/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.3",
+      "updateType": "update",
+      "summary": "محدّث · v1.3Starfieldستار فيلد88 تحميلأكتوبر 2026PC · 7.66 MB",
       "publishedAt": ""
     },
     {
@@ -1852,6 +2479,17 @@
       "publishedAt": ""
     },
     {
+      "title": "Styx: Blades of Greedستيكس: أنصال الجشع55 تحميلأكتوبر 2026PC · 3.18 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/styx-blades-of-greed/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Styx: Blades of Greedستيكس: أنصال الجشع55 تحميلأكتوبر 2026PC · 3.18 MB",
+      "publishedAt": ""
+    },
+    {
       "title": "Subnauticaسابنوتيكا49 تحميلأكتوبر 2026PC · 14.75 MB",
       "sourceUrl": "https://ta3reebat.com/translations/subnautica/",
       "sourceName": "Ta3reebat",
@@ -1863,6 +2501,17 @@
       "publishedAt": ""
     },
     {
+      "title": "Supermarket Simulatorمحاكاة سوبر ماركت47 تحميلنوفمبر 2026PC · 0.59 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/supermarket-simulator/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.2",
+      "updateType": "update",
+      "summary": "محدّث · v1.2Supermarket Simulatorمحاكاة سوبر ماركت47 تحميلنوفمبر 2026PC · 0.59 MB",
+      "publishedAt": ""
+    },
+    {
       "title": "Terrariaتيراريا56 تحميلأكتوبر 2026PC · 2.72 MB",
       "sourceUrl": "https://ta3reebat.com/translations/terraria/",
       "sourceName": "Ta3reebat",
@@ -1871,6 +2520,28 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "Terrariaتيراريا56 تحميلأكتوبر 2026PC · 2.72 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "The Blood of Dawnwalkerدماء سائر الفجر103 تحميلأكتوبر 2026PC · 3.58 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/the-blood-of-dawnwalker/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1The Blood of Dawnwalkerدماء سائر الفجر103 تحميلأكتوبر 2026PC · 3.58 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "The Elder Scrolls V: Skyrim Special Editionذا إلدر سكرولز 5: سكايرم - الإصدار الخاص157 تحميلأكتوبر 2026PC · 5.92 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/the-elder-scrolls-v-skyrim-special-edition/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1The Elder Scrolls V: Skyrim Special Editionذا إلدر سكرولز 5: سكايرم - الإصدار الخاص157 تحميلأكتوبر 2026PC · 5.92 MB",
       "publishedAt": ""
     },
     {
@@ -1896,6 +2567,28 @@
       "publishedAt": ""
     },
     {
+      "title": "The Last of Us Part IIذا لاست أوف أس: الجزء الثاني221 تحميلأكتوبر 2026PC · 3.46 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/the-last-of-us-part-ii/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.4",
+      "updateType": "update",
+      "summary": "محدّث · v1.4The Last of Us Part IIذا لاست أوف أس: الجزء الثاني221 تحميلأكتوبر 2026PC · 3.46 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "The Last of Us™ Part Iذا لاست أوف أس™ الجزء الأول",
+      "sourceUrl": "https://ta3reebat.com/translations/the-last-of-us-part-i/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "",
+      "updateType": "listing",
+      "summary": "2The Last of Us™ Part Iذا لاست أوف أس™ الجزء الأول1.1K تحميل",
+      "publishedAt": ""
+    },
+    {
       "title": "The Long Darkذا لونغ دارك72 تحميلأكتوبر 2026PC · 178.95 MB",
       "sourceUrl": "https://ta3reebat.com/translations/the-long-dark/",
       "sourceName": "Ta3reebat",
@@ -1904,6 +2597,28 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "The Long Darkذا لونغ دارك72 تحميلأكتوبر 2026PC · 178.95 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "The Walking Dead The Telltale Definitive Seriesالموتى السائرون: سلسلة تلتيل النهائية",
+      "sourceUrl": "https://ta3reebat.com/translations/the-walking-dead-the-telltale-definitive-series/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "",
+      "updateType": "listing",
+      "summary": "9The Walking Dead The Telltale Definitive Seriesالموتى السائرون: سلسلة تلتيل النهائية381تحميل",
+      "publishedAt": ""
+    },
+    {
+      "title": "The Witcher 2: Assassins of Kings Enhanced EditionThe Witcher 2: Assassins of Kings النسخة المحسنة124 تحميلأكتوبر 2026PC · 11.03 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/the-witcher-2-assassins-of-kings-enhanced-edition/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1The Witcher 2: Assassins of Kings Enhanced EditionThe Witcher 2: Assassins of Kings النسخة المحسنة124 تحميلأكتوبر 2026PC · 11.03 MB",
       "publishedAt": ""
     },
     {
@@ -2039,13 +2754,13 @@
       "publishedAt": ""
     },
     {
-      "title": "Where Winds Meet1.3.7→1.3.8اختصار جديد على سطح المكتب «شغّل Where Winds Meet بالعربي»: يعيد التعريب إن رجعت ملفات إنجليزية ثم يفتح اللعبة مباشرة، لمن يفتح اللعبة من لانشرها الرسمي ",
+      "title": "Where Winds Meet",
       "sourceUrl": "https://ta3reebat.com/translations/where-winds-meet/",
       "sourceName": "Ta3reebat",
       "platform": "",
       "gameVersion": "",
-      "translationVersion": "",
-      "updateType": "new",
+      "translationVersion": "1.3.8",
+      "updateType": "update",
       "summary": "Where Winds Meet1.3.7→1.3.8اختصار جديد على سطح المكتب «شغّل Where Winds Meet بالعربي»: يعيد التعريب إن رجعت ملفات إنجليزية ثم يفتح اللعبة مباشرة، لمن يفتح اللعبة من لانشرها الرسمي أو من Epic (اللانشر كان يمسح التعريب عند فحص الملفات)21 نوفمبر 2026",
       "publishedAt": ""
     },
@@ -2067,7 +2782,7 @@
       "platform": "",
       "gameVersion": "",
       "translationVersion": "",
-      "updateType": "new",
+      "updateType": "listing",
       "summary": "Wolfenstein: The New Orderوولفنشتاين: النظام الجديد176 تحميلأكتوبر 2026PC · 112.28 MB",
       "publishedAt": ""
     },
@@ -2094,6 +2809,28 @@
       "publishedAt": ""
     },
     {
+      "title": "Yakuza 0 Director's Cutياكوزا 0 قطع المخرج164 تحميلأكتوبر 2026PC · 10.68 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/yakuza-0-directors-cut/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.5",
+      "updateType": "update",
+      "summary": "محدّث · v1.5Yakuza 0 Director's Cutياكوزا 0 قطع المخرج164 تحميلأكتوبر 2026PC · 10.68 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Yakuza 0ياكوزا 0147 تحميلأكتوبر 2026PC · 72.83 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/yakuza-0/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.7",
+      "updateType": "update",
+      "summary": "محدّث · v1.7Yakuza 0ياكوزا 0147 تحميلأكتوبر 2026PC · 72.83 MB",
+      "publishedAt": ""
+    },
+    {
       "title": "Yakuza 3 Remasteredياكوزا 3 ريمستر68 تحميلأكتوبر 2026PC · 6.89 MB",
       "sourceUrl": "https://ta3reebat.com/translations/yakuza-3-remastered/",
       "sourceName": "Ta3reebat",
@@ -2105,12 +2842,12 @@
       "publishedAt": ""
     },
     {
-      "title": "Yakuza 4 Remastered1.2→1.3كلام المكالمات صار داخل مربع المكالمة (سطرين بالكثير)21 نوفمبر 2026",
+      "title": "Yakuza 4 Remastered",
       "sourceUrl": "https://ta3reebat.com/translations/yakuza-4-remastered/",
       "sourceName": "Ta3reebat",
       "platform": "",
       "gameVersion": "",
-      "translationVersion": "",
+      "translationVersion": "1.3",
       "updateType": "update",
       "summary": "Yakuza 4 Remastered1.2→1.3كلام المكالمات صار داخل مربع المكالمة (سطرين بالكثير)21 نوفمبر 2026",
       "publishedAt": ""
@@ -2127,6 +2864,28 @@
       "publishedAt": ""
     },
     {
+      "title": "Yakuza 6: The Song of Lifeياكوزا 6: أغنية الحياة52 تحميلأكتوبر 2026PC · 60.67 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/yakuza-6-the-song-of-life/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Yakuza 6: The Song of Lifeياكوزا 6: أغنية الحياة52 تحميلأكتوبر 2026PC · 60.67 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Yakuza Kiwami 2ياكوزا كيومي 2115 تحميلأكتوبر 2026PC · 208.48 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/yakuzaiwami2/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "محدّث · v1.1Yakuza Kiwami 2ياكوزا كيومي 2115 تحميلأكتوبر 2026PC · 208.48 MB",
+      "publishedAt": ""
+    },
+    {
       "title": "Yakuza Kiwami 3 & Dark Tiesياكوزا كيوامي 3 والعلاقات المظلمة97 تحميلأكتوبر 2026PC · 174.71 MB",
       "sourceUrl": "https://ta3reebat.com/translations/yakuza-kiwami-3-dark-ties/",
       "sourceName": "Ta3reebat",
@@ -2135,6 +2894,28 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "Yakuza Kiwami 3 & Dark Tiesياكوزا كيوامي 3 والعلاقات المظلمة97 تحميلأكتوبر 2026PC · 174.71 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Yakuza Kiwamiياكوزا كيوامي137 تحميلأكتوبر 2026PC · 7.16 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/yakuza-kiwami/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.3",
+      "updateType": "update",
+      "summary": "محدّث · v1.3Yakuza Kiwamiياكوزا كيوامي137 تحميلأكتوبر 2026PC · 7.16 MB",
+      "publishedAt": ""
+    },
+    {
+      "title": "Yakuza: Like a Dragonياكوزا: كالتنين114 تحميلأكتوبر 2026PC · 27.74 MB",
+      "sourceUrl": "https://ta3reebat.com/translations/yakuza-like-a-dragon/",
+      "sourceName": "Ta3reebat",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "1.0.2",
+      "updateType": "update",
+      "summary": "محدّث · v1.0.2Yakuza: Like a Dragonياكوزا: كالتنين114 تحميلأكتوبر 2026PC · 27.74 MB",
       "publishedAt": ""
     },
     {
@@ -2166,7 +2947,7 @@
       "platform": "",
       "gameVersion": "",
       "translationVersion": "",
-      "updateType": "new",
+      "updateType": "listing",
       "summary": "تعريبات لايفجديد",
       "publishedAt": ""
     },
@@ -2289,787 +3070,6 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "مثبّتThe Wolf Among Us Remasteredالذئب بيننا - النسخة المحسنةThe Wolf Among Us Remasteredالذئب بيننا - النسخة المحسنة",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.0.1CONTROL Resonantكنترول: صدى الاضطراب123 تحميلأكتوبر 2026PC · 4.43 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/control-resonant/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.0.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.0.1CONTROL Resonantكنترول: صدى الاضطراب123 تحميلأكتوبر 2026PC · 4.43 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.0.1It Takes Twoات تكس تو306 تحميلأكتوبر 2026PC · 831 KB",
-      "sourceUrl": "https://ta3reebat.com/translations/it-takes-two/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.0.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.0.1It Takes Twoات تكس تو306 تحميلأكتوبر 2026PC · 831 KB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.0.2Shift At Midnightنوبة عمل في منتصف الليل148 تحميلنوفمبر 2026PC · 990 KB",
-      "sourceUrl": "https://ta3reebat.com/translations/shift-at-midnight/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.0.2",
-      "updateType": "listing",
-      "summary": "محدّث · v1.0.2Shift At Midnightنوبة عمل في منتصف الليل148 تحميلنوفمبر 2026PC · 990 KB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.0.2Yakuza: Like a Dragonياكوزا: كالتنين114 تحميلأكتوبر 2026PC · 27.74 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/yakuza-like-a-dragon/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.0.2",
-      "updateType": "listing",
-      "summary": "محدّث · v1.0.2Yakuza: Like a Dragonياكوزا: كالتنين114 تحميلأكتوبر 2026PC · 27.74 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.0.4Middle-earth: Shadow of Mordorالأرض الوسطى: ظل موردور185 تحميلأكتوبر 2026PC · 1.70 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/middle-earth-shadow-of-mordor/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.0.4",
-      "updateType": "listing",
-      "summary": "محدّث · v1.0.4Middle-earth: Shadow of Mordorالأرض الوسطى: ظل موردور185 تحميلأكتوبر 2026PC · 1.70 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Barotraumaبارو-تروما24 تحميلنوفمبر 2026PC · 1.70 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/barotrauma/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Barotraumaبارو-تروما24 تحميلنوفمبر 2026PC · 1.70 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Batman: Arkham Knightباتمان: أركام نايت169 تحميلنوفمبر 2026PC · 12.93 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/batman-arkham-knight/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Batman: Arkham Knightباتمان: أركام نايت169 تحميلنوفمبر 2026PC · 12.93 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Batman: Arkham Originsباتمان: أركام أوريجنز91 تحميلنوفمبر 2026PC · 8.15 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/batman-arkham-origins/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Batman: Arkham Originsباتمان: أركام أوريجنز91 تحميلنوفمبر 2026PC · 8.15 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Beyond Two Soulsما وراء الروحين78 تحميلأكتوبر 2026PC · 409.81 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/beyond-two-souls/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Beyond Two Soulsما وراء الروحين78 تحميلأكتوبر 2026PC · 409.81 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Big Ambitionsطموحات كبيرة111 تحميلأكتوبر 2026PC · 1.48 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/big-ambitions/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Big Ambitionsطموحات كبيرة111 تحميلأكتوبر 2026PC · 1.48 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Borderlands 2بوردرلاندز 266 تحميلنوفمبر 2026PC · 14.78 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/borderlands-2/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Borderlands 2بوردرلاندز 266 تحميلنوفمبر 2026PC · 14.78 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Borderlands 3بوردرلاندز 387 تحميلأكتوبر 2026PC · 5.31 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/borderlands-3/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Borderlands 3بوردرلاندز 387 تحميلأكتوبر 2026PC · 5.31 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1CRACKكراك65 تحميلأكتوبر 2026PC · 1.07 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/crack/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1CRACKكراك65 تحميلأكتوبر 2026PC · 1.07 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Cronos: The New Dawnكرونوس: الفجر الجديد90 تحميلأكتوبر 2026PC · 2.30 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/cronos-the-new-dawn/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "new",
-      "summary": "محدّث · v1.1Cronos: The New Dawnكرونوس: الفجر الجديد90 تحميلأكتوبر 2026PC · 2.30 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Fallout 76فال آوت 7644 تحميلأكتوبر 2026PC · 9.79 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/fallout-76/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Fallout 76فال آوت 7644 تحميلأكتوبر 2026PC · 9.79 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Far Cry 4فار كراي 4282 تحميلأكتوبر 2026PC · 2.67 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/far-cry-4/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Far Cry 4فار كراي 4282 تحميلأكتوبر 2026PC · 2.67 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Fields of Mistriaحقول ميستريا80 تحميلنوفمبر 2026PC · 2.64 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/fields-of-mistria/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Fields of Mistriaحقول ميستريا80 تحميلنوفمبر 2026PC · 2.64 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Frostpunk 2فروستبانك 2102 تحميلأكتوبر 2026PC · 6.80 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/frostpunk-2/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Frostpunk 2فروستبانك 2102 تحميلأكتوبر 2026PC · 6.80 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Graveyard Keeperحارس المقبرة48 تحميلنوفمبر 2026PC · 1.36 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/graveyard-keeper/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Graveyard Keeperحارس المقبرة48 تحميلنوفمبر 2026PC · 1.36 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Grim Dawnالفجر القاتم49 تحميلأكتوبر 2026PC · 2.19 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/grim-dawn/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Grim Dawnالفجر القاتم49 تحميلأكتوبر 2026PC · 2.19 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1HITMAN World of Assassinationالقاتل المأجور: عالم الاغتيال196 تحميلأكتوبر 2026PC · 4.09 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/hitman-world-of-assassination/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1HITMAN World of Assassinationالقاتل المأجور: عالم الاغتيال196 تحميلأكتوبر 2026PC · 4.09 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Hollow Knight Silksongهولو نايت سيلك سونغ192 تحميلأكتوبر 2026PC · 9.53 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/hollow-knight-silksong/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Hollow Knight Silksongهولو نايت سيلك سونغ192 تحميلأكتوبر 2026PC · 9.53 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1House Flipper 2هاوس فليبر 272 تحميلأكتوبر 2026PC · 3.43 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/house-flipper-2/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1House Flipper 2هاوس فليبر 272 تحميلأكتوبر 2026PC · 3.43 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Life is Strange - Episode 1لايف إز سترينج - الحلقة الأولى175 تحميلأكتوبر 2026PC · 1.35 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/life-is-strange-episode-1/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Life is Strange - Episode 1لايف إز سترينج - الحلقة الأولى175 تحميلأكتوبر 2026PC · 1.35 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Marvel’s Spider-Man: Miles Moralesالرجل العنكبوت من مارفل: مايلز موراليس107 تحميلنوفمبر 2026PC · 5.39 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/marvels-spider-man-miles-morales/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Marvel’s Spider-Man: Miles Moralesالرجل العنكبوت من مارفل: مايلز موراليس107 تحميلنوفمبر 2026PC · 5.39 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Metro Exodusمترو إكسودس114 تحميلأكتوبر 2026PC · 5.28 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/metro-exodus/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Metro Exodusمترو إكسودس114 تحميلأكتوبر 2026PC · 5.28 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Mortal Shell IIمورتال شل II62 تحميلنوفمبر 2026PC · 2.73 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/mortal-shell-ii/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Mortal Shell IIمورتال شل II62 تحميلنوفمبر 2026PC · 2.73 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Nioh 2 – The Complete Editionنيو 2 - الإصدار الكامل107 تحميلأكتوبر 2026PC · 30.41 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/nioh-2-the-complete-edition/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Nioh 2 – The Complete Editionنيو 2 - الإصدار الكامل107 تحميلأكتوبر 2026PC · 30.41 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Ori and the Will of the Wispsأوري ووصية الأرواح123 تحميلأكتوبر 2026PC · 2.96 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/ori-and-the-will-of-the-wisps/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Ori and the Will of the Wispsأوري ووصية الأرواح123 تحميلأكتوبر 2026PC · 2.96 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Outlast 2أوت لاست 2127 تحميلأكتوبر 2026PC · 1.62 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/outlast-2/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Outlast 2أوت لاست 2127 تحميلأكتوبر 2026PC · 1.62 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Persona 3 Reloadبيرسونا 3 ريلود186 تحميلأكتوبر 2026PC · 15.58 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/persona-3-reload/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Persona 3 Reloadبيرسونا 3 ريلود186 تحميلأكتوبر 2026PC · 15.58 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Ready or Notمستعد أم لا167 تحميلأكتوبر 2026PC · 8.28 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/ready-or-not/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Ready or Notمستعد أم لا167 تحميلأكتوبر 2026PC · 8.28 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Red Dead Redemption 2ريد ديد ريدمبشن 2374 تحميلأكتوبر 2026PC · 9.64 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/red-dead-redemption-2/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Red Dead Redemption 2ريد ديد ريدمبشن 2374 تحميلأكتوبر 2026PC · 9.64 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Red Dead Redemptionريد ديد ريدمبشن200 تحميلأكتوبر 2026PC · 32.90 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/red-dead-redemption/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Red Dead Redemptionريد ديد ريدمبشن200 تحميلأكتوبر 2026PC · 32.90 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Resident Evil 6الشر المقيم 6184 تحميلأكتوبر 2026PC · 1.98 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/resident-evil-6/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Resident Evil 6الشر المقيم 6184 تحميلأكتوبر 2026PC · 1.98 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Resident Evil Revelationsريزيدنت إيفل ريفيليشنز151 تحميلأكتوبر 2026PC · 18.51 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/resident-evil-revelations/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Resident Evil Revelationsريزيدنت إيفل ريفيليشنز151 تحميلأكتوبر 2026PC · 18.51 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Sleeping Dogs: Definitive Editionالكلاب النائمة: الطبعة النهائية162 تحميلنوفمبر 2026PC · 2.40 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/sleeping-dogs-definitive-edition/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Sleeping Dogs: Definitive Editionالكلاب النائمة: الطبعة النهائية162 تحميلنوفمبر 2026PC · 2.40 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Styx: Blades of Greedستيكس: أنصال الجشع55 تحميلأكتوبر 2026PC · 3.18 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/styx-blades-of-greed/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Styx: Blades of Greedستيكس: أنصال الجشع55 تحميلأكتوبر 2026PC · 3.18 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1The Blood of Dawnwalkerدماء سائر الفجر103 تحميلأكتوبر 2026PC · 3.58 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/the-blood-of-dawnwalker/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1The Blood of Dawnwalkerدماء سائر الفجر103 تحميلأكتوبر 2026PC · 3.58 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1The Elder Scrolls V: Skyrim Special Editionذا إلدر سكرولز 5: سكايرم - الإصدار الخاص157 تحميلأكتوبر 2026PC · 5.92 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/the-elder-scrolls-v-skyrim-special-edition/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1The Elder Scrolls V: Skyrim Special Editionذا إلدر سكرولز 5: سكايرم - الإصدار الخاص157 تحميلأكتوبر 2026PC · 5.92 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1The Witcher 2: Assassins of Kings Enhanced EditionThe Witcher 2: Assassins of Kings النسخة المحسنة124 تحميلأكتوبر 2026PC · 11.03 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/the-witcher-2-assassins-of-kings-enhanced-edition/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1The Witcher 2: Assassins of Kings Enhanced EditionThe Witcher 2: Assassins of Kings النسخة المحسنة124 تحميلأكتوبر 2026PC · 11.03 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Yakuza 6: The Song of Lifeياكوزا 6: أغنية الحياة52 تحميلأكتوبر 2026PC · 60.67 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/yakuza-6-the-song-of-life/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Yakuza 6: The Song of Lifeياكوزا 6: أغنية الحياة52 تحميلأكتوبر 2026PC · 60.67 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.1Yakuza Kiwami 2ياكوزا كيومي 2115 تحميلأكتوبر 2026PC · 208.48 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/yakuzaiwami2/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.1",
-      "updateType": "listing",
-      "summary": "محدّث · v1.1Yakuza Kiwami 2ياكوزا كيومي 2115 تحميلأكتوبر 2026PC · 208.48 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.2Attack on Titan / A.O.T. Wings of Freedomهجوم العمالقة / A.O.T. أجنحة الحرية89 تحميلأكتوبر 2026PC · 5.59 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/attack-on-titan-a-o-t-wings-of-freedom/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.2",
-      "updateType": "listing",
-      "summary": "محدّث · v1.2Attack on Titan / A.O.T. Wings of Freedomهجوم العمالقة / A.O.T. أجنحة الحرية89 تحميلأكتوبر 2026PC · 5.59 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.2Cities: Skylinesالمدن: سكايلاينز84 تحميلأكتوبر 2026PC · 1.69 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/cities-skylines/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.2",
-      "updateType": "listing",
-      "summary": "محدّث · v1.2Cities: Skylinesالمدن: سكايلاينز84 تحميلأكتوبر 2026PC · 1.69 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.2Conan Exiles Enhancedتعزيز كونان المنفيين104 تحميلأكتوبر 2026PC · 5.97 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/conan-exiles-enhanced/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.2",
-      "updateType": "listing",
-      "summary": "محدّث · v1.2Conan Exiles Enhancedتعزيز كونان المنفيين104 تحميلأكتوبر 2026PC · 5.97 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.2DAVE THE DIVERديف ذا دايفر225 تحميلأكتوبر 2026PC · 2.88 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/dave-the-diver/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.2",
-      "updateType": "listing",
-      "summary": "محدّث · v1.2DAVE THE DIVERديف ذا دايفر225 تحميلأكتوبر 2026PC · 2.88 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.2Enshroudedإنشرودد216 تحميلأكتوبر 2026PC · 8.10 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/enshrouded/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.2",
-      "updateType": "listing",
-      "summary": "محدّث · v1.2Enshroudedإنشرودد216 تحميلأكتوبر 2026PC · 8.10 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.2Factorioفاكتوريو33 تحميلأكتوبر 2026PC · 1.05 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/factorio/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.2",
-      "updateType": "listing",
-      "summary": "محدّث · v1.2Factorioفاكتوريو33 تحميلأكتوبر 2026PC · 1.05 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.2Fallout 4فال آوت 4115 تحميلأكتوبر 2026PC · 5.61 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/fallout-4/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.2",
-      "updateType": "listing",
-      "summary": "محدّث · v1.2Fallout 4فال آوت 4115 تحميلأكتوبر 2026PC · 5.61 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.2Lost Judgmentلوست جاجمنت122 تحميلأكتوبر 2026PC · 57.27 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/lost-judgment/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.2",
-      "updateType": "listing",
-      "summary": "محدّث · v1.2Lost Judgmentلوست جاجمنت122 تحميلأكتوبر 2026PC · 57.27 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.2Mafia III: Definitive Editionمافيا 3: الطبعة النهائية332 تحميلأكتوبر 2026PC · 3.83 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/mafia-iii-definitive-edition/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.2",
-      "updateType": "listing",
-      "summary": "محدّث · v1.2Mafia III: Definitive Editionمافيا 3: الطبعة النهائية332 تحميلأكتوبر 2026PC · 3.83 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.2Persona 5 Royalبيرسونا 5 رويال247 تحميلأكتوبر 2026PC · 49.39 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/persona-5-royal/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.2",
-      "updateType": "listing",
-      "summary": "محدّث · v1.2Persona 5 Royalبيرسونا 5 رويال247 تحميلأكتوبر 2026PC · 49.39 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.2Planet Zoo 2كوكب حديقة الحيوان 2249 تحميلأكتوبر 2026PC · 2.87 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/planet-zoo-2/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.2",
-      "updateType": "listing",
-      "summary": "محدّث · v1.2Planet Zoo 2كوكب حديقة الحيوان 2249 تحميلأكتوبر 2026PC · 2.87 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.2Slay the Spireسلاي ذَ سباير58 تحميلنوفمبر 2026PC · 1.38 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/slay-the-spire/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.2",
-      "updateType": "listing",
-      "summary": "محدّث · v1.2Slay the Spireسلاي ذَ سباير58 تحميلنوفمبر 2026PC · 1.38 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.2Supermarket Simulatorمحاكاة سوبر ماركت47 تحميلنوفمبر 2026PC · 0.59 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/supermarket-simulator/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.2",
-      "updateType": "listing",
-      "summary": "محدّث · v1.2Supermarket Simulatorمحاكاة سوبر ماركت47 تحميلنوفمبر 2026PC · 0.59 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.3007 First Light007: الضوء الأول294 تحميلأكتوبر 2026PC · 51.47 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/007-first-light/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.3007",
-      "updateType": "listing",
-      "summary": "محدّث · v1.3007 First Light007: الضوء الأول294 تحميلأكتوبر 2026PC · 51.47 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.3Dead Spaceديد سبيس188 تحميلأكتوبر 2026PC · 778 KB",
-      "sourceUrl": "https://ta3reebat.com/translations/dead-space/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.3",
-      "updateType": "listing",
-      "summary": "محدّث · v1.3Dead Spaceديد سبيس188 تحميلأكتوبر 2026PC · 778 KB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.3Frostpunkفروست بانك210 تحميلأكتوبر 2026PC · 10.76 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/frostpunk/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.3",
-      "updateType": "listing",
-      "summary": "محدّث · v1.3Frostpunkفروست بانك210 تحميلأكتوبر 2026PC · 10.76 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.3Mafia II: Definitive Editionمافيا II: الإصدار النهائي249 تحميلأكتوبر 2026PC · 1.2 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/mafia-ii-definitive-edition/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.3",
-      "updateType": "listing",
-      "summary": "محدّث · v1.3Mafia II: Definitive Editionمافيا II: الإصدار النهائي249 تحميلأكتوبر 2026PC · 1.2 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.3Starfieldستار فيلد88 تحميلأكتوبر 2026PC · 7.66 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/starfield/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.3",
-      "updateType": "listing",
-      "summary": "محدّث · v1.3Starfieldستار فيلد88 تحميلأكتوبر 2026PC · 7.66 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.3Yakuza Kiwamiياكوزا كيوامي137 تحميلأكتوبر 2026PC · 7.16 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/yakuza-kiwami/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.3",
-      "updateType": "listing",
-      "summary": "محدّث · v1.3Yakuza Kiwamiياكوزا كيوامي137 تحميلأكتوبر 2026PC · 7.16 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.4Attack on Titan 2 - A.O.T.2هجوم العمالقة 2 - A.O.T.2111 تحميلأكتوبر 2026PC · 2.72 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/attack-on-titan-2-a-o-t-2/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.4",
-      "updateType": "listing",
-      "summary": "محدّث · v1.4Attack on Titan 2 - A.O.T.2هجوم العمالقة 2 - A.O.T.2111 تحميلأكتوبر 2026PC · 2.72 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.4The Last of Us Part IIذا لاست أوف أس: الجزء الثاني221 تحميلأكتوبر 2026PC · 3.46 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/the-last-of-us-part-ii/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.4",
-      "updateType": "listing",
-      "summary": "محدّث · v1.4The Last of Us Part IIذا لاست أوف أس: الجزء الثاني221 تحميلأكتوبر 2026PC · 3.46 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.5Yakuza 0 Director's Cutياكوزا 0 قطع المخرج164 تحميلأكتوبر 2026PC · 10.68 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/yakuza-0-directors-cut/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.5",
-      "updateType": "listing",
-      "summary": "محدّث · v1.5Yakuza 0 Director's Cutياكوزا 0 قطع المخرج164 تحميلأكتوبر 2026PC · 10.68 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.6Aniimoأنيمو170 تحميلأكتوبر 2026PC · 30.33 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/aniimo/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.6",
-      "updateType": "listing",
-      "summary": "محدّث · v1.6Aniimoأنيمو170 تحميلأكتوبر 2026PC · 30.33 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.7Kingdom Come Deliveranceكينغدوم كام: ديليفرانس173 تحميلأكتوبر 2026PC · 27.09 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/kingdom-come-deliverance/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.7",
-      "updateType": "listing",
-      "summary": "محدّث · v1.7Kingdom Come Deliveranceكينغدوم كام: ديليفرانس173 تحميلأكتوبر 2026PC · 27.09 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v1.7Yakuza 0ياكوزا 0147 تحميلأكتوبر 2026PC · 72.83 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/yakuza-0/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v1.7",
-      "updateType": "listing",
-      "summary": "محدّث · v1.7Yakuza 0ياكوزا 0147 تحميلأكتوبر 2026PC · 72.83 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v2.1Hadesهادس160 تحميلسبتمبر 2026PC · 3.97 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/hades/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v2.1",
-      "updateType": "listing",
-      "summary": "محدّث · v2.1Hadesهادس160 تحميلسبتمبر 2026PC · 3.97 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v2.3Baldur's Gate 3بالدورز كيت 3227 تحميلأكتوبر 2026PC · 34.77 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/baldurs-gate-3/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v2.3",
-      "updateType": "listing",
-      "summary": "محدّث · v2.3Baldur's Gate 3بالدورز كيت 3227 تحميلأكتوبر 2026PC · 34.77 MB",
-      "publishedAt": ""
-    },
-    {
-      "title": "محدّث · v2.4Star Wars Outlawsستار وورز: أوتلوز186 تحميلأكتوبر 2026PC · 7.35 MB",
-      "sourceUrl": "https://ta3reebat.com/translations/star-wars-outlaws/",
-      "sourceName": "Ta3reebat",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "v2.4",
-      "updateType": "listing",
-      "summary": "محدّث · v2.4Star Wars Outlawsستار وورز: أوتلوز186 تحميلأكتوبر 2026PC · 7.35 MB",
       "publishedAt": ""
     }
   ]
