@@ -180,7 +180,9 @@ public partial class LocalizationLibraryWindow : Window
         var entries = catalog.Entries.Select(x => new LibraryEntry
         {
             Title = x.Title,
-            Subtitle = string.Join(" · ", new[] { x.Platform, x.GameVersion, x.TranslationVersion }
+            Subtitle = string.Join(" · ", new[] { x.Platform, x.GameVersion,
+                string.IsNullOrWhiteSpace(x.TranslationVersion) ? null : "تعريب " + x.TranslationVersion,
+                string.IsNullOrWhiteSpace(x.PublishedAt) ? null : x.PublishedAt }
                 .Where(v => !string.IsNullOrWhiteSpace(v))),
             KindLabel = (x.UpdateType == "new" ? "تعريب جديد" : x.UpdateType == "update" ? "تحديث تعريب" : "صفحة تعريب") + " · " + x.SourceName,
             Category = "تعريبات موثقة",

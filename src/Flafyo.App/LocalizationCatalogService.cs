@@ -55,13 +55,30 @@ internal sealed class LocalizationCatalogService
         var catalog = JsonSerializer.Deserialize<Catalog>(json, Options)
                       ?? throw new InvalidDataException("Invalid localization catalog.");
         var allowed = new[] { "ta3reebat.com", "muarrab.com", "ta3reb.com" };
-        catalog.Entries = catalog.Entries.Where(e =>
-            Uri.TryCreate(e.SourceUrl, UriKind.Absolute, out var uri) &&
-            uri.Scheme == Uri.UriSchemeHttps &&
-            allowed.Any(host => uri.Host.Equals(host, StringComparison.OrdinalIgnoreCase) ||
-                                uri.Host.EndsWith("." + host, StringComparison.OrdinalIgnoreCase)))
+        catalog.Entries = catalog.Entries
+            .Where(e =>
+                !string.IsNullOrWhiteSpace(e.Title) &&
+                !string.IsNullOrWhiteSpace(e.SourceName) &&
+                Uri.TryCreate(e.SourceUrl, UriKind.Absolute, out var uri) &&
+                uri.Scheme == Uri.UriSchemeHttps &&
+                allowed.Any(host => uri.Host.Equals(host, StringComparison.OrdinalIgnoreCase) ||
+                                    uri.Host.EndsWith("." + host, StringComparison.OrdinalIgnoreCase)) &&
+                !uri.AbsolutePath.TrimEnd('/').EndsWith("/home", StringComparison.OrdinalIgnoreCase))
+            .Select(e =>
+            {
+                // Some source pages expose URL-encoded titles instead of readable game names.
+                try { e.Title = Uri.UnescapeDataString(e.Title.Replace("+", " ")); } catch { }
+                e.Title = e.Title.Trim();
+                e.UpdateType = string.IsNullOrWhiteSpace(e.UpdateType) ? "listing" : e.UpdateType.Trim().ToLowerInvariant();
+                return e;
+            })
+            .Where(e => !e.Title.Equals("العربية", StringComparison.OrdinalIgnoreCase) &&
+                        !e.Title.Equals("home", StringComparison.OrdinalIgnoreCase))
             .GroupBy(e => e.SourceUrl, StringComparer.OrdinalIgnoreCase)
-            .Select(g => g.First()).ToList();
+            .Select(g => g.First())
+            .OrderByDescending(e => e.UpdateType.Equals("update", StringComparison.OrdinalIgnoreCase))
+            .ThenBy(e => e.Title, StringComparer.OrdinalIgnoreCase)
+            .ToList();
         Directory.CreateDirectory(Path.GetDirectoryName(CachePath)!);
         await File.WriteAllTextAsync(CachePath, json);
         return catalog;
