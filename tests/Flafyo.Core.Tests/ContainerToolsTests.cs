@@ -155,6 +155,21 @@ public class ContainerToolsTests : IDisposable
     }
 
     [Fact]
+    public void Repack_supports_legacy_v1_zip_indexes()
+    {
+        var folder = Path.Combine(_root, "legacy-v1");
+        Directory.CreateDirectory(folder);
+        File.WriteAllText(Path.Combine(folder, "legacy.txt"), "legacy archive content");
+        File.WriteAllLines(Path.Combine(folder, "_flafyo_container.txt"),
+            new[] { "FLAFYO_CONTAINER_V1", "Zip", "legacy.txt" });
+
+        var rebuilt = ContainerTools.Repack(folder);
+        using var zip = new ZipArchive(new MemoryStream(rebuilt), ZipArchiveMode.Read);
+        using var reader = new StreamReader(zip.GetEntry("legacy.txt")!.Open());
+        Assert.Equal("legacy archive content", reader.ReadToEnd());
+    }
+
+    [Fact]
     public void Zip_repack_rejects_tampered_index_paths()
     {
         var folder = Path.Combine(_root, "tampered");
