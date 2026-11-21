@@ -1,5 +1,6 @@
 using System.Diagnostics;
-using System.Drawing;\nusing System.Threading.Channels;
+using System.Drawing;
+using System.Threading.Channels;
 
 namespace Flafyo.Core;
 
@@ -223,7 +224,8 @@ public sealed class ScreenPipeline : IAsyncDisposable
         catch (Exception ex) { _log?.Invoke("OCR failed: " + ex.Message); return; }
 
         var ocrMs = sw.Elapsed.TotalMilliseconds;
-        if (generation != Interlocked.Read(ref _scanGeneration)) return; // discard OCR from an obsolete frame\n        var blocks = BlockBuilder.Build(lines).Take(_opt.MaxBlocks).ToList();
+        if (generation != Interlocked.Read(ref _scanGeneration)) return; // discard OCR from an obsolete frame
+        var blocks = BlockBuilder.Build(lines).Take(_opt.MaxBlocks).ToList();
         try { Scanned?.Invoke(lines.Count, blocks.Count, ocrMs); } catch { }
         if (blocks.Count == 0)
         {
@@ -285,7 +287,8 @@ public sealed class ScreenPipeline : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        _stop.Cancel();\n        CancelActiveScan();
+        _stop.Cancel();
+        CancelActiveScan();
         if (_worker != null) { try { await _worker.ConfigureAwait(false); } catch { } }
         _stop.Dispose();
     }
