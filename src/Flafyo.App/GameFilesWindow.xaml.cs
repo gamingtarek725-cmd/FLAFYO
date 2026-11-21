@@ -250,39 +250,54 @@ public partial class GameFilesWindow : Window
         ProbeEditStatus.Text = $"تمت إضافة التعديل للقائمة. عدد التعديلات: {_pendingProbeEdits.Count}. سيتم التحقق من الترميز والطول عند حفظ النسخة.";
     }
 
-    private void SaveProbeEdits_Click(object sender, RoutedEventArgs e)
+    private async void SaveProbeEdits_Click(object sender, RoutedEventArgs e)
     {
-        if (_selectedEditableHit == null || _selectedEditableHit.Entry != null)
+        var hit = _selectedEditableHit;
+        var edits = _pendingProbeEdits.Values.ToArray();
+        var outputRoot = OutputBox.Text.Trim();
+        if (hit == null || hit.Entry != null)
         {
             ProbeEditStatus.Text = "الميزة متاحة حاليًا لملف مستقل محدد، وليس عنصرًا داخل أرشيف.";
             return;
         }
-        if (_pendingProbeEdits.Count == 0)
+        if (edits.Length == 0)
         {
             ProbeEditStatus.Text = "أضف تعديلًا واحدًا على الأقل قبل الحفظ.";
             return;
         }
+        if (string.IsNullOrWhiteSpace(outputRoot))
+        {
+            ProbeEditStatus.Text = "حدد مجلد الناتج أولًا.";
+            return;
+        }
 
+        SaveProbeEditsButton.IsEnabled = false;
+        ProbeEditStatus.Text = "جاري التحقق وحفظ نسخة منفصلة…";
         try
         {
-            var sourcePath = _selectedEditableHit.FullPath;
-            var info = new FileInfo(sourcePath);
-            if (!info.Exists || info.Length <= 0 || info.Length > 300L * 1024 * 1024)
-                throw new InvalidDataException("حجم الملف غير مناسب للتعديل التجريبي (الحد الأقصى 300 MiB).");
+            var outputPath = await Task.Run(() =>
+            {
+                var sourcePath = hit.FullPath;
+                var info = new FileInfo(sourcePath);
+                const long maxSourceBytes = 300L * 1024 * 1024;
+                if (!info.Exists || info.Length <= 0 || info.Length > maxSourceBytes)
+                    throw new InvalidDataException("حجم الملف غير مناسب للتعديل التجريبي (الحد الأقصى 300 MiB).");
 
-            var source = File.ReadAllBytes(sourcePath);
-            var patched = BinaryTextPatcher.CreatePatchedCopy(source, _pendingProbeEdits.Values);
-            var outputRoot = OutputBox.Text.Trim();
-            if (string.IsNullOrWhiteSpace(outputRoot))
-                throw new InvalidOperationException("حدد مجلد الناتج أولًا.");
-            var outputFolder = Path.Combine(outputRoot, "_patched");
-            Directory.CreateDirectory(outputFolder);
+                var source = File.ReadAllBytes(sourcePath);
+                if (source.LongLength > maxSourceBytes)
+                    throw new InvalidDataException("حجم الملف تجاوز الحد المسموح أثناء القراءة.");
+                var patched = BinaryTextPatcher.CreatePatchedCopy(source, edits);
+                var outputFolder = Path.Combine(outputRoot, "_patched");
+                Directory.CreateDirectory(outputFolder);
 
-            var stamp = DateTime.Now.ToString("yyyyMMdd-HHmmss");
-            var outputPath = Path.Combine(outputFolder,
-                Path.GetFileNameWithoutExtension(sourcePath) + ".flafyo-patched-" + stamp + Path.GetExtension(sourcePath));
-            using (var output = new FileStream(outputPath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-                output.Write(patched, 0, patched.Length);
+                var stamp = DateTime.Now.ToString("yyyyMMdd-HHmmss");
+                var unique = Guid.NewGuid().ToString("N")[..8];
+                var output = Path.Combine(outputFolder,
+                    Path.GetFileNameWithoutExtension(sourcePath) + ".flafyo-patched-" + stamp + "-" + unique + Path.GetExtension(sourcePath));
+                using (var stream = new FileStream(output, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                    stream.Write(patched, 0, patched.Length);
+                return output;
+            });
 
             ProbeEditStatus.Text = $"تم حفظ نسخة منفصلة: {outputPath}. الملف الأصلي لم يتغير.";
             Log("تم حفظ نسخة ملف معدلة منفصلة: " + outputPath);
@@ -291,6 +306,10 @@ public partial class GameFilesWindow : Window
         {
             ProbeEditStatus.Text = "تعذر حفظ النسخة: " + ex.Message;
             AppLog.Write(ex);
+        }
+        finally
+        {
+            SaveProbeEditsButton.IsEnabled = true;
         }
     }
 
