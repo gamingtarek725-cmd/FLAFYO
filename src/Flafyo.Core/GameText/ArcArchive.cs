@@ -100,18 +100,39 @@ public sealed class ArcArchive
     /// <summary>Builds an archive. Each entry keeps its name, type and flags; its data is compressed again.</summary>
     public static byte[] Build(ushort version, IReadOnlyList<(ArcEntry Template, byte[] Data)> files)
     {
-        int headerEnd = 8 + 80 * files.Count;
-        long dataStart = ((long)headerEnd + DataAlignment - 1) / DataAlignment * DataAlignment;
+        ArgumentNullException.ThrowIfNull(files);
+        if (files.Count > MaxEntries)
+            throw new InvalidDataException("ARC contains too many entries.");
 
-        var packed = new List<byte[]>();
-        foreach (var (_, data) in files)
+        long totalUncompressed = 0;
+        var packed = new List<byte[]>(files.Count);
+        foreach (var (template, data) in files)
         {
+            if (template is null || template.RawName is null || data is null)
+                throw new InvalidDataException("ARC entry template or data is missing.");
+            if (data.LongLength > MaxEntryBytes || (totalUncompressed += data.LongLength) > MaxTotalEntryBytes)
+                throw new InvalidDataException("ARC entry data exceeds the safe build size limits.");
+            if (data.LongLength > 0x1FFFFFFF)
+                throw new InvalidDataException("ARC entry is too large for the archive size field.");
+
             using var ms = new MemoryStream();
-            using (var z = new ZLibStream(ms, CompressionLevel.Optimal, leaveOpen: true)) z.Write(data, 0, data.Length);
-            packed.Add(ms.ToArray());
+            using (var z = new ZLibStream(ms, CompressionLevel.Optimal, leaveOpen: true))
+                z.Write(data, 0, data.Length);
+            var compressed = ms.ToArray();
+            if (compressed.LongLength > uint.MaxValue)
+                throw new InvalidDataException("Compressed ARC entry is too large.");
+            packed.Add(compressed);
         }
 
-        using var output = new MemoryStream();
+        long headerEnd = checked(8L + 80L * files.Count);
+        long dataStart = checked(((headerEnd + DataAlignment - 1) / DataAlignment) * DataAlignment);
+        long archiveLength = dataStart;
+        foreach (var item in packed)
+            archiveLength = checked(archiveLength + item.LongLength);
+        if (archiveLength > MaxTotalEntryBytes || archiveLength > uint.MaxValue)
+            throw new InvalidDataException("Rebuilt ARC archive exceeds the safe output size limit.");
+
+        using var output = new MemoryStream((int)archiveLength);
         using var w = new BinaryWriter(output);
         w.Write((byte)'A'); w.Write((byte)'R'); w.Write((byte)'C'); w.Write((byte)0);
         w.Write(version); w.Write((ushort)files.Count);
@@ -124,12 +145,12 @@ public sealed class ArcArchive
             w.Write(name);
             w.Write(t.TypeHash);
             w.Write((uint)packed[i].Length);
-            w.Write(t.Flags | ((uint)data.Length & 0x1FFFFFFF));
+            w.Write(t.Flags | (uint)data.Length);
             w.Write((uint)offset);
-            offset += packed[i].Length;
+            offset = checked(offset + packed[i].LongLength);
         }
-        w.Write(new byte[dataStart - output.Length]);          // padding up to the first data block
-        foreach (var p in packed) w.Write(p);
+        w.Write(new byte[checked((int)(dataStart - output.Length))]);
+        foreach (var item in packed) w.Write(item);
         w.Flush();
         return output.ToArray();
     }

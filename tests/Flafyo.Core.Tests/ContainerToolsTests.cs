@@ -18,6 +18,16 @@ public class ContainerToolsTests : IDisposable
     }
 
     [Fact]
+    public void Arc_builder_rejects_more_than_the_supported_entry_count()
+    {
+        var tooMany = Enumerable.Range(0, 10_001)
+            .Select(i => (Template($"entry{i}.bin", 0x1234ABCD), Array.Empty<byte>()))
+            .ToArray();
+
+        Assert.Throws<InvalidDataException>(() => ArcArchive.Build(7, tooMany));
+    }
+
+    [Fact]
     public void Arc_container_round_trips_through_extract_edit_repack()
     {
         var text = Encoding.UTF8.GetBytes("{\"greet\":\"Hello there friend\"}");
