@@ -66,12 +66,15 @@ public static class ContainerTools
             for (int i = 0; i < arc.Entries.Count; i++)
             {
                 var e = arc.Entries[i];
-                if (e.Size > MaxEntryBytes || (total += e.Size) > MaxExtractedBytes)
-                    throw new InvalidDataException("حجم عناصر ARC يتجاوز حدود الاستخراج الآمن.");
+                if (e.Size > MaxEntryBytes)
+                    throw new InvalidDataException("حجم عنصر ARC يتجاوز حدود الاستخراج الآمن.");
                 var rel = SafeRelativePath(e.Name, i, "." + e.TypeHash.ToString("X8") + ".bin");
                 var dest = Path.Combine(outputFolder, rel);
                 Directory.CreateDirectory(Path.GetDirectoryName(dest)!);
-                File.WriteAllBytes(dest, arc.Read(e));
+                var entryBytes = arc.Read(e);
+                if ((total += entryBytes.LongLength) > MaxExtractedBytes)
+                    throw new InvalidDataException("الحجم الفعلي المفكوك لعناصر ARC تجاوز الحد الآمن.");
+                File.WriteAllBytes(dest, entryBytes);
                 index.Add($"{rel}\t{Convert.ToBase64String(e.RawName)}\t{e.TypeHash:X8}\t{e.Flags:X8}");
             }
             File.WriteAllLines(Path.Combine(outputFolder, IndexFile), index);
@@ -86,14 +89,16 @@ public static class ContainerTools
             {
                 if (++n > MaxEntries) throw new InvalidDataException("الأرشيف يحتوي على أكثر من 10,000 عنصر.");
                 if (e.FullName.EndsWith('/') || e.Length == 0 && e.Name.Length == 0) { n--; continue; }
-                if (e.Length < 0 || e.Length > MaxEntryBytes || (total += e.Length) > MaxExtractedBytes)
-                    throw new InvalidDataException("الحجم غير المضغوط للأرشيف يتجاوز حدود الاستخراج الآمن.");
+                if (e.Length < 0 || e.Length > MaxEntryBytes)
+                    throw new InvalidDataException("الحجم المعلن لعنصر الأرشيف يتجاوز حدود الاستخراج الآمن.");
                 var rel = NormalizeArchivePath(e.FullName);
                 var dest = ResolveSafePath(outputFolder, rel);
                 Directory.CreateDirectory(Path.GetDirectoryName(dest)!);
                 using var input = e.Open();
                 using var output = new FileStream(dest, FileMode.CreateNew, FileAccess.Write, FileShare.None);
-                CopyBounded(input, output, MaxEntryBytes);
+                total += CopyBounded(input, output, MaxEntryBytes);
+                if (total > MaxExtractedBytes)
+                    throw new InvalidDataException("الحجم الفعلي المفكوك للأرشيف تجاوز الحد الإجمالي الآمن.");
                 index.Add(rel.Replace(Path.DirectorySeparatorChar, '/'));
             }
             File.WriteAllLines(Path.Combine(outputFolder, IndexFile), index);
@@ -158,6 +163,8 @@ public static class ContainerTools
                     CopyBounded(input, output, MaxEntryBytes);
                 }
             }
+            if (ms.Length > MaxContainerBytes)
+                throw new InvalidDataException("حجم أرشيف ZIP الناتج تجاوز الحد الآمن.");
             return ms.ToArray();
         }
         throw new InvalidOperationException("نوع الحاوية غير مدعوم: " + kind);
@@ -236,7 +243,7 @@ public static class ContainerTools
         return fullPath;
     }
 
-    private static void CopyBounded(Stream input, Stream output, long limit)
+    private static long CopyBounded(Stream input, Stream output, long limit)
     {
         var buffer = new byte[81920];
         long copied = 0;
@@ -247,6 +254,7 @@ public static class ContainerTools
             if (copied > limit) throw new InvalidDataException("تجاوز عنصر الأرشيف حد الحجم أثناء الاستخراج.");
             output.Write(buffer, 0, read);
         }
+        return copied;
     }
 
     /// <summary>Keeps the entry's own folders (so files that belong together stay together) and only makes the FILE NAME
