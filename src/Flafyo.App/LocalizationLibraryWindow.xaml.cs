@@ -27,6 +27,7 @@ public partial class LocalizationLibraryWindow : Window
     private readonly ObservableCollection<LibraryEntry> _visible = new();
     private readonly System.Collections.Generic.List<LibraryEntry> _remoteCatalog = new();
     private bool _refreshing;
+    private string _categoryFilter = "all";
     private readonly LibraryEntry[] _catalog =
     {
         new()
@@ -198,9 +199,12 @@ public partial class LocalizationLibraryWindow : Window
     private void RefreshList()
     {
         var query = SearchBox?.Text?.Trim() ?? "";
-        var category = (CategoryBox?.SelectedItem as ComboBoxItem)?.Content?.ToString();
         var filtered = _catalog.Concat(_remoteCatalog).Where(x =>
-            (string.IsNullOrWhiteSpace(category) || category == "كل المصادر" || x.Category == category) &&
+            (_categoryFilter == "all" ||
+             (_categoryFilter == "pc" && (x.Subtitle.Contains("PC", StringComparison.OrdinalIgnoreCase) || x.Info.Contains("PC", StringComparison.OrdinalIgnoreCase))) ||
+             (_categoryFilter == "console" && (x.Subtitle.Contains("PS", StringComparison.OrdinalIgnoreCase) || x.Info.Contains("PlayStation", StringComparison.OrdinalIgnoreCase) || x.Info.Contains("Nintendo", StringComparison.OrdinalIgnoreCase) || x.Info.Contains("Xbox", StringComparison.OrdinalIgnoreCase))) ||
+             (_categoryFilter == "new" && (x.KindLabel.Contains("جديد") || x.KindLabel.Contains("تحديث"))) ||
+             (_categoryFilter == "directories" && x.IsDirectory)) &&
             (string.IsNullOrWhiteSpace(query) ||
              x.Title.Contains(query, StringComparison.OrdinalIgnoreCase) ||
              x.Subtitle.Contains(query, StringComparison.OrdinalIgnoreCase) ||
@@ -210,13 +214,27 @@ public partial class LocalizationLibraryWindow : Window
         foreach (var item in filtered) _visible.Add(item);
         if (selected != null) EntriesList.SelectedItem = _visible.FirstOrDefault(x => x.Title == selected.Title);
         if (EntriesList.SelectedItem == null && _visible.Count > 0) EntriesList.SelectedIndex = 0;
+        CountText.Text = $"{_visible.Count} عنصر";
         if (_visible.Count == 0) ShowEmpty();
     }
 
     private void SearchBox_TextChanged(object sender, TextChangedEventArgs e) => RefreshList();
-    private void CategoryBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+
+    private void Category_Click(object sender, RoutedEventArgs e)
     {
-        if (IsLoaded) RefreshList();
+        if (sender is not Button selected) return;
+        _categoryFilter = selected.Tag?.ToString() ?? "all";
+        foreach (var button in CategoryFilters.Children.OfType<Button>())
+        {
+            bool active = ReferenceEquals(button, selected);
+            button.Background = new System.Windows.Media.SolidColorBrush(active
+                ? System.Windows.Media.Color.FromRgb(32, 191, 208)
+                : System.Windows.Media.Color.FromRgb(27, 41, 66));
+            button.Foreground = active
+                ? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(7, 19, 33))
+                : System.Windows.Media.Brushes.White;
+        }
+        RefreshList();
     }
 
     private void EntriesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -225,7 +243,7 @@ public partial class LocalizationLibraryWindow : Window
         DetailTitle.Text = item.Title;
         DetailSubtitle.Text = item.Subtitle;
         DetailInfo.Text = item.Info;
-        InstallSteps.Text = item.Install;
+        InstallSteps.Text = "طريقة التثبيت: " + item.Install;
         SafetyNotes.Text = item.Notes;
         SourceAddress.Text = "المصدر: " + item.SourceName + " — " + item.SourceUrl;
         OpenSourceButton.IsEnabled = Uri.TryCreate(item.SourceUrl, UriKind.Absolute, out var uri) && uri.Scheme == Uri.UriSchemeHttps;
@@ -235,7 +253,7 @@ public partial class LocalizationLibraryWindow : Window
     {
         DetailTitle.Text = "مفيش نتائج مطابقة";
         DetailSubtitle.Text = "جرّب اسم لعبة أو اختار «كل المصادر».";
-        DetailInfo.Text = "";
+        DetailInfo.Text = "لا توجد عناصر تطابق البحث أو التصنيف الحالي.";
         InstallSteps.Text = "";
         SafetyNotes.Text = "";
         SourceAddress.Text = "";

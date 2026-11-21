@@ -14,5 +14,30 @@
 <Style TargetType="ComboBoxItem"><Setter Property="Background" Value="#18243B"/><Setter Property="Foreground" Value="{StaticResource Ink}"/><Setter Property="Padding" Value="8,7"/></Style>
 <Style TargetType="CheckBox"><Setter Property="Foreground" Value="{StaticResource Ink}"/><Setter Property="Margin" Value="0,9,0,0"/></Style><Style TargetType="RadioButton"><Setter Property="Foreground" Value="{StaticResource Ink}"/><Setter Property="Margin" Value="0,4,0,4"/></Style>
 <Style TargetType="TabControl"><Setter Property="Background" Value="{StaticResource Surface}"/><Setter Property="BorderBrush" Value="{StaticResource Line}"/><Setter Property="BorderThickness" Value="1"/></Style>
-<Style TargetType="TabItem"><Setter Property="Padding" Value="16,11"/><Setter Property="FontSize" Value="13"/><Setter Property="Foreground" Value="{StaticResource Muted}"/><Setter Property="Background" Value="#111A2D"/><Setter Property="BorderBrush" Value="{StaticResource Line}"/></Style>
+<Style TargetType="TabItem">
+  <Setter Property="Padding" Value="18,12"/><Setter Property="FontSize" Value="13"/>
+  <Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Foreground" Value="{StaticResource Muted}"/>
+  <Setter Property="Background" Value="#111A2D"/><Setter Property="BorderBrush" Value="{StaticResource Line}"/>
+  <Setter Property="Margin" Value="3,3,3,0"/>
+  <Setter Property="Template">
+    <Setter.Value>
+      <ControlTemplate TargetType="TabItem">
+        <Border x:Name="TabBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="1" CornerRadius="10,10,0,0" Padding="{TemplateBinding Padding}">
+          <ContentPresenter ContentSource="Header" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Border>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsSelected" Value="True">
+            <Setter TargetName="TabBorder" Property="Background" Value="#20394B"/>
+            <Setter TargetName="TabBorder" Property="BorderBrush" Value="#20BFD0"/>
+            <Setter Property="Foreground" Value="#65E2EA"/>
+          </Trigger>
+          <Trigger Property="IsMouseOver" Value="True">
+            <Setter TargetName="TabBorder" Property="Background" Value="#263854"/>
+          </Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter.Value>
+  </Setter>
+</Style>
 </Application.Resources></Application>
