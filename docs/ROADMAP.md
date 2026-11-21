@@ -44,8 +44,8 @@ FLAFYO is a Windows-first game translation and localization platform. Existing t
 
 ### Phase 5 — Language and game management
 - Manage offline language packs, disk usage, dictionaries, and per-game profiles.
-- Add profile import/export and recovery.
-- Acceptance: settings remain isolated per game and survive upgrades.
+- Add profile import/export and recovery. (Implemented; automated validation and import/export tests added.)
+- Acceptance: settings remain isolated per game and survive upgrades. Import rejects unsafe paths, invalid settings, malformed files, and files larger than 256 KiB; replacement keeps a `.bak` copy.
 
 ### Phase 6 — Release hardening
 - Clean install/uninstall, upgrade, recovery, logging, accessibility, and documentation.
