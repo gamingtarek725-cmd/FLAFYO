@@ -47,11 +47,13 @@
                 <TextBlock Text="تصميم مقترح" Foreground="#45D6A0" FontSize="10" FontWeight="Bold"/>
               </Border>
             </Grid>
-            <UniformGrid Columns="2" Rows="2">
+            <UniformGrid Columns="2" Rows="3">
               <Button Content="⛶&#10;الترجمة الفورية&#10;OCR و Overlay" Click="DashboardLive_Click" Margin="4" Padding="18,16" FontSize="15" Background="#1C2B45" BorderBrush="#2B4265" MinHeight="92"/>
               <Button Content="▱&#10;تعريب الألعاب&#10;تحليل الملفات" Click="DashboardFiles_Click" Margin="4" Padding="18,16" FontSize="15" Background="#1C2B45" BorderBrush="#2B4265" MinHeight="92"/>
               <Button Content="文&#10;إدارة اللغات&#10;حزم Offline" Click="DashboardLanguages_Click" Margin="4" Padding="18,16" FontSize="15" Background="#1C2B45" BorderBrush="#2B4265" MinHeight="92"/>
               <Button Content="⌘&#10;إعدادات الألعاب&#10;ملفات مستقلة" Click="DashboardGameSettings_Click" Margin="4" Padding="18,16" FontSize="15" Background="#1C2B45" BorderBrush="#2B4265" MinHeight="92"/>
+              <Button Content="▦&#10;مكتبة التعريبات&#10;بحث وتحديثات الألعاب" Click="DashboardLibrary_Click" Margin="4" Padding="18,16" FontSize="15" Background="#1C2B45" BorderBrush="#2B4265" MinHeight="92"/>
+              <Button Content="◷&#10;سجل الترجمة والأداء&#10;التشخيص والنتائج" Click="DashboardLogs_Click" Margin="4" Padding="18,16" FontSize="15" Background="#1C2B45" BorderBrush="#2B4265" MinHeight="92"/>
             </UniformGrid>
             <Border Background="#1C2B45" CornerRadius="12" Padding="14" Margin="4,10,4,0">
               <Grid>

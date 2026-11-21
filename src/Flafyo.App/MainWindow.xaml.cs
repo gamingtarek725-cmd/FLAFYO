@@ -103,6 +103,8 @@ public partial class MainWindow : Window
     {
         StateText.Text = running ? "● شغّال" : "● متوقف";
         StateText.Foreground = (System.Windows.Media.Brush)FindResource(running ? "Ok" : "Muted");
+        DashboardState.Text = running ? "الترجمة تعمل" : "متوقف";
+        DashboardState.Foreground = (System.Windows.Media.Brush)FindResource(running ? "Ok" : "Muted");
     }
 
     private void SetStatus(string s) => Dispatcher.InvokeAsync(() => StatusText.Text = s);

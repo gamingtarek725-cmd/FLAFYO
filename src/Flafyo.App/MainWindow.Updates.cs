@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
@@ -54,15 +55,18 @@ public partial class MainWindow
             }
 
             string? installerUrl = null;
+            string? expectedDigest = null;
             if (root.TryGetProperty("assets", out var assets))
             {
                 foreach (var asset in assets.EnumerateArray())
                 {
                     var name = asset.TryGetProperty("name", out var n) ? n.GetString() : null;
                     var url = asset.TryGetProperty("browser_download_url", out var u) ? u.GetString() : null;
+                    var digest = asset.TryGetProperty("digest", out var d) ? d.GetString() : null;
                     if (string.Equals(name, "FLAFYO-GAME-TRANSLATOR-Setup.exe", StringComparison.OrdinalIgnoreCase))
                     {
                         installerUrl = url;
+                        expectedDigest = digest;
                         break;
                     }
                 }
@@ -76,10 +80,22 @@ public partial class MainWindow
                 return;
             }
 
+            if (string.IsNullOrWhiteSpace(expectedDigest) ||
+                !expectedDigest.StartsWith("sha256:", StringComparison.OrdinalIgnoreCase))
+            {
+                UpdateStatusText.Text = "التحديث متاح، لكن لا يوجد بصمة SHA-256 موثوقة للملف؛ تم إلغاء التنزيل الآمن.";
+                return;
+            }
+
             UpdateStatusText.Text = $"الإصدار {latest} متاح — جارٍ تنزيل المُثبّت...";
             var bytes = await UpdateHttp.GetByteArrayAsync(downloadUri);
             if (bytes.Length < 1024 * 1024)
                 throw new InvalidDataException("حجم ملف التحديث غير متوقع؛ تم إلغاء التثبيت.");
+
+            var actualDigest = Convert.ToHexString(SHA256.HashData(bytes));
+            var expectedHex = expectedDigest.Substring("sha256:".Length);
+            if (!actualDigest.Equals(expectedHex, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("فشل التحقق من بصمة SHA-256؛ لن يتم تشغيل ملف التحديث.");
 
             var installerPath = Path.Combine(Path.GetTempPath(), "FLAFYO-GAME-TRANSLATOR-Update.exe");
             await File.WriteAllBytesAsync(installerPath, bytes);
@@ -100,5 +116,7 @@ public partial class MainWindow
     private void DashboardLive_Click(object sender, RoutedEventArgs e) => Start_Click(sender, e);
     private void DashboardFiles_Click(object sender, RoutedEventArgs e) => GameFiles_Click(sender, e);
     private void DashboardLanguages_Click(object sender, RoutedEventArgs e) => SettingsTabs.SelectedIndex = 0;
-    private void DashboardGameSettings_Click(object sender, RoutedEventArgs e) => SettingsTabs.SelectedIndex = 4;
+    private void DashboardGameSettings_Click(object sender, RoutedEventArgs e) => SettingsTabs.SelectedIndex = 3;
+    private void DashboardLibrary_Click(object sender, RoutedEventArgs e) => GameLibrary_Click(sender, e);
+    private void DashboardLogs_Click(object sender, RoutedEventArgs e) => OpenLog_Click(sender, e);
 }
