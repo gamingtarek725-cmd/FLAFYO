@@ -112,10 +112,24 @@ internal static class ProfileStore
 
     public static GameProfile Import(string path)
     {
-        var info = new FileInfo(path);
-        if (!info.Exists || info.Length <= 0 || info.Length > MaxImportBytes)
-            throw new InvalidDataException("حجم ملف الإعدادات غير صالح (الحد الأقصى 256 كيلوبايت).");
-        var json = File.ReadAllText(path, System.Text.Encoding.UTF8);
+        byte[] bytes;
+        using (var input = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+        {
+            if (input.Length <= 0 || input.Length > MaxImportBytes)
+                throw new InvalidDataException("حجم ملف الإعدادات غير صالح (الحد الأقصى 256 كيلوبايت).");
+            using var buffer = new MemoryStream((int)input.Length);
+            var chunk = new byte[8192];
+            int read;
+            while ((read = input.Read(chunk, 0, chunk.Length)) > 0)
+            {
+                if (buffer.Length + read > MaxImportBytes)
+                    throw new InvalidDataException("حجم ملف الإعدادات تجاوز الحد المسموح.");
+                buffer.Write(chunk, 0, read);
+            }
+            bytes = buffer.ToArray();
+        }
+
+        var json = new System.Text.UTF8Encoding(false, true).GetString(bytes);
         var profile = JsonSerializer.Deserialize<GameProfile>(json)
             ?? throw new InvalidDataException("تعذّر قراءة ملف الإعدادات.");
         if (!Validate(profile, out var error)) throw new InvalidDataException(error);
