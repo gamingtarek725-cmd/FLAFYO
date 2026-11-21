@@ -170,7 +170,11 @@ public partial class GameFilesWindow : Window
     private void ProbeList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
     {
         if (ProbeList.SelectedItem is ProbeItem it)
-            ProbePreview.Text = string.Join(Environment.NewLine, it.Hit.Samples.Select(s => "• " + s));
+        {
+            var preview = it.Hit.All.Take(24)
+                .Select(s => $"[{s.Offset:X8} | {s.EncodingName}] {s.Text}");
+            ProbePreview.Text = string.Join(Environment.NewLine, preview);
+        }
     }
 
     private void ExportHit_Click(object sender, RoutedEventArgs e)

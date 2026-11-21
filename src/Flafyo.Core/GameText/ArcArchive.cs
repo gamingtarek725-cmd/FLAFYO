@@ -26,6 +26,9 @@ public sealed class ArcEntry
 public sealed class ArcArchive
 {
     public const int DataAlignment = 0x8000;
+    private const int MaxEntries = 10_000;
+    private const long MaxEntryBytes = 128L * 1024 * 1024;
+    private const long MaxTotalEntryBytes = 512L * 1024 * 1024;
     private readonly byte[] _file;
 
     public ushort Version { get; }
@@ -39,8 +42,10 @@ public sealed class ArcArchive
     {
         if (!IsArc(file)) throw new InvalidDataException("Not an ARC archive.");
         ushort version = BitConverter.ToUInt16(file, 4), count = BitConverter.ToUInt16(file, 6);
+        if (count > MaxEntries) throw new InvalidDataException("ARC contains too many entries.");
         if (8L + 80L * count > file.Length) throw new InvalidDataException("ARC header is damaged.");
         var list = new List<ArcEntry>(count);
+        long totalUncompressed = 0;
         for (int i = 0; i < count; i++)
         {
             int p = 8 + i * 80;
@@ -57,6 +62,9 @@ public sealed class ArcArchive
                 Offset = BitConverter.ToUInt32(file, p + 76),
             };
             if ((long)e.Offset + e.CompressedSize > file.Length) throw new InvalidDataException($"Entry {i} points outside the file.");
+            if (e.CompressedSize > MaxEntryBytes || e.Size > MaxEntryBytes ||
+                (totalUncompressed += e.Size) > MaxTotalEntryBytes)
+                throw new InvalidDataException($"Entry {i} exceeds the safe ARC size limits.");
             list.Add(e);
         }
         return new ArcArchive(file, version, list);
@@ -72,7 +80,18 @@ public sealed class ArcArchive
             using var input = new MemoryStream(slice);
             using var z = new ZLibStream(input, CompressionMode.Decompress);
             using var output = new MemoryStream(e.Size > 0 ? e.Size : 4096);
-            z.CopyTo(output);
+            var buffer = new byte[81920];
+            long copied = 0;
+            int read;
+            while ((read = z.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                copied += read;
+                if (copied > MaxEntryBytes || copied > e.Size)
+                    throw new IOException("ARC entry exceeded its declared or safe decompressed size.");
+                output.Write(buffer, 0, read);
+            }
+            if (e.Size > 0 && copied != e.Size)
+                throw new IOException("ARC entry size does not match its header.");
             return output.ToArray();
         }
         catch (InvalidDataException) { return slice; }     // stored without compression

@@ -184,15 +184,36 @@ public static class GameProbe
             }
             return;
         }
-        if (ext.Equals(".zip", StringComparison.OrdinalIgnoreCase))
+        if (ext.Equals(".zip", StringComparison.OrdinalIgnoreCase) ||
+            ContainerTools.Detect(data) == ContainerKind.Zip)
         {
-            using var zip = new ZipArchive(new MemoryStream(data), ZipArchiveMode.Read);
+            const int maxEntries = 10_000;
+            const long maxEntryBytes = 50_000_000;
+            const long maxTotalBytes = 512L * 1024 * 1024;
+            using var zip = new ZipArchive(new MemoryStream(data, writable: false), ZipArchiveMode.Read);
+            if (zip.Entries.Count > maxEntries) throw new InvalidDataException("ZIP contains too many entries.");
+            long totalBytes = 0;
             foreach (var e in zip.Entries)
             {
                 ct.ThrowIfCancellationRequested();
-                if (e.Length == 0 || e.Length > 50_000_000 || SkipExt.Contains(Path.GetExtension(e.FullName))) continue;
-                using var s = e.Open(); using var ms = new MemoryStream();
-                s.CopyTo(ms);
+                if (e.Length == 0 || SkipExt.Contains(Path.GetExtension(e.FullName))) continue;
+                if (e.Length > maxEntryBytes || (totalBytes += e.Length) > maxTotalBytes) continue;
+
+                // Enforce limits on bytes actually decompressed, not only ZIP's declared length.
+                using var input = e.Open();
+                using var ms = new MemoryStream((int)Math.Min(e.Length, 1024 * 1024));
+                var buffer = new byte[81920];
+                long copied = 0;
+                int read;
+                while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    ct.ThrowIfCancellationRequested();
+                    copied += read;
+                    if (copied > maxEntryBytes || copied > e.Length || totalBytes - e.Length + copied > maxTotalBytes)
+                        throw new InvalidDataException("ZIP entry exceeded its safe decompression limit.");
+                    ms.Write(buffer, 0, read);
+                }
+                if (copied != e.Length) continue;
                 Add(hits, file, e.FullName, "ZIP", ms.ToArray(), minSentences);
             }
             return;
