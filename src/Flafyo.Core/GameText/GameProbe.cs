@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Flafyo.Core.GameText;
 
-public sealed record FoundText(string Text, long Offset, bool Utf16);
+public sealed record FoundText(string Text, long Offset, bool Utf16, string EncodingName = "ASCII / UTF-8");
 
 /// <summary>Finds readable English text inside any binary data (like the "strings" tool, but only keeps real sentences).</summary>
 public static class BinaryTextMiner
@@ -24,14 +24,29 @@ public static class BinaryTextMiner
             if (i - start >= minChars) Add(results, Encoding.ASCII.GetString(d.Slice(start, i - start)), start, false, minChars);
         }
 
-        // UTF-16 little-endian text (every second byte is zero)
+        // UTF-16 little-endian text (ASCII-range characters followed by zero bytes).
         for (int s = 0; s < n - 1 && results.Count < maxResults;)
         {
             if (Printable(d[s]) && d[s + 1] == 0)
             {
                 int e = s;
                 while (e + 1 < n && Printable(d[e]) && d[e + 1] == 0) e += 2;
-                if ((e - s) / 2 >= minChars) Add(results, Encoding.Unicode.GetString(d.Slice(s, e - s)), s, true, minChars);
+                if ((e - s) / 2 >= minChars)
+                    Add(results, Encoding.Unicode.GetString(d.Slice(s, e - s)), s, true, minChars, "UTF-16 LE");
+                s = e;
+            }
+            else s++;
+        }
+
+        // UTF-16 big-endian text (zero byte followed by an ASCII-range character).
+        for (int s = 0; s < n - 1 && results.Count < maxResults;)
+        {
+            if (d[s] == 0 && Printable(d[s + 1]))
+            {
+                int e = s;
+                while (e + 1 < n && d[e] == 0 && Printable(d[e + 1])) e += 2;
+                if ((e - s) / 2 >= minChars)
+                    Add(results, Encoding.BigEndianUnicode.GetString(d.Slice(s, e - s)), s, true, minChars, "UTF-16 BE");
                 s = e;
             }
             else s++;
@@ -39,11 +54,12 @@ public static class BinaryTextMiner
         return results;
     }
 
-    private static void Add(List<FoundText> results, string raw, long offset, bool utf16, int minChars)
+    private static void Add(List<FoundText> results, string raw, long offset, bool utf16, int minChars,
+        string encodingName = "ASCII / UTF-8")
     {
         var t = TextNormalizer.Normalize(raw);
         if (t.Length < minChars || !t.Contains(' ') || !TextQuality.LooksLikeText(t)) return;
-        results.Add(new FoundText(t, offset, utf16));
+        results.Add(new FoundText(t, offset, utf16, encodingName));
     }
 
     /// <summary>A "sentence" has at least four words (binary garbage rarely lines up three spaces by chance).</summary>
@@ -77,14 +93,29 @@ public static class BinaryTextMiner
     {
         if (data.Length == 0) return 0;
         int stride = Math.Max(1, data.Length / maxSamples);
-        int printable = 0, n = 0;
+        int printable = 0, sampled = 0;
+        int littleEndianPairs = 0, bigEndianPairs = 0, pairs = 0;
         for (int i = 0; i < data.Length; i += stride)
         {
             byte b = data[i];
-            if ((b >= 0x20 && b < 0x7F) || b == 9 || b == 10 || b == 13) printable++;
-            n++;
+            if (Printable(b)) printable++;
+            sampled++;
         }
-        return n == 0 ? 0 : (double)printable / n;
+
+        // A UTF-16 ASCII-heavy file has roughly half zero bytes. Score decoded code units,
+        // rather than rejecting it as binary based on its raw-byte ratio.
+        int pairStride = Math.Max(2, stride);
+        for (int i = 0; i + 1 < data.Length; i += pairStride)
+        {
+            if (Printable(data[i]) && data[i + 1] == 0) littleEndianPairs++;
+            if (data[i] == 0 && Printable(data[i + 1])) bigEndianPairs++;
+            pairs++;
+        }
+
+        double rawRatio = sampled == 0 ? 0 : (double)printable / sampled;
+        double leRatio = pairs == 0 ? 0 : (double)littleEndianPairs / pairs;
+        double beRatio = pairs == 0 ? 0 : (double)bigEndianPairs / pairs;
+        return Math.Max(rawRatio, Math.Max(leRatio, beRatio));
     }
 }
 
@@ -189,7 +220,7 @@ public static class GameProbe
         var name = Path.GetFileNameWithoutExtension(hit.FullPath) + (hit.Entry == null ? "" : "_" + Path.GetFileName(hit.Entry.Replace('\\', '/').Split(' ')[0]));
         name = new string(name.Select(c => Path.GetInvalidFileNameChars().Contains(c) ? '_' : c).ToArray());
         var path = Path.Combine(folder, name + ".txt");
-        File.WriteAllLines(path, hit.All.Select(f => $"{f.Offset:X8}\t{(f.Utf16 ? "utf16" : "ascii")}\t{f.Text}"), new UTF8Encoding(false));
+        File.WriteAllLines(path, hit.All.Select(f => $"{f.Offset:X8}\t{f.EncodingName}\t{f.Text}"), new UTF8Encoding(false));
         return path;
     }
 
