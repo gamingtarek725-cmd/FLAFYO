@@ -38,9 +38,13 @@ public static class ContainerTools
         if (kind == ContainerKind.Arc)
         {
             var arc = ArcArchive.Parse(data);
+            if (arc.Entries.Count > MaxEntries) throw new InvalidDataException("أرشيف ARC يحتوي على أكثر من 10,000 عنصر.");
+            long total = 0;
             for (int i = 0; i < arc.Entries.Count; i++)
             {
                 var e = arc.Entries[i];
+                if (e.Size > MaxEntryBytes || (total += e.Size) > MaxExtractedBytes)
+                    throw new InvalidDataException("حجم عناصر ARC يتجاوز حدود الاستخراج الآمن.");
                 var rel = SafeRelativePath(e.Name, i, "." + e.TypeHash.ToString("X8") + ".bin");
                 var dest = Path.Combine(outputFolder, rel);
                 Directory.CreateDirectory(Path.GetDirectoryName(dest)!);
@@ -87,17 +91,25 @@ public static class ContainerTools
         if (kind == ContainerKind.Arc)
         {
             var files = new List<(ArcEntry Template, byte[] Data)>();
+            long total = 0;
             foreach (var line in lines.Skip(2))
             {
                 var p = line.Split('\t');
+                if (p.Length != 4 || files.Count >= MaxEntries) throw new InvalidDataException("فهرس ARC غير صالح أو يحتوي عناصر أكثر من الحد.");
                 var raw = Convert.FromBase64String(p[1]);
                 int len = Array.IndexOf(raw, (byte)0); if (len < 0) len = raw.Length;
+                var rel = NormalizeArchivePath(p[0]);
+                var source = ResolveSafePath(extractedFolder, rel);
+                if (!File.Exists(source)) throw new FileNotFoundException("ملف عنصر ARC غير موجود.", source);
+                var size = new FileInfo(source).Length;
+                if (size > MaxEntryBytes || (total += size) > MaxExtractedBytes)
+                    throw new InvalidDataException("حجم ملفات ARC يتجاوز الحدود الآمنة.");
                 var template = new ArcEntry
                 {
                     RawName = raw, Name = System.Text.Encoding.Latin1.GetString(raw, 0, len),
                     TypeHash = Convert.ToUInt32(p[2], 16), SizeAndFlags = Convert.ToUInt32(p[3], 16),
                 };
-                files.Add((template, File.ReadAllBytes(ResolveSafePath(extractedFolder, NormalizeArchivePath(p[0])))));
+                files.Add((template, File.ReadAllBytes(source)));
             }
             return ArcArchive.Build(7, files);
         }
@@ -105,6 +117,7 @@ public static class ContainerTools
         {
             using var ms = new MemoryStream();
             using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
+            {
                 int count = 0;
                 long total = 0;
                 foreach (var rawRel in lines.Skip(2))
@@ -121,6 +134,7 @@ public static class ContainerTools
                     using var input = File.OpenRead(source);
                     CopyBounded(input, output, MaxEntryBytes);
                 }
+            }
             return ms.ToArray();
         }
         throw new InvalidOperationException("نوع الحاوية غير مدعوم: " + kind);
