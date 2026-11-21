@@ -57,6 +57,19 @@ public class ContainerToolsTests : IDisposable
     }
 
     [Fact]
+    public void Apply_rejects_invalid_rebuild_without_changing_original_or_creating_backup()
+    {
+        var original = Path.Combine(_root, "original.arc");
+        var valid = ArcArchive.Build(7, new[] { (Template("data.bin", 0x1234ABCD), Encoding.UTF8.GetBytes("original")) });
+        File.WriteAllBytes(original, valid);
+
+        Assert.Throws<InvalidDataException>(() => ContainerTools.Apply(original, Encoding.UTF8.GetBytes("not an archive")));
+
+        Assert.Equal(valid, File.ReadAllBytes(original));
+        Assert.False(File.Exists(original + ".flafyo_backup"));
+    }
+
+    [Fact]
     public void Pak_file_with_zip_bytes_is_detected_and_round_trips()
     {
         var zipPath = Path.Combine(_root, "data3.zip");

@@ -143,15 +143,43 @@ public static class ContainerTools
     /// <summary>Writes the rebuilt container over the original, after backing the original up next to it (once).</summary>
     public static string Apply(string originalContainerPath, byte[] rebuilt)
     {
+        ArgumentNullException.ThrowIfNull(rebuilt);
+        var originalInfo = new FileInfo(originalContainerPath);
+        if (!originalInfo.Exists) throw new FileNotFoundException("ملف الحاوية الأصلي غير موجود.", originalContainerPath);
+        if (originalInfo.Length <= 0 || originalInfo.Length > MaxContainerBytes || rebuilt.Length <= 0 || rebuilt.LongLength > MaxContainerBytes)
+            throw new InvalidDataException("حجم الحاوية الأصلية أو الناتجة خارج الحدود الآمنة.");
+
+        var originalKind = Detect(File.ReadAllBytes(originalContainerPath));
+        var rebuiltKind = Detect(rebuilt);
+        if (originalKind == ContainerKind.None || rebuiltKind != originalKind)
+            throw new InvalidDataException("نوع الحاوية الناتجة لا يطابق نوع الملف الأصلي.");
+
         var backup = originalContainerPath + ".flafyo_backup";
         var temp = originalContainerPath + ".flafyo_tmp";
-        if (!File.Exists(backup)) File.Copy(originalContainerPath, backup);
+        var verifyArchive = temp + ".verify";
+        var verifyFolder = temp + ".verify_dir";
         try
         {
-            File.WriteAllBytes(temp, rebuilt);
+            // Validate the exact bytes that will be applied by reopening them through the bounded extractor.
+            File.WriteAllBytes(verifyArchive, rebuilt);
+            var (_, verifiedCount) = Extract(verifyArchive, verifyFolder);
+            if (verifiedCount == 0)
+                throw new InvalidDataException("الحاوية الناتجة لا تحتوي على عناصر قابلة للتحقق.");
+
+            if (!File.Exists(backup)) File.Copy(originalContainerPath, backup);
+            using (var stream = new FileStream(temp, FileMode.Create, FileAccess.Write, FileShare.None, 81920, FileOptions.WriteThrough))
+            {
+                stream.Write(rebuilt, 0, rebuilt.Length);
+                stream.Flush(flushToDisk: true);
+            }
             File.Move(temp, originalContainerPath, overwrite: true);
         }
-        finally { if (File.Exists(temp)) File.Delete(temp); }
+        finally
+        {
+            if (File.Exists(temp)) File.Delete(temp);
+            if (File.Exists(verifyArchive)) File.Delete(verifyArchive);
+            if (Directory.Exists(verifyFolder)) Directory.Delete(verifyFolder, recursive: true);
+        }
         return backup;
     }
 
