@@ -169,7 +169,7 @@ public class ArcAndProbeTests : IDisposable
 
         var patched = BinaryTextPatcher.CreatePatchedCopy(source, new[]
         {
-            new TextByteReplacement(0, source.Length, "ASCII / UTF-8", replacement)
+            new TextByteReplacement(0, source.Length, "ASCII / UTF-8", replacement, "Find the golden key before midnight.")
         });
 
         Assert.Equal(original, source);
@@ -191,6 +191,18 @@ public class ArcAndProbeTests : IDisposable
         });
 
         Assert.Equal(replacement, encoding.GetString(patched));
+    }
+
+    [Fact]
+    public void Binary_patcher_rejects_stale_offsets_when_original_text_has_changed()
+    {
+        var source = Encoding.ASCII.GetBytes("A different sentence is now here.");
+
+        Assert.Throws<InvalidDataException>(() => BinaryTextPatcher.CreatePatchedCopy(source, new[]
+        {
+            new TextByteReplacement(0, source.Length, "ASCII / UTF-8",
+                "A different sentence is now here.", "Find the golden key before midnight.")
+        }));
     }
 
     [Fact]
