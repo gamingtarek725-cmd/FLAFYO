@@ -3,7 +3,7 @@ using System.Text;
 namespace Flafyo.Core.GameText;
 
 /// <summary>A fixed-width replacement for a byte range discovered by BinaryTextMiner.</summary>
-public sealed record TextByteReplacement(long Offset, int ByteLength, string EncodingName, string Replacement);
+public sealed record TextByteReplacement(long Offset, int ByteLength, string EncodingName, string Replacement, string? ExpectedOriginal = null);
 
 /// <summary>
 /// Applies fixed-width edits to a copy of a binary file. It never changes the input array,
@@ -36,6 +36,19 @@ public static class BinaryTextPatcher
                 "UTF-16 BE" => new UnicodeEncoding(true, false, true),
                 _ => throw new InvalidDataException("Unsupported text encoding: " + edit.EncodingName)
             };
+
+            if (edit.ExpectedOriginal != null)
+            {
+                string current;
+                try { current = TextNormalizer.Normalize(encoding.GetString(source.Slice(checked((int)edit.Offset), edit.ByteLength))); }
+                catch (DecoderFallbackException ex)
+                {
+                    throw new InvalidDataException("Original byte range is no longer valid for its detected encoding.", ex);
+                }
+
+                if (!string.Equals(current, TextNormalizer.Normalize(edit.ExpectedOriginal), StringComparison.Ordinal))
+                    throw new InvalidDataException("The source text changed after scanning. Scan the file again before saving edits.");
+            }
 
             try { encoded[i] = encoding.GetBytes(edit.Replacement ?? string.Empty); }
             catch (EncoderFallbackException ex)
