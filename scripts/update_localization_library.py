@@ -78,17 +78,26 @@ def main():
             if not relevant or absolute in seen:
                 continue
             seen.add(absolute)
-            versions = VERSION_RE.findall(title)
-            is_new = bool(re.search(r"جديد|new release|first release|إصدار أول", title, re.I))
-            is_update = bool(re.search(r"تحديث|updated|update|→", title, re.I))
+            arrow_versions = re.search(r"(\d+(?:\.\d+){1,3})\s*→\s*(\d+(?:\.\d+){1,3})", title)
+            prefixed_version = re.search(r"(?i)\bv\s*(\d+(?:\.\d+){1,3})", title)
+            translation_version = arrow_versions.group(2) if arrow_versions else (prefixed_version.group(1) if prefixed_version else "")
+            is_new = bool(re.match(r"^\s*جديد\b", title)) or bool(re.search(r"جديد\s+الإصدار\s+الأول", title, re.I))
+            is_update = bool(arrow_versions) or bool(re.search(r"محدّث|محدث|تحديث", title, re.I))
             update_type = "new" if is_new else ("update" if is_update else "listing")
+            display_title = title
+            if arrow_versions:
+                display_title = title[:arrow_versions.start()].strip()
+            display_title = re.sub(r"^\s*محدّث\s*[·:-]?\s*v?\d+(?:\.\d+){1,3}\s*", "", display_title, flags=re.I)
+            display_title = re.sub(r"^\s*جديد\s*", "", display_title, flags=re.I)
+            display_title = re.sub(r"^\d+", "", display_title).strip()
+            display_title = re.sub(r"\s*\d+(?:\.\d+)?\s*K?\s*تحميل\s*$", "", display_title, flags=re.I).strip()
             entries.append({
-                "title": title[:180],
+                "title": (display_title or title)[:180],
                 "sourceUrl": absolute,
                 "sourceName": source_name,
-                "platform": "",
+                "platform": "PC" if re.search(r"\bPC\b", title, re.I) else "",
                 "gameVersion": "",
-                "translationVersion": " / ".join(versions[-2:]) if versions else "",
+                "translationVersion": translation_version,
                 "updateType": update_type,
                 "summary": title[:500],
                 "publishedAt": ""
