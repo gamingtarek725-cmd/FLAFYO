@@ -149,8 +149,10 @@ public partial class GameFilesWindow : Window
         var folder = FolderBox.Text;
         if (!Directory.Exists(folder)) { ProbeStatus.Text = "اختر مجلد اللعبة الأول."; return; }
         ProbeList.ItemsSource = _probe;
+        if (_probeCts != null) return;
         _probe.Clear(); ProbePreview.Text = "";
         ProbeButton.IsEnabled = false;
+        CancelProbeButton.IsEnabled = true;
         ProbeStatus.Text = "جاري الفحص… ممكن ياخد دقايق لو اللعبة كبيرة.";
         _probeCts = new CancellationTokenSource();
         try
@@ -164,7 +166,21 @@ public partial class GameFilesWindow : Window
         }
         catch (OperationCanceledException) { ProbeStatus.Text = "اتوقف الفحص."; }
         catch (Exception ex) { ProbeStatus.Text = "فشل الفحص: " + ex.Message; AppLog.Write(ex); }
-        finally { ProbeButton.IsEnabled = true; _probeCts?.Dispose(); _probeCts = null; }
+        finally
+        {
+            ProbeButton.IsEnabled = true;
+            CancelProbeButton.IsEnabled = false;
+            _probeCts?.Dispose();
+            _probeCts = null;
+        }
+    }
+
+    private void CancelProbe_Click(object sender, RoutedEventArgs e)
+    {
+        if (_probeCts == null || _probeCts.IsCancellationRequested) return;
+        CancelProbeButton.IsEnabled = false;
+        ProbeStatus.Text = "جاري إيقاف الفحص…";
+        _probeCts.Cancel();
     }
 
     private void ProbeList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
