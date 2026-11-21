@@ -45,7 +45,7 @@ class LinkParser(HTMLParser):
             self.active["text"] += data
     def handle_endtag(self, tag):
         if tag.lower() == "a" and self.active is not None:
-            self.active["text"] = re.sub(r"\\s+", " ", html.unescape(self.active["text"])).strip()
+            self.active["text"] = re.sub(r"\s+", " ", html.unescape(self.active["text"])).strip()
             self.links.append(self.active)
             self.active = None
 
@@ -99,10 +99,10 @@ def main():
             if not is_game_page or absolute in seen:
                 continue
             seen.add(absolute)
-            arrow_versions = re.search(r"(\\d+(?:\\.\\d+){1,3})\\s*→\\s*(\\d+(?:\\.\\d+){1,3})", raw_title)
-            prefixed_version = re.search(r"(?i)\\bv\\s*(\\d+(?:\\.\\d+){1,3})", raw_title)
+            arrow_versions = re.search(r"(\d+(?:\.\d+){1,3})\s*→\s*(\d+(?:\.\d+){1,3})", raw_title)
+            prefixed_version = re.search(r"(?i)\bv\s*(\d+(?:\.\d+){1,3})", raw_title)
             translation_version = arrow_versions.group(2) if arrow_versions else (prefixed_version.group(1) if prefixed_version else "")
-            is_new = bool(re.match(r"^\\s*جديد\\b", raw_title)) or bool(re.search(r"جديد\\s+الإصدار\\s+الأول", raw_title, re.I))
+            is_new = bool(re.match(r"^\s*جديد\b", raw_title)) or bool(re.search(r"جديد\s+الإصدار\s+الأول", raw_title, re.I))
             is_update = bool(arrow_versions) or bool(re.search(r"محدّث|محدث|تحديث", raw_title, re.I))
             update_type = "new" if is_new else ("update" if is_update else "listing")
             title = title_from_slug(path, raw_title)
@@ -135,7 +135,7 @@ def main():
         "entries": entries[:1200]
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+    OUTPUT.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Indexed {len(catalog['entries'])} public game pages from {len(SOURCES)} source sites.")
 
 if __name__ == "__main__":
