@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using System.Drawing;
+using System.Drawing;\nusing System.Threading.Channels;
 
 namespace Flafyo.Core;
 
@@ -38,6 +38,10 @@ public sealed class ScreenPipeline : IAsyncDisposable
     private List<ScreenBlock>? _lastBlocks;
     private long _emptySince;
     private Frame? _lastFrame;
+    private readonly object _scanLock = new();
+    private CancellationTokenSource? _activeScan;
+    private long _scanGeneration;
+    public long DroppedFrames { get; private set; }
 
     public event Action<IReadOnlyList<TranslatedBlock>>? Updated;
     /// <summary>(text lines read by OCR, blocks after grouping, OCR milliseconds) after every scan - shows what the program really saw.</summary>
@@ -78,6 +82,24 @@ public sealed class ScreenPipeline : IAsyncDisposable
 
     private async Task Run(CancellationToken ct)
     {
+        var latest = new LatestQueue<FrameWork>(1);
+        var consumer = ConsumeLatestAsync(latest, ct);
+        try
+        {
+            await CaptureLoopAsync(latest, ct).ConfigureAwait(false);
+        }
+        finally
+        {
+            latest.Complete();
+            try { await consumer.ConfigureAwait(false); }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested) { }
+        }
+    }
+
+    private sealed record FrameWork(Frame Frame, long Generation);
+
+    private async Task CaptureLoopAsync(LatestQueue<FrameWork> latest, CancellationToken ct)
+    {
         Frame? pending = null;
         long changedAt = 0, firstChangeAt = 0;
         while (!ct.IsCancellationRequested)
@@ -93,25 +115,35 @@ public sealed class ScreenPipeline : IAsyncDisposable
 
             if (forced)
             {
-                var f = got ?? _lastFrame;
-                if (f != null) { _detector.HasChanged(f); pending = null; await ScanAsync(f, ct).ConfigureAwait(false); }
+                var frame = got ?? _lastFrame;
+                if (frame != null)
+                {
+                    _detector.HasChanged(frame);
+                    pending = null;
+                    OfferLatest(latest, frame);
+                }
             }
             else
             {
                 if (got != null && _detector.HasChanged(got))
                 {
                     if (pending == null) firstChangeAt = now;
-                    changedAt = now; pending = got;
+                    changedAt = now;
+                    pending = got;
                 }
                 if (pending != null)
                 {
                     bool settled = Seconds(changedAt, now) >= _opt.Settle.TotalSeconds;
                     bool maxed = Seconds(firstChangeAt, now) >= _opt.MaxWait.TotalSeconds;
-                    if (settled || maxed) { var p = pending; pending = null; await ScanAsync(p, ct).ConfigureAwait(false); }
+                    if (settled || maxed)
+                    {
+                        var frame = pending;
+                        pending = null;
+                        OfferLatest(latest, frame);
+                    }
                 }
             }
 
-            // everything vanished for long enough → remove the translations
             long since = Interlocked.Read(ref _emptySince);
             if (since != 0 && Seconds(since, Stopwatch.GetTimestamp()) >= _opt.ClearDelay.TotalSeconds)
             {
@@ -125,13 +157,54 @@ public sealed class ScreenPipeline : IAsyncDisposable
         }
     }
 
+    private void OfferLatest(LatestQueue<FrameWork> latest, Frame frame)
+    {
+        var generation = Interlocked.Increment(ref _scanGeneration);
+        CancelActiveScan();
+        latest.Offer(new FrameWork(frame, generation));
+        DroppedFrames = latest.Dropped;
+    }
+
+    private void CancelActiveScan()
+    {
+        lock (_scanLock)
+        {
+            try { _activeScan?.Cancel(); } catch (ObjectDisposedException) { }
+        }
+    }
+
+    private async Task ConsumeLatestAsync(LatestQueue<FrameWork> latest, CancellationToken ct)
+    {
+        while (!ct.IsCancellationRequested)
+        {
+            FrameWork work;
+            try { work = await latest.TakeAsync(ct).ConfigureAwait(false); }
+            catch (ChannelClosedException) { return; }
+
+            using var scan = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            lock (_scanLock) _activeScan = scan;
+            try
+            {
+                await ScanAsync(work.Frame, scan.Token, work.Generation).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (!ct.IsCancellationRequested) { }
+            finally
+            {
+                lock (_scanLock)
+                {
+                    if (ReferenceEquals(_activeScan, scan)) _activeScan = null;
+                }
+            }
+        }
+    }
+
     private void ReportPerformance(int lines, int blocks, double ocrMs, Stopwatch total, Stopwatch? translation)
     {
         try { Performance?.Invoke(lines, blocks, ocrMs, translation?.Elapsed.TotalMilliseconds ?? 0, total.Elapsed.TotalMilliseconds); }
         catch { /* diagnostics must never interrupt the game translation worker */ }
     }
 
-    private async Task ScanAsync(Frame frame, CancellationToken ct)
+    private async Task ScanAsync(Frame frame, CancellationToken ct, long generation)
     {
         var total = Stopwatch.StartNew();
         Scans++;
@@ -150,7 +223,7 @@ public sealed class ScreenPipeline : IAsyncDisposable
         catch (Exception ex) { _log?.Invoke("OCR failed: " + ex.Message); return; }
 
         var ocrMs = sw.Elapsed.TotalMilliseconds;
-        var blocks = BlockBuilder.Build(lines).Take(_opt.MaxBlocks).ToList();
+        if (generation != Interlocked.Read(ref _scanGeneration)) return; // discard OCR from an obsolete frame\n        var blocks = BlockBuilder.Build(lines).Take(_opt.MaxBlocks).ToList();
         try { Scanned?.Invoke(lines.Count, blocks.Count, ocrMs); } catch { }
         if (blocks.Count == 0)
         {
@@ -212,7 +285,7 @@ public sealed class ScreenPipeline : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        _stop.Cancel();
+        _stop.Cancel();\n        CancelActiveScan();
         if (_worker != null) { try { await _worker.ConfigureAwait(false); } catch { } }
         _stop.Dispose();
     }
