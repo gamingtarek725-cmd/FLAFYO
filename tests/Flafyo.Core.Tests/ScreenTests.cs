@@ -150,6 +150,23 @@ public class ScreenPipelineTests
     }
 
     [Fact]
+    public async Task Live_mode_reports_ocr_translation_and_total_scan_time()
+    {
+        var (p, _, _, _, ov) = Make();
+        (int Lines, int Blocks, double Ocr, double Translation, double Total)? metrics = null;
+        p.Performance += (lines, blocks, ocr, translation, total) =>
+            metrics = (lines, blocks, ocr, translation, total);
+
+        Assert.True(await WaitUntil(() => metrics.HasValue && ov.Last?.Count == 3));
+        Assert.Equal(3, metrics!.Value.Blocks);
+        Assert.True(metrics.Value.Lines >= 3);
+        Assert.True(metrics.Value.Ocr >= 0);
+        Assert.True(metrics.Value.Translation >= 0);
+        Assert.True(metrics.Value.Total >= metrics.Value.Ocr);
+        await p.DisposeAsync();
+    }
+
+    [Fact]
     public async Task An_unchanged_screen_is_not_scanned_again()
     {
         var (p, _, ocr, _, ov) = Make();
