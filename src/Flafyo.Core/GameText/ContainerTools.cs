@@ -56,11 +56,12 @@ public static class ContainerTools
         var data = File.ReadAllBytes(containerPath);
         var kind = Detect(data);
         Directory.CreateDirectory(outputFolder);
-        var index = new List<string> { "FLAFYO_CONTAINER_V1", kind.ToString() };
+        var index = new List<string> { "FLAFYO_CONTAINER_V2", kind.ToString(), "0" };
 
         if (kind == ContainerKind.Arc)
         {
             var arc = ArcArchive.Parse(data);
+            index[2] = arc.Version.ToString(System.Globalization.CultureInfo.InvariantCulture);
             if (arc.Entries.Count > MaxEntries) throw new InvalidDataException("أرشيف ARC يحتوي على أكثر من 10,000 عنصر.");
             long total = 0;
             for (int i = 0; i < arc.Entries.Count; i++)
@@ -113,14 +114,25 @@ public static class ContainerTools
         var indexPath = Path.Combine(extractedFolder, IndexFile);
         if (!File.Exists(indexPath)) throw new InvalidOperationException("المجلد ده مش ناتج استخراج حاوية (مفيش فهرس).");
         var lines = File.ReadAllLines(indexPath);
-        if (lines.Length < 2 || lines[0] != "FLAFYO_CONTAINER_V1") throw new InvalidOperationException("فهرس الحاوية غير مفهوم.");
+        if (lines.Length < 2 || (lines[0] != "FLAFYO_CONTAINER_V1" && lines[0] != "FLAFYO_CONTAINER_V2"))
+            throw new InvalidOperationException("فهرس الحاوية غير مفهوم.");
+        var isVersion2 = lines[0] == "FLAFYO_CONTAINER_V2";
         var kind = Enum.Parse<ContainerKind>(lines[1]);
+        ushort arcVersion = 7;
+        int entryStart = 2;
+        if (isVersion2)
+        {
+            if (lines.Length < 3 || !ushort.TryParse(lines[2], System.Globalization.NumberStyles.None,
+                System.Globalization.CultureInfo.InvariantCulture, out arcVersion))
+                throw new InvalidDataException("إصدار ARC في الفهرس غير صالح.");
+            entryStart = 3;
+        }
 
         if (kind == ContainerKind.Arc)
         {
             var files = new List<(ArcEntry Template, byte[] Data)>();
             long total = 0;
-            foreach (var line in lines.Skip(2))
+            foreach (var line in lines.Skip(entryStart))
             {
                 var p = line.Split('\t');
                 if (p.Length != 4 || files.Count >= MaxEntries) throw new InvalidDataException("فهرس ARC غير صالح أو يحتوي عناصر أكثر من الحد.");
@@ -139,7 +151,7 @@ public static class ContainerTools
                 };
                 files.Add((template, File.ReadAllBytes(source)));
             }
-            return ArcArchive.Build(7, files);
+            return ArcArchive.Build(arcVersion, files);
         }
         if (kind == ContainerKind.Zip)
         {
@@ -148,7 +160,7 @@ public static class ContainerTools
             {
                 int count = 0;
                 long total = 0;
-                foreach (var rawRel in lines.Skip(2))
+                foreach (var rawRel in lines.Skip(entryStart))
                 {
                     if (++count > MaxEntries) throw new InvalidDataException("الفهرس يحتوي على أكثر من 10,000 عنصر.");
                     var rel = NormalizeArchivePath(rawRel);

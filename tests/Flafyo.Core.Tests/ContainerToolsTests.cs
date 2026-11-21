@@ -31,7 +31,7 @@ public class ContainerToolsTests : IDisposable
     public void Arc_container_round_trips_through_extract_edit_repack()
     {
         var text = Encoding.UTF8.GetBytes("{\"greet\":\"Hello there friend\"}");
-        var arcBytes = ArcArchive.Build(7, new[] { (Template(@"data\id\eng\msg.json", 0x1234ABCD), text) });
+        var arcBytes = ArcArchive.Build(12, new[] { (Template(@"data\id\eng\msg.json", 0x1234ABCD), text) });
         var arcPath = Path.Combine(_root, "lang.arc");
         File.WriteAllBytes(arcPath, arcBytes);
 
@@ -44,6 +44,7 @@ public class ContainerToolsTests : IDisposable
 
         var rebuilt = ContainerTools.Repack(Path.Combine(_root, "x"));
         var arc2 = ArcArchive.Parse(rebuilt);
+        Assert.Equal((ushort)12, arc2.Version); // the original ARC version is preserved
         Assert.Equal(@"data\id\eng\msg.json", arc2.Entries[0].Name);                    // name/path preserved
         Assert.Equal(0x1234ABCDu, arc2.Entries[0].TypeHash);                            // type preserved
         Assert.Equal("{\"greet\":\"مرحبا بك يا صديقي\"}", Encoding.UTF8.GetString(arc2.Read(arc2.Entries[0])));
