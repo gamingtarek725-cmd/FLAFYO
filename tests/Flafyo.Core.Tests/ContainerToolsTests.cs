@@ -48,6 +48,15 @@ public class ContainerToolsTests : IDisposable
         Assert.Equal(0x1234ABCDu, arc2.Entries[0].TypeHash);                            // type preserved
         Assert.Equal("{\"greet\":\"مرحبا بك يا صديقي\"}", Encoding.UTF8.GetString(arc2.Read(arc2.Entries[0])));
 
+        // Full round-trip: write the rebuilt ARC, extract it again, and verify the preserved path and exact bytes.
+        var rebuiltArcPath = Path.Combine(_root, "rebuilt.arc");
+        File.WriteAllBytes(rebuiltArcPath, rebuilt);
+        var (rebuiltKind, rebuiltCount) = ContainerTools.Extract(rebuiltArcPath, Path.Combine(_root, "arc-roundtrip"));
+        Assert.Equal(ContainerKind.Arc, rebuiltKind);
+        Assert.Equal(1, rebuiltCount);
+        var roundTripFile = Directory.GetFiles(Path.Combine(_root, "arc-roundtrip"), "*.json", SearchOption.AllDirectories).Single();
+        Assert.Equal("{\"greet\":\"مرحبا بك يا صديقي\"}", File.ReadAllText(roundTripFile));
+
         var backup = ContainerTools.Apply(arcPath, rebuilt);
         Assert.True(File.Exists(backup));
         Assert.Equal(arcBytes, File.ReadAllBytes(backup));                              // the ORIGINAL is what got backed up
@@ -90,9 +99,20 @@ public class ContainerToolsTests : IDisposable
         File.WriteAllText(inner, "{\"line\":\"جد المفتاح\"}");
 
         var rebuilt = ContainerTools.Repack(Path.Combine(_root, "y"));
-        using var check = new ZipArchive(new MemoryStream(rebuilt), ZipArchiveMode.Read);
-        using var rs = check.GetEntry("data/lang/en.json")!.Open(); using var rr = new StreamReader(rs);
-        Assert.Equal("{\"line\":\"جد المفتاح\"}", rr.ReadToEnd());
+        using (var check = new ZipArchive(new MemoryStream(rebuilt), ZipArchiveMode.Read))
+        {
+            using var rs = check.GetEntry("data/lang/en.json")!.Open(); using var rr = new StreamReader(rs);
+            Assert.Equal("{\"line\":\"جد المفتاح\"}", rr.ReadToEnd());
+        }
+
+        // Re-open through FLAFYO's extractor, not just ZipArchive, to verify the complete workflow.
+        var rebuiltZipPath = Path.Combine(_root, "rebuilt.pak");
+        File.WriteAllBytes(rebuiltZipPath, rebuilt);
+        var (rebuiltKind, rebuiltCount) = ContainerTools.Extract(rebuiltZipPath, Path.Combine(_root, "zip-roundtrip"));
+        Assert.Equal(ContainerKind.Zip, rebuiltKind);
+        Assert.Equal(1, rebuiltCount);
+        Assert.Equal("{\"line\":\"جد المفتاح\"}",
+            File.ReadAllText(Path.Combine(_root, "zip-roundtrip", "data", "lang", "en.json")));
     }
 
     [Fact]
