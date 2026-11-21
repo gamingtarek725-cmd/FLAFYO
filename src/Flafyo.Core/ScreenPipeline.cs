@@ -250,6 +250,8 @@ public sealed class ScreenPipeline : IAsyncDisposable
             try
             {
                 var (ar, _) = await _resolver.ResolveAsync(block.Text, ct).ConfigureAwait(false);
+                ct.ThrowIfCancellationRequested();
+                if (generation != Interlocked.Read(ref _scanGeneration)) return;
                 if (!string.IsNullOrWhiteSpace(ar)) translated.Add(new TranslatedBlock(block, ar));
             }
             catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
@@ -257,10 +259,14 @@ public sealed class ScreenPipeline : IAsyncDisposable
 
             if (translated.Count > 0 && Seconds(lastPublish, Stopwatch.GetTimestamp()) > 1.0)
             {
+                ct.ThrowIfCancellationRequested();
+                if (generation != Interlocked.Read(ref _scanGeneration)) return;
                 Publish(translated, area);
                 lastPublish = Stopwatch.GetTimestamp();
             }
         }
+        ct.ThrowIfCancellationRequested();
+        if (generation != Interlocked.Read(ref _scanGeneration)) return;
         translation.Stop();
         Publish(translated, area);
         _lastBlocks = blocks;
