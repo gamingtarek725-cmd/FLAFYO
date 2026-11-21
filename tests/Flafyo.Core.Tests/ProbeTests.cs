@@ -63,6 +63,18 @@ public class ArcAndProbeTests : IDisposable
     }
 
     [Fact]
+    public void Miner_finds_utf16_big_endian_text_and_reports_its_encoding()
+    {
+        var sentence = "Find the hidden key before the guards return.";
+        var data = Encoding.BigEndianUnicode.GetBytes(sentence);
+
+        Assert.True(BinaryTextMiner.PrintableRatio(data) >= 0.55);
+        var found = BinaryTextMiner.Extract(data, minChars: 14);
+
+        Assert.Contains(found, item => item.Text == sentence && item.EncodingName == "UTF-16 BE");
+    }
+
+    [Fact]
     public void Probe_ranks_files_and_archive_entries_and_ignores_pictures_and_media()
     {
         var pic = new byte[8000]; new Random(2).NextBytes(pic);
