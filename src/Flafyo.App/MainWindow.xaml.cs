@@ -472,6 +472,14 @@ public partial class MainWindow : Window
                 if (answer != MessageBoxResult.Yes) return;
             }
 
+            if (imported.AutoStart)
+            {
+                var answer = MessageBox.Show(this,
+                    $"الملف المستورد يفعّل بدء الترجمة تلقائيًا عند فتح {imported.ExeName}.\nهل تريد الإبقاء على هذا الاختيار؟",
+                    "بدء الترجمة تلقائيًا", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (answer != MessageBoxResult.Yes) imported.AutoStart = false;
+            }
+
             ProfileStore.Save(imported);
             RefreshProfiles();
             var importedIndex = _profiles.FindIndex(p =>
