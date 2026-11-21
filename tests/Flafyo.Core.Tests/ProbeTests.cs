@@ -146,4 +146,88 @@ public class ArcAndProbeTests : IDisposable
         Assert.Equal(2, count);
         Assert.True(File.Exists(Path.Combine(_root, "unpacked", "_index.txt")));
     }
+
+    [Fact]
+    public void Miner_reports_exact_original_byte_lengths()
+    {
+        var sentence = "Find the golden key before midnight.";
+        var ascii = BinaryTextMiner.Extract(Encoding.ASCII.GetBytes(sentence)).Single();
+        var little = BinaryTextMiner.Extract(Encoding.Unicode.GetBytes(sentence)).Single();
+        var big = BinaryTextMiner.Extract(Encoding.BigEndianUnicode.GetBytes(sentence)).Single();
+
+        Assert.Equal(Encoding.ASCII.GetByteCount(sentence), ascii.ByteLength);
+        Assert.Equal(Encoding.Unicode.GetByteCount(sentence), little.ByteLength);
+        Assert.Equal(Encoding.BigEndianUnicode.GetByteCount(sentence), big.ByteLength);
+    }
+
+    [Fact]
+    public void Binary_patcher_changes_only_same_width_ascii_range_and_keeps_source_unchanged()
+    {
+        var source = Encoding.ASCII.GetBytes("Find the golden key before midnight.");
+        var original = source.ToArray();
+        var replacement = "Find the silver key before midnight.";
+
+        var patched = BinaryTextPatcher.CreatePatchedCopy(source, new[]
+        {
+            new TextByteReplacement(0, source.Length, "ASCII / UTF-8", replacement)
+        });
+
+        Assert.Equal(original, source);
+        Assert.Equal(replacement, Encoding.ASCII.GetString(patched));
+    }
+
+    [Theory]
+    [InlineData("UTF-16 LE")]
+    [InlineData("UTF-16 BE")]
+    public void Binary_patcher_preserves_utf16_endianness(string encodingName)
+    {
+        var encoding = encodingName == "UTF-16 LE" ? Encoding.Unicode : Encoding.BigEndianUnicode;
+        var source = encoding.GetBytes("Find the golden key before midnight.");
+        var replacement = "Find the silver key before midnight.";
+
+        var patched = BinaryTextPatcher.CreatePatchedCopy(source, new[]
+        {
+            new TextByteReplacement(0, source.Length, encodingName, replacement)
+        });
+
+        Assert.Equal(replacement, encoding.GetString(patched));
+    }
+
+    [Fact]
+    public void Binary_patcher_rejects_replacements_that_change_byte_length()
+    {
+        var source = Encoding.ASCII.GetBytes("Find the golden key before midnight.");
+
+        Assert.Throws<InvalidDataException>(() => BinaryTextPatcher.CreatePatchedCopy(source, new[]
+        {
+            new TextByteReplacement(0, source.Length, "ASCII / UTF-8", "A much longer replacement sentence.")
+        }));
+    }
+
+    [Fact]
+    public void Binary_patcher_rejects_overlapping_or_out_of_range_edits()
+    {
+        var source = Encoding.ASCII.GetBytes("Find the golden key before midnight.");
+
+        Assert.Throws<InvalidDataException>(() => BinaryTextPatcher.CreatePatchedCopy(source, new[]
+        {
+            new TextByteReplacement(0, 20, "ASCII / UTF-8", "Find the golden key "),
+            new TextByteReplacement(10, 10, "ASCII / UTF-8", "before mid")
+        }));
+        Assert.Throws<InvalidDataException>(() => BinaryTextPatcher.CreatePatchedCopy(source, new[]
+        {
+            new TextByteReplacement(source.Length - 2, 8, "ASCII / UTF-8", "12345678")
+        }));
+    }
+
+    [Fact]
+    public void Binary_patcher_rejects_characters_not_supported_by_ascii()
+    {
+        var source = Encoding.ASCII.GetBytes("Find the golden key before midnight.");
+
+        Assert.Throws<InvalidDataException>(() => BinaryTextPatcher.CreatePatchedCopy(source, new[]
+        {
+            new TextByteReplacement(0, source.Length, "ASCII / UTF-8", "هذه جملة عربية")
+        }));
+    }
 }
