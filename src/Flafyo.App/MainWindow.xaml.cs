@@ -416,6 +416,76 @@ public partial class MainWindow : Window
         RefreshProfiles();
     }
 
+    private void ExportProfile_Click(object sender, RoutedEventArgs e)
+    {
+        if (ProfileBox.SelectedIndex < 0 || ProfileBox.SelectedIndex >= _profiles.Count)
+        {
+            ProfileText.Text = "اختار لعبة محفوظة الأول عشان تصدّر إعداداتها.";
+            return;
+        }
+
+        var profile = _profiles[ProfileBox.SelectedIndex];
+        var dialog = new Microsoft.Win32.SaveFileDialog
+        {
+            Title = "تصدير إعدادات اللعبة",
+            Filter = "FLAFYO Game Profile (*.flafyoprofile)|*.flafyoprofile|JSON (*.json)|*.json",
+            DefaultExt = ".flafyoprofile",
+            AddExtension = true,
+            FileName = profile.ExeName + ".flafyoprofile",
+            OverwritePrompt = true
+        };
+        if (dialog.ShowDialog(this) != true) return;
+
+        try
+        {
+            ProfileStore.Export(profile, dialog.FileName);
+            ProfileText.Text = $"تم تصدير إعدادات {profile.ExeName} بنجاح.";
+        }
+        catch (Exception ex)
+        {
+            ProfileText.Text = "فشل تصدير الإعدادات: " + ex.Message;
+            AppLog.Write(ex);
+        }
+    }
+
+    private void ImportProfile_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = "استيراد إعدادات لعبة",
+            Filter = "ملفات إعدادات FLAFYO (*.flafyoprofile;*.json)|*.flafyoprofile;*.json|كل الملفات (*.*)|*.*",
+            CheckFileExists = true,
+            Multiselect = false
+        };
+        if (dialog.ShowDialog(this) != true) return;
+
+        try
+        {
+            var imported = ProfileStore.Import(dialog.FileName);
+            var existing = _profiles.FirstOrDefault(p =>
+                p.ExeName.Equals(imported.ExeName, StringComparison.OrdinalIgnoreCase));
+            if (existing != null)
+            {
+                var answer = MessageBox.Show(this,
+                    $"فيه إعدادات محفوظة بالفعل للعبة {imported.ExeName}.\nهل تريد استبدالها؟ سيتم الاحتفاظ بنسخة احتياطية.",
+                    "استبدال إعدادات اللعبة", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (answer != MessageBoxResult.Yes) return;
+            }
+
+            ProfileStore.Save(imported);
+            RefreshProfiles();
+            var importedIndex = _profiles.FindIndex(p =>
+                p.ExeName.Equals(imported.ExeName, StringComparison.OrdinalIgnoreCase));
+            if (importedIndex >= 0) ProfileBox.SelectedIndex = importedIndex;
+            ProfileText.Text = $"تم استيراد إعدادات {imported.ExeName}. اختار «تحميل» لتطبيقها.";
+        }
+        catch (Exception ex)
+        {
+            ProfileText.Text = "تعذّر استيراد الملف: " + ex.Message;
+            AppLog.Write(ex);
+        }
+    }
+
     private void LoadProfile(GameProfile p)
     {
         _activeProfile = p;
