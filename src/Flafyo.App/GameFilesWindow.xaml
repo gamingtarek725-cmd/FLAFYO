@@ -55,7 +55,7 @@
           <TextBox x:Name="ProbeReplacementText" Padding="6" TextWrapping="Wrap" FlowDirection="LeftToRight"/>
           <WrapPanel Margin="0,8,0,0">
             <Button Content="إضافة / تحديث التعديل" Click="QueueProbeEdit_Click"/>
-            <Button Content="حفظ نسخة معدلة منفصلة" Margin="8,0,0,0" Style="{StaticResource PrimaryButton}" Click="SaveProbeEdits_Click"/>
+            <Button x:Name="SaveProbeEditsButton" Content="حفظ نسخة معدلة منفصلة" Margin="8,0,0,0" Style="{StaticResource PrimaryButton}" Click="SaveProbeEdits_Click"/>
           </WrapPanel>
           <TextBlock x:Name="ProbeEditStatus" Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,6,0,0"/>
           <WrapPanel Margin="0,8,0,0">
