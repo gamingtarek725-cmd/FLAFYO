@@ -42,6 +42,22 @@
             </ListBox.ItemTemplate>
           </ListBox>
           <TextBox x:Name="ProbePreview" Height="100" Margin="0,8,0,0" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FlowDirection="LeftToRight" Padding="6"/>
+          <TextBlock Text="تعديل نص من ملف مستقل (تجريبي وآمن)" Style="{StaticResource H}" Margin="0,12,0,0"/>
+          <TextBlock Text="متاح حاليًا للملفات المستقلة فقط، وليس النصوص داخل ARC/ZIP. التعديل يحافظ على نفس عدد البايتات ويُنشئ نسخة منفصلة؛ الملف الأصلي لا يتغير." Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+          <ListBox x:Name="ProbeEditList" Height="130" Margin="0,8,0,0" BorderBrush="{StaticResource Line}" SelectionChanged="ProbeEditList_SelectionChanged">
+            <ListBox.ItemTemplate>
+              <DataTemplate><TextBlock Text="{Binding DisplayText}" TextWrapping="Wrap" FlowDirection="LeftToRight"/></DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+          <TextBlock Text="النص الأصلي" Style="{StaticResource L}" Margin="0,8,0,0"/>
+          <TextBox x:Name="ProbeOriginalText" IsReadOnly="True" Padding="6" TextWrapping="Wrap" FlowDirection="LeftToRight"/>
+          <TextBlock Text="النص البديل (نفس طول البايتات)" Style="{StaticResource L}" Margin="0,8,0,0"/>
+          <TextBox x:Name="ProbeReplacementText" Padding="6" TextWrapping="Wrap" FlowDirection="LeftToRight"/>
+          <WrapPanel Margin="0,8,0,0">
+            <Button Content="إضافة / تحديث التعديل" Click="QueueProbeEdit_Click"/>
+            <Button Content="حفظ نسخة معدلة منفصلة" Margin="8,0,0,0" Style="{StaticResource PrimaryButton}" Click="SaveProbeEdits_Click"/>
+          </WrapPanel>
+          <TextBlock x:Name="ProbeEditStatus" Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,6,0,0"/>
           <WrapPanel Margin="0,8,0,0">
             <Button Content="تصدير نصوص العنصر المحدد" Margin="0,0,8,0" Click="ExportHit_Click"/>
             <Button Content="استخراج الحاوية (ARC / ZIP / .pak)" Click="ExtractArc_Click"/>
