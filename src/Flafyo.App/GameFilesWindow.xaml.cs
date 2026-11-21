@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -35,6 +36,7 @@ public partial class GameFilesWindow : Window
         FilesList.ItemsSource = _items;
         FilesList.SelectionChanged += (_, _) => ShowPreview();
         ProbeList.SelectionChanged += ProbeList_SelectionChanged;
+        ProbeEditList.ItemsSource = _probeTexts;
         if (!string.IsNullOrEmpty(settings.GameFolder) && Directory.Exists(settings.GameFolder)) SetFolder(settings.GameFolder);
         StatusText.Text = "ابدأ باختيار مجلد اللعبة.";
     }
@@ -192,6 +194,93 @@ public partial class GameFilesWindow : Window
                 .Take(24)
                 .Select(s => $"[{s.Offset:X8} | {s.EncodingName}] {s.Text}");
             ProbePreview.Text = string.Join(Environment.NewLine, preview);
+
+            _probeTexts.Clear();
+            _pendingProbeEdits.Clear();
+            _selectedEditableHit = it.Hit;
+            ProbeOriginalText.Text = "";
+            ProbeReplacementText.Text = "";
+            if (it.Hit.Entry != null)
+            {
+                ProbeEditStatus.Text = "التعديل المباشر غير متاح للنصوص داخل الأرشيف حاليًا. استخرج الحاوية أولًا؛ وسيظل الملف الأصلي دون تغيير.";
+            }
+            else
+            {
+                foreach (var found in it.Hit.All.Where(s => BinaryTextMiner.IsRealSentence(s.Text) && s.ByteLength > 0))
+                    _probeTexts.Add(new ProbeEditItem(found));
+                ProbeEditStatus.Text = $"تم تحميل {_probeTexts.Count} نص قابل للمراجعة من ملف مستقل. اختر نصًا لبدء التعديل.";
+            }
+        }
+    }
+
+    private void ProbeEditList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        if (ProbeEditList.SelectedItem is not ProbeEditItem item) return;
+        ProbeOriginalText.Text = item.Found.Text;
+        ProbeReplacementText.Text = _pendingProbeEdits.TryGetValue(item.Found.Offset, out var edit)
+            ? edit.Replacement : item.Found.Text;
+    }
+
+    private void QueueProbeEdit_Click(object sender, RoutedEventArgs e)
+    {
+        if (_selectedEditableHit?.Entry != null || _selectedEditableHit == null)
+        {
+            ProbeEditStatus.Text = "اختار ملفًا مستقلًا من نتائج الفحص الذكي أولًا.";
+            return;
+        }
+        if (ProbeEditList.SelectedItem is not ProbeEditItem item)
+        {
+            ProbeEditStatus.Text = "اختار النص المراد تعديله من القائمة.";
+            return;
+        }
+
+        var replacement = ProbeReplacementText.Text;
+        _pendingProbeEdits[item.Found.Offset] = new TextByteReplacement(
+            item.Found.Offset, item.Found.ByteLength, item.Found.EncodingName, replacement);
+        ProbeEditStatus.Text = $"تمت إضافة التعديل للقائمة. عدد التعديلات: {_pendingProbeEdits.Count}. سيتم التحقق من الترميز والطول عند حفظ النسخة.";
+    }
+
+    private void SaveProbeEdits_Click(object sender, RoutedEventArgs e)
+    {
+        if (_selectedEditableHit == null || _selectedEditableHit.Entry != null)
+        {
+            ProbeEditStatus.Text = "الميزة متاحة حاليًا لملف مستقل محدد، وليس عنصرًا داخل أرشيف.";
+            return;
+        }
+        if (_pendingProbeEdits.Count == 0)
+        {
+            ProbeEditStatus.Text = "أضف تعديلًا واحدًا على الأقل قبل الحفظ.";
+            return;
+        }
+
+        try
+        {
+            var sourcePath = _selectedEditableHit.FullPath;
+            var info = new FileInfo(sourcePath);
+            if (!info.Exists || info.Length <= 0 || info.Length > 300L * 1024 * 1024)
+                throw new InvalidDataException("حجم الملف غير مناسب للتعديل التجريبي (الحد الأقصى 300 MiB).");
+
+            var source = File.ReadAllBytes(sourcePath);
+            var patched = BinaryTextPatcher.CreatePatchedCopy(source, _pendingProbeEdits.Values);
+            var outputRoot = OutputBox.Text.Trim();
+            if (string.IsNullOrWhiteSpace(outputRoot))
+                throw new InvalidOperationException("حدد مجلد الناتج أولًا.");
+            var outputFolder = Path.Combine(outputRoot, "_patched");
+            Directory.CreateDirectory(outputFolder);
+
+            var stamp = DateTime.Now.ToString("yyyyMMdd-HHmmss");
+            var outputPath = Path.Combine(outputFolder,
+                Path.GetFileNameWithoutExtension(sourcePath) + ".flafyo-patched-" + stamp + Path.GetExtension(sourcePath));
+            using (var output = new FileStream(outputPath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                output.Write(patched, 0, patched.Length);
+
+            ProbeEditStatus.Text = $"تم حفظ نسخة منفصلة: {outputPath}. الملف الأصلي لم يتغير.";
+            Log("تم حفظ نسخة ملف معدلة منفصلة: " + outputPath);
+        }
+        catch (Exception ex)
+        {
+            ProbeEditStatus.Text = "تعذر حفظ النسخة: " + ex.Message;
+            AppLog.Write(ex);
         }
     }
 
