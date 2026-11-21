@@ -82,4 +82,13 @@ public sealed class ProfileStoreTests : IDisposable
 
         Assert.ThrowsAny<Exception>(() => ProfileStore.Import(path));
     }
+
+    [Fact]
+    public void Import_rejects_invalid_utf8()
+    {
+        var path = Path.Combine(_root, "invalid-utf8.json");
+        File.WriteAllBytes(path, new byte[] { 0xC3, 0x28 });
+
+        Assert.Throws<System.Text.DecoderFallbackException>(() => ProfileStore.Import(path));
+    }
 }
