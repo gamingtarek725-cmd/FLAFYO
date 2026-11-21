@@ -143,6 +143,17 @@ public partial class GameFilesWindow : Window
         public ProbeItem(ProbeHit hit) => Hit = hit;
     }
 
+    public sealed class ProbeEditItem
+    {
+        public FoundText Found { get; }
+        public string DisplayText => $"[{Found.Offset:X8} | {Found.EncodingName} | {Found.ByteLength} بايت] {Found.Text}";
+        public ProbeEditItem(FoundText found) => Found = found;
+    }
+
+    private readonly ObservableCollection<ProbeEditItem> _probeTexts = new();
+    private readonly Dictionary<long, TextByteReplacement> _pendingProbeEdits = new();
+    private ProbeHit? _selectedEditableHit;
+
     private readonly ObservableCollection<ProbeItem> _probe = new();
     private CancellationTokenSource? _probeCts;
 
