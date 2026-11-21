@@ -29,9 +29,11 @@ public sealed class GameProfile
 
 internal static class ProfileStore
 {
+    private const int MaxImportBytes = 256 * 1024;
+    private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
     public static string Dir => Path.Combine(UserData.Dir, "profiles");
 
-    private static string Safe(string exe) => new string(exe.Select(c => Path.GetInvalidFileNameChars().Contains(c) ? '_' : c).ToArray());
+    private static string Safe(string exe) => new(exe.Select(c => Path.GetInvalidFileNameChars().Contains(c) ? '_' : c).ToArray());
 
     public static string DictionaryFile(string exe) => Path.Combine(UserData.Dir, $"dictionary.{Safe(exe)}.txt");
     public static string IdiomsFile(string exe) => Path.Combine(UserData.Dir, $"idioms.{Safe(exe)}.txt");
@@ -44,7 +46,11 @@ internal static class ProfileStore
             if (!Directory.Exists(Dir)) return list;
             foreach (var f in Directory.EnumerateFiles(Dir, "*.json"))
             {
-                try { var p = JsonSerializer.Deserialize<GameProfile>(File.ReadAllText(f)); if (p != null && p.ExeName.Length > 0) list.Add(p); }
+                try
+                {
+                    var p = JsonSerializer.Deserialize<GameProfile>(File.ReadAllText(f));
+                    if (p != null && Validate(p, out _)) list.Add(p);
+                }
                 catch { }
             }
         }
@@ -52,10 +58,84 @@ internal static class ProfileStore
         return list.OrderBy(p => p.ExeName, StringComparer.OrdinalIgnoreCase).ToList();
     }
 
+    public static bool Validate(GameProfile? p, out string error)
+    {
+        error = "";
+        if (p == null) { error = "ملف الإعدادات فارغ أو غير صالح."; return false; }
+        if (string.IsNullOrWhiteSpace(p.ExeName) || p.ExeName.Length > 128 ||
+            p.ExeName is "." or ".." ||
+            p.ExeName.Any(c => !(char.IsAsciiLetterOrDigit(c) || c is '_' or '-' or '.')) ||
+            !string.Equals(Path.GetFileName(p.ExeName), p.ExeName, StringComparison.Ordinal))
+        { error = "اسم ملف اللعبة غير صالح."; return false; }
+        if (p.Title == null || p.Title.Length > 256) { error = "اسم اللعبة أطول من المسموح."; return false; }
+        if (p.X is < -32768 or > 32768 || p.Y is < -32768 or > 32768 ||
+            p.Width is < 0 or > 32768 || p.Height is < 0 or > 32768)
+        { error = "أبعاد منطقة الترجمة غير صالحة."; return false; }
+        if (p.ModeIndex is < 0 or > 1 || p.CaptureIndex is < 0 or > 1 ||
+            p.MonitorIndex is < 0 or > 255 || p.SpeedIndex is < 0 or > 2 ||
+            p.TextSizeIndex is < 0 or > 2 || p.PackIndex is < 0 or > 1)
+        { error = "إحدى قيم إعدادات اللعبة خارج النطاق المسموح."; return false; }
+
+        var s = p.Style;
+        if (s == null || string.IsNullOrWhiteSpace(s.FontFamily) || s.FontFamily.Length > 128 ||
+            !double.IsFinite(s.FontSize) || s.FontSize is < 6 or > 96 ||
+            s.BackOpacity is < 0 or > 100 || s.Align is < 0 or > 2 ||
+            s.OverlayMode is < 0 or > 2 || s.AreaX is < -32768 or > 32768 ||
+            s.AreaY is < -32768 or > 32768 || s.AreaW is < 0 or > 32768 ||
+            s.AreaH is < 0 or > 32768 || s.AutoWidthPx is < 0 or > 32768 ||
+            s.AutoHideSeconds is < 0 or > 3600 || s.HeadingScalePercent is < 50 or > 250 ||
+            !ValidColor(s.TextColor) || !ValidColor(s.BackColor) ||
+            !ValidColor(s.BorderColor) || !ValidColor(s.HeadingTextColor))
+        { error = "إعدادات مظهر الترجمة تحتوي على قيم غير صالحة."; return false; }
+        return true;
+    }
+
+    private static bool ValidColor(string? value) =>
+        value is { Length: 7 } && value[0] == '#' && value.Skip(1).All(Uri.IsHexDigit);
+
     public static void Save(GameProfile p)
     {
+        if (!Validate(p, out var error)) throw new InvalidDataException(error);
         Directory.CreateDirectory(Dir);
-        File.WriteAllText(Path.Combine(Dir, Safe(p.ExeName) + ".json"), JsonSerializer.Serialize(p, new JsonSerializerOptions { WriteIndented = true }));
+        var target = Path.Combine(Dir, Safe(p.ExeName) + ".json");
+        AtomicWrite(target, JsonSerializer.Serialize(p, JsonOptions), keepBackup: File.Exists(target));
+    }
+
+    public static void Export(GameProfile p, string path)
+    {
+        if (!Validate(p, out var error)) throw new InvalidDataException(error);
+        var json = JsonSerializer.Serialize(p, JsonOptions);
+        if (System.Text.Encoding.UTF8.GetByteCount(json) > MaxImportBytes)
+            throw new InvalidDataException("ملف الإعدادات أكبر من الحد المسموح.");
+        File.WriteAllText(path, json, new System.Text.UTF8Encoding(false));
+    }
+
+    public static GameProfile Import(string path)
+    {
+        var info = new FileInfo(path);
+        if (!info.Exists || info.Length <= 0 || info.Length > MaxImportBytes)
+            throw new InvalidDataException("حجم ملف الإعدادات غير صالح (الحد الأقصى 256 كيلوبايت).");
+        var json = File.ReadAllText(path, System.Text.Encoding.UTF8);
+        var profile = JsonSerializer.Deserialize<GameProfile>(json)
+            ?? throw new InvalidDataException("تعذّر قراءة ملف الإعدادات.");
+        if (!Validate(profile, out var error)) throw new InvalidDataException(error);
+        return profile;
+    }
+
+    private static void AtomicWrite(string target, string content, bool keepBackup)
+    {
+        var temp = target + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        try
+        {
+            File.WriteAllText(temp, content, new System.Text.UTF8Encoding(false));
+            if (keepBackup)
+                File.Copy(target, target + ".bak", overwrite: true);
+            File.Move(temp, target, overwrite: true);
+        }
+        finally
+        {
+            try { if (File.Exists(temp)) File.Delete(temp); } catch { }
+        }
     }
 
     public static void Delete(string exe)
