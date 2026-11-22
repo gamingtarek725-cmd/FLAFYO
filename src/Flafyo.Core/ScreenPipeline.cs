@@ -261,7 +261,8 @@ public sealed class ScreenPipeline : IAsyncDisposable
         for (int i = 0; i < a.Count; i++)
         {
             if (!TextQuality.IsJitterOf(a[i].Text, b[i].Text)) return false;
-            if (Math.Abs(a[i].Box.X - b[i].Box.X) > 10 || Math.Abs(a[i].Box.Y - b[i].Box.Y) > 10) return false;
+            // OCR boxes can drift a few pixels between frames because of animation, scaling, and antialiasing.
+            if (Math.Abs(a[i].Box.X - b[i].Box.X) > 18 || Math.Abs(a[i].Box.Y - b[i].Box.Y) > 18) return false;
         }
         return true;
     }
