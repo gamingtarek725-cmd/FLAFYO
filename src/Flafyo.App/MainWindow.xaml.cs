@@ -64,6 +64,7 @@ public partial class MainWindow : Window
         ContinuousBox.IsChecked = _settings.Continuous;
         MasculineBox.IsChecked = _settings.Masculine;
         PreciseBox.IsChecked = _settings.Precise;
+        TranslateBrandsBox.IsChecked = _settings.TranslateBrands;
         SpeakBox.IsChecked = _settings.Speak;
         AutoProfileBox.IsChecked = _settings.AutoProfile;
         _masculine = _settings.Masculine;
@@ -268,6 +269,13 @@ public partial class MainWindow : Window
         if (!_ready) return;
         _settings.UseAiApi = UseAiBox.IsChecked == true; _settings.Save();
         if (_settings.UseAiApi && !_aiTested) AiStatusText.Text = "اضغط «اربط الحساب واختبر الاتصال» الأول عشان تتأكد إنه شغال.";
+    }
+
+    private void TranslateBrands_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_ready) return;
+        _settings.TranslateBrands = TranslateBrandsBox.IsChecked == true;
+        _settings.Save();
     }
 
     private void Masculine_Changed(object sender, RoutedEventArgs e)
@@ -685,6 +693,8 @@ public partial class MainWindow : Window
         // dictionary priority: the game's own file > the general file > ready glossaries
         var exe = _activeProfile?.ExeName;
         var dictionary = BuiltInDictionary.Load(UserData.DictionaryFile);
+        if (_settings.TranslateBrands)
+            foreach (var kv in BrandDictionary.Load()) dictionary.TryAdd(kv.Key, kv.Value);
         foreach (var kv in Glossaries.Load(_settings.Glossaries)) dictionary.TryAdd(kv.Key, kv.Value);
         if (exe != null) foreach (var kv in BuiltInDictionary.Load(ProfileStore.DictionaryFile(exe))) dictionary[kv.Key] = kv.Value;
         var idioms = IdiomRewriter.LoadMany(exe != null ? ProfileStore.IdiomsFile(exe) : null, UserData.IdiomsFile);
