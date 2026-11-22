@@ -11,7 +11,7 @@ namespace Flafyo.Core;
 /// </summary>
 public sealed class OnnxMadladTranslator : ITranslator, IDisposable
 {
-    private static readonly Regex SentenceSplit = new(@"(?<=[.!?…])\\s+", RegexOptions.Compiled);
+    private static readonly Regex SentenceSplit = new(@"(?<=[.!?…])\s+", RegexOptions.Compiled);
     private readonly InferenceSession _encoder, _decoder;
     private readonly SessionOptions _options;
     private readonly MadladTokenizer _tokenizer;
