@@ -760,8 +760,12 @@ public partial class MainWindow : Window
         var options = new ScreenPipelineOptions
         {
             Continuous = ContinuousBox.IsChecked == true,
-            Interval = TimeSpan.FromMilliseconds(SpeedBox.SelectedIndex switch { 0 => 1200, 2 => 450, _ => 700 }),
-            Settle = TimeSpan.FromMilliseconds(SpeedBox.SelectedIndex switch { 0 => 800, 2 => 350, _ => 500 }),
+            // Fullscreen scenes often contain idle character animation. Scan at a bounded cadence
+            // instead of waiting for a perfectly static frame that may never arrive.
+            Interval = TimeSpan.FromMilliseconds(SpeedBox.SelectedIndex switch { 0 => 550, 2 => 250, _ => 350 }),
+            Settle = TimeSpan.FromMilliseconds(SpeedBox.SelectedIndex switch { 0 => 350, 2 => 180, _ => 250 }),
+            MaxWait = TimeSpan.FromMilliseconds(SpeedBox.SelectedIndex switch { 0 => 1600, 2 => 800, _ => 1100 }),
+            ClearDelay = TimeSpan.FromSeconds(6),
         };
         var sp = new ScreenPipeline(_grabber!, ocr, resolver, overlay, () => area, options, s => SetStatus(s));
         sp.Updated += blocks =>
