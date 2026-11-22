@@ -116,6 +116,20 @@
           </StackPanel>
         </Border>
 
+        <!-- settings navigation -->
+        <Border Background="#15172B" BorderBrush="{StaticResource Line}" BorderThickness="1" CornerRadius="16" Padding="16" Margin="0,0,0,10">
+          <StackPanel>
+            <TextBlock Text="مركز التحكم والإعدادات" Style="{StaticResource H}"/>
+            <TextBlock Text="اختار القسم المطلوب مباشرة بدل التنقل داخل صفحة طويلة." Style="{StaticResource MutedText}" Margin="0,3,0,10"/>
+            <UniformGrid Columns="4">
+              <Button Content="محرك الترجمة" Tag="0" Click="SettingsSection_Click" Margin="3" Padding="10,12" Background="#211D3A" BorderBrush="#7657B5"/>
+              <Button Content="التصوير والشاشة" Tag="1" Click="SettingsSection_Click" Margin="3" Padding="10,12" Background="#1B2340" BorderBrush="#465A91"/>
+              <Button Content="الشكل والصوت" Tag="2" Click="SettingsSection_Click" Margin="3" Padding="10,12" Background="#1C2B45" BorderBrush="#2B4265"/>
+              <Button Content="الألعاب والملفات" Tag="3" Click="SettingsSection_Click" Margin="3" Padding="10,12" Background="#1C2B45" BorderBrush="#2B4265"/>
+            </UniformGrid>
+          </StackPanel>
+        </Border>
+
         <!-- settings tabs -->
         <TabControl x:Name="SettingsTabs" Padding="0" Margin="0,0,0,12">
 
