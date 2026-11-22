@@ -75,7 +75,7 @@ internal static class ProfileStore
         { error = "أبعاد منطقة الترجمة غير صالحة."; return false; }
         if (p.ModeIndex is < 0 or > 1 || p.CaptureIndex is < 0 or > 1 ||
             p.MonitorIndex is < 0 or > 255 || p.SpeedIndex is < 0 or > 2 ||
-            p.TextSizeIndex is < 0 or > 2 || p.PackIndex is < 0 or > 1)
+            p.TextSizeIndex is < 0 or > 2 || p.PackIndex is < 0 or > 2)
         { error = "إحدى قيم إعدادات اللعبة خارج النطاق المسموح."; return false; }
 
         var s = p.Style;
