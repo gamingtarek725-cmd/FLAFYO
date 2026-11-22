@@ -93,7 +93,7 @@ public sealed class MadladTokenizer
         {
             case 0: ReadVarint(data, ref pos); break;
             case 1: pos = checked(pos + 8); break;
-            case 2: pos = checked(pos + (int)ReadVarint(data, ref pos)); break;
+            case 2: { int length = checked((int)ReadVarint(data, ref pos)); pos = checked(pos + length); break; }
             case 5: pos = checked(pos + 4); break;
             default: throw new InvalidDataException("Unsupported SentencePiece protobuf wire type " + wire);
         }
