@@ -26,6 +26,8 @@ public sealed class WindowsOcrEngine : IOcrEngine, IOcrLayoutEngine
 
     public bool IsAvailable => _engine != null;
     public bool AutoInvert { get; set; } = true;
+    /// <summary>Runs an optional high-contrast OCR pass when the first pass finds only a small amount of text.</summary>
+    public bool EnhancedRecognition { get; set; }
     public int Scale { get => _scale; set => _scale = Math.Clamp(value, 1, 4); }
 
     public async Task<string> RecognizeAsync(Frame f, CancellationToken ct)
@@ -71,11 +73,73 @@ public sealed class WindowsOcrEngine : IOcrEngine, IOcrLayoutEngine
         if (_engine == null) throw new InvalidOperationException("Windows OCR language pack is not installed.");
         int max = (int)OcrEngine.MaxImageDimension;
         var (data, w, h, factor) = Preprocess(f, max);
+        var first = await RecognizeBitmapAsync(data, w, h, ct).ConfigureAwait(false);
+
+        // Logo lettering and decorative fonts can be missed by the normal grayscale pass.
+        // The optional second pass uses a binary high-contrast image and is only attempted
+        // when the first pass found relatively little text.
+        if (EnhancedRecognition && first.Lines.Count <= 8)
+        {
+            var (altData, altW, altH, altFactor) = PreprocessBinary(f, max);
+            var second = await RecognizeBitmapAsync(altData, altW, altH, ct).ConfigureAwait(false);
+            if (CountWords(second) > CountWords(first)) return (second, altFactor);
+        }
+        return (first, factor);
+    }
+
+    private async Task<OcrResult> RecognizeBitmapAsync(byte[] data, int w, int h, CancellationToken ct)
+    {
         var writer = new DataWriter();
         writer.WriteBytes(data);
         using var bitmap = SoftwareBitmap.CreateCopyFromBuffer(writer.DetachBuffer(), BitmapPixelFormat.Gray8, w, h);
-        var result = await _engine.RecognizeAsync(bitmap).AsTask(ct).ConfigureAwait(false);
-        return (result, factor);
+        return await _engine!.RecognizeAsync(bitmap).AsTask(ct).ConfigureAwait(false);
+    }
+
+    private static int CountWords(OcrResult result) => result.Lines.Sum(line => line.Words.Count);
+
+    private (byte[] Data, int W, int H, double Factor) PreprocessBinary(Frame f, int maxDim)
+    {
+        var src = f.Gray;
+        int n = f.Width * f.Height;
+        var histogram = new int[256];
+        long sum = 0;
+        for (int i = 0; i < n; i++) { histogram[src[i]]++; sum += src[i]; }
+
+        // Otsu threshold: select a split between text and its background.
+        double totalMean = (double)sum / Math.Max(1, n);
+        long backgroundWeight = 0, backgroundSum = 0;
+        double bestVariance = -1;
+        int threshold = 127;
+        for (int t = 0; t < 256; t++)
+        {
+            backgroundWeight += histogram[t];
+            if (backgroundWeight == 0) continue;
+            long foregroundWeight = n - backgroundWeight;
+            if (foregroundWeight == 0) break;
+            backgroundSum += (long)t * histogram[t];
+            double meanBackground = (double)backgroundSum / backgroundWeight;
+            double meanForeground = (sum - backgroundSum) / (double)foregroundWeight;
+            double variance = backgroundWeight * (double)foregroundWeight
+                * Math.Pow(meanBackground - meanForeground, 2);
+            if (variance > bestVariance) { bestVariance = variance; threshold = t; }
+        }
+
+        bool lightBackground = totalMean >= 127;
+        var binary = new byte[n];
+        for (int i = 0; i < n; i++)
+        {
+            bool bright = src[i] > threshold;
+            binary[i] = (byte)(lightBackground ? (bright ? 255 : 0) : (bright ? 0 : 255));
+        }
+
+        double factor = Math.Min(_scale, (double)maxDim / Math.Max(f.Width, f.Height));
+        if (factor > 1.05 || factor < 0.95)
+        {
+            int W = Math.Max(8, Math.Min(maxDim, (int)Math.Round(f.Width * factor)));
+            int H = Math.Max(8, Math.Min(maxDim, (int)Math.Round(f.Height * factor)));
+            return (Resize(binary, f.Width, f.Height, W, H), W, H, (double)W / f.Width);
+        }
+        return (binary, f.Width, f.Height, 1.0);
     }
 
     private (byte[] Data, int W, int H, double Factor) Preprocess(Frame f, int maxDim)
