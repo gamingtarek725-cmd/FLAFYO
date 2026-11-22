@@ -191,7 +191,9 @@ public partial class LocalizationLibraryWindow : Window
         var entries = catalog.Entries.Select(x => new LibraryEntry
         {
             Title = x.Title,
-            Subtitle = string.Join(" · ", new[] { x.Platform, x.GameVersion,
+            Subtitle = string.Join(" · ", new[] {
+                string.IsNullOrWhiteSpace(x.Platform) ? InferPlatforms(x.Summary) : x.Platform,
+                x.GameVersion,
                 string.IsNullOrWhiteSpace(x.TranslationVersion) ? null : "تعريب " + x.TranslationVersion,
                 string.IsNullOrWhiteSpace(x.PublishedAt) ? null : x.PublishedAt }
                 .Where(v => !string.IsNullOrWhiteSpace(v))),
@@ -257,7 +259,7 @@ public partial class LocalizationLibraryWindow : Window
     private static string InferPlatforms(string? summary)
     {
         if (string.IsNullOrWhiteSpace(summary)) return "";
-        var known = new[] { "PC", "PS4", "PS5", "PlayStation", "Xbox", "Nintendo Switch", "Switch", "Android" };
+        var known = new[] { "PC", "PS4", "PS5", "PlayStation", "Xbox", "Nintendo Switch", "Switch", "Android", "iOS", "iPhone", "iPad" };
         return string.Join(", ", known.Where(platform =>
             System.Text.RegularExpressions.Regex.IsMatch(
                 summary,
