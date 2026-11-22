@@ -113,6 +113,16 @@ public partial class MainWindow
         }
     }
 
+    private void SettingsSection_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string indexText } && int.TryParse(indexText, out var index) &&
+            index >= 0 && index < SettingsTabs.Items.Count)
+        {
+            SettingsTabs.SelectedIndex = index;
+            SettingsTabs.Focus();
+        }
+    }
+
     private void DashboardLive_Click(object sender, RoutedEventArgs e)
     {
         if (!ScreenMode && (Region.Width < 20 || Region.Height < 10))
