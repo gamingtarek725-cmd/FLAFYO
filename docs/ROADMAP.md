@@ -3,21 +3,24 @@
 ## Product direction
 FLAFYO is a Windows-first game translation and localization platform. Existing translation and file-analysis features must remain usable as the platform grows.
 
-## Verified baseline
-- Main commit before this roadmap: `9e0749784cb9c4191602435cf81956144419046a`.
-- GitHub Actions build run `44901005824`: completed successfully.
-- Existing modules include live OCR/translation, Windows capture and overlay, game file analysis, localization library window, per-game settings, and offline translation pack workflows.
-- CI success is not proof of in-game compatibility. Real-game acceptance testing remains outstanding.
+## Verified baseline (2026-11-22)
+- Latest published Windows release: **v0.3.3** — [release page](https://github.com/gamingtarek725-cmd/FLAFYO/releases/tag/v0.3.3).
+- Release workflow `44921025565`: completed successfully, including its test/build/installer/release job.
+- Profile import/export security validation workflow `44921125902`: completed successfully.
+- Localization catalog refresh workflow `44995357361`: completed successfully.
+- Current source includes live OCR/translation, Windows capture and overlay, game-file analysis, localization library, per-game profiles, and offline translation pack workflows.
+- Latest documentation update: `7ad003d8ad46cfa944f0f9c902e86adf4a730f5d`.
+- CI success is not proof of in-game compatibility. Real-game acceptance testing and performance measurements remain outstanding.
 
 ## Delivery phases
 
-### Phase 0 — Foundation and dashboard (current)
+### Phase 0 — Foundation and dashboard (implemented; acceptance verification remains)
 - Connect every dashboard tile to a real existing screen/action.
 - Fix navigation indexes and synchronize dashboard status with the translation engine.
 - Keep the dark navy/blue visual system consistent.
 - Acceptance: Windows build and tests pass; every tile opens its intended feature.
 
-### Phase 1 — Safe updates and releases
+### Phase 1 — Safe updates and releases (v0.3.3 published; upgrade acceptance remains)
 - Publish versioned Windows installers through GitHub Releases.
 - Verify installer SHA-256 against the release asset digest before execution.
 - Preserve user settings and data across upgrades.
@@ -42,12 +45,12 @@ FLAFYO is a Windows-first game translation and localization platform. Existing t
 - Preserve placeholders, IDs, encoding, and file structure.
 - Acceptance: every claimed format has real fixtures and successful extract/edit/rebuild tests.
 
-### Phase 5 — Language and game management
+### Phase 5 — Language and game management (profile import/export implemented)
 - Manage offline language packs, disk usage, dictionaries, and per-game profiles.
 - Add profile import/export and recovery. (Implemented; automated validation and import/export tests added.)
 - Acceptance: settings remain isolated per game and survive upgrades. Import rejects unsafe paths, invalid settings, malformed files, and files larger than 256 KiB; replacement keeps a `.bak` copy.
 
-### Phase 6 — Release hardening
+### Phase 6 — Release hardening (current)
 - Clean install/uninstall, upgrade, recovery, logging, accessibility, and documentation.
 - Acceptance: clean Windows test machine, regression suite, and release checklist pass.
 
