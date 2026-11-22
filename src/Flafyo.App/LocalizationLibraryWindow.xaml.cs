@@ -231,7 +231,11 @@ public partial class LocalizationLibraryWindow : Window
              ContainsText(x.SourceName, query) ||
              ContainsText(x.Info, query) ||
              ContainsText(x.KindLabel, query) ||
-             ContainsText(x.Platform, query)));
+             ContainsText(x.Platform, query)))
+            .OrderByDescending(x =>
+                x.KindLabel.Contains("تحديث", StringComparison.OrdinalIgnoreCase) ||
+                x.KindLabel.Contains("جديد", StringComparison.OrdinalIgnoreCase))
+            .ThenBy(x => x.Title, StringComparer.CurrentCultureIgnoreCase);
         var entriesList = EntriesList;
         if (entriesList is null) return;
 
