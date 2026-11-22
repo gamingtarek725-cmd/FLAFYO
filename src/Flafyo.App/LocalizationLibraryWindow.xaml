@@ -82,6 +82,7 @@
           <StackPanel>
             <TextBlock x:Name="DetailTitle" Text="اختار تعريبًا لعرض التفاصيل" Style="{StaticResource H}" FontSize="17"/>
             <TextBlock x:Name="DetailSubtitle" Style="{StaticResource MutedText}" Margin="0,3,0,7"/>
+            <TextBlock x:Name="DetailMetadata" Foreground="#8FA4C8" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,8"/>
             <TextBlock x:Name="DetailInfo" Foreground="{StaticResource Ink}" TextWrapping="Wrap"/>
             <TextBlock x:Name="InstallSteps" Style="{StaticResource MutedText}" Margin="0,5,0,0"/>
             <TextBlock x:Name="SafetyNotes" Style="{StaticResource WarnText}" Margin="0,5,0,0"/>
