@@ -248,6 +248,27 @@ public class ScreenPipelineTests
     }
 
     [Fact]
+    public async Task Small_ocr_box_jitter_does_not_redraw_or_retranslate_the_same_text()
+    {
+        var (pipeline, grabber, ocr, translator, overlay) = Make();
+        Assert.True(await WaitUntil(() => overlay.Last?.Count == 3));
+
+        ocr.Lines = new List<OcrTextLine>
+        {
+            L("Active Quests", 112, 108, 260, 32),
+            L("Find the key", 112, 158, 200, 20),
+            L("Open the door", 112, 184, 220, 20),
+        };
+        grabber.Fill = 190;
+        Assert.True(await WaitUntil(() => ocr.Calls >= 2));
+        await Task.Delay(150);
+
+        Assert.Equal(3, translator.Calls);
+        Assert.Equal(1, overlay.Shown.Count);
+        await pipeline.DisposeAsync();
+    }
+
+    [Fact]
     public async Task Translations_are_removed_after_all_text_is_gone()
     {
         var (p, g, ocr, _, ov) = Make();
