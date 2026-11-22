@@ -238,7 +238,9 @@ public partial class LocalizationLibraryWindow : Window
         var selected = entriesList.SelectedItem as LibraryEntry;
         _visible.Clear();
         foreach (var item in filtered) _visible.Add(item);
-        if (selected != null) entriesList.SelectedItem = _visible.FirstOrDefault(x => x.Title == selected.Title);
+        if (selected != null) entriesList.SelectedItem = _visible.FirstOrDefault(x =>
+            !string.IsNullOrWhiteSpace(selected.SourceUrl) &&
+            x.SourceUrl.Equals(selected.SourceUrl, StringComparison.OrdinalIgnoreCase));
         if (entriesList.SelectedItem == null && _visible.Count > 0) entriesList.SelectedIndex = 0;
         if (CountText is not null) CountText.Text = $"{_visible.Count} عنصر";
         if (_visible.Count == 0) ShowEmpty();
