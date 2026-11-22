@@ -1,8 +1,18 @@
 name: build
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      validate_madlad:
+        description: "تنزيل واختبار نموذج MADLAD الكبير (حوالي 3.7 جيجا)"
+        required: false
+        default: false
+        type: boolean
 jobs:
   windows:
     runs-on: windows-latest
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -58,3 +68,29 @@ jobs:
       - name: Real heavy translation test
         continue-on-error: true
         run: dotnet test tests/Flafyo.Core.Tests -c Release --filter "FullyQualifiedName~OnnxNllbHeavyIntegration" --logger "console;verbosity=detailed"
+      - name: Download MADLAD 3B INT4 pack (manual validation only)
+        if: github.event_name == 'workflow_dispatch' && inputs.validate_madlad
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $base = "https://huggingface.co/tonythethompson/madlad400-3b-mt-onnx/resolve/c165d741425c82365761aae98d0891bd9e7995ed/mixed_fp16_int4"
+          $dir = Join-Path $env:RUNNER_TEMP "madlad"
+          $files = @(
+            "config.json",
+            "generation_config.json",
+            "spiece.model",
+            "onnx/encoder_model.onnx",
+            "onnx/encoder_model.onnx.data",
+            "onnx/decoder_model_merged.onnx",
+            "onnx/decoder_model_merged.onnx.data"
+          )
+          foreach ($f in $files) {
+            $target = Join-Path $dir $f
+            New-Item -ItemType Directory -Force (Split-Path $target) | Out-Null
+            curl.exe -L --fail --retry 3 --retry-delay 2 "$base/$f" -o "$target"
+            if ($LASTEXITCODE -ne 0) { throw "Download failed: $f" }
+          }
+          "FLAFYO_MADLAD_MODEL_DIR=$dir" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Real MADLAD 3B translation test
+        if: github.event_name == 'workflow_dispatch' && inputs.validate_madlad
+        run: dotnet test tests/Flafyo.Core.Tests -c Release --filter "FullyQualifiedName~OnnxMadladIntegrationTests" --logger "console;verbosity=detailed"
