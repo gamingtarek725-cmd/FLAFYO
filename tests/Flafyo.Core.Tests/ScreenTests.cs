@@ -93,10 +93,12 @@ internal sealed class FakeLayoutOcr : IOcrLayoutEngine
 {
     public volatile List<OcrTextLine> Lines = new();
     public int Calls;
-    public Task<IReadOnlyList<OcrTextLine>> RecognizeLayoutAsync(Frame frame, CancellationToken ct)
+    public int DelayMs;
+    public async Task<IReadOnlyList<OcrTextLine>> RecognizeLayoutAsync(Frame frame, CancellationToken ct)
     {
         Interlocked.Increment(ref Calls);
-        return Task.FromResult<IReadOnlyList<OcrTextLine>>(Lines.ToList());
+        if (DelayMs > 0) await Task.Delay(DelayMs, ct);
+        return Lines.ToList();
     }
 }
 
@@ -135,6 +137,63 @@ public class ScreenPipelineTests
             });
         p.Start();
         return (p, g, ocr, tr, ov);
+    }
+
+    [Fact]
+    public async Task Idle_animation_does_not_cancel_an_ocr_scan_in_progress()
+    {
+        var g = new FakeGrabber();
+        var ocr = new FakeLayoutOcr { DelayMs = 300 };
+        ocr.Lines = new List<OcrTextLine>
+        {
+            L("Find the key", 100, 150, 200, 20),
+        };
+        var overlay = new RecordingScreenOverlay();
+        var pipeline = new ScreenPipeline(g, ocr,
+            new TranslationResolver(new FakeTranslator(), new TranslationCache()), overlay,
+            () => new Rectangle(0, 0, 1920, 1080),
+            new ScreenPipelineOptions
+            {
+                Interval = TimeSpan.FromMilliseconds(15),
+                Settle = TimeSpan.FromMilliseconds(30),
+                MaxWait = TimeSpan.FromMilliseconds(80),
+                ClearDelay = TimeSpan.FromSeconds(2),
+            });
+        pipeline.Start();
+
+        // Simulate a breathing/idle animation: pixels keep changing while the displayed text stays the same.
+        for (int i = 0; i < 12; i++)
+        {
+            g.Fill = (byte)(30 + i * 12);
+            await Task.Delay(35);
+        }
+
+        Assert.True(await WaitUntil(() => overlay.Last?.Count == 1, 5000));
+        Assert.Equal("AR:Find the key", overlay.Last![0].Arabic);
+        await pipeline.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task Brief_ocr_miss_does_not_immediately_clear_the_last_translation()
+    {
+        var (pipeline, grabber, ocr, _, overlay) = Make();
+        Assert.True(await WaitUntil(() => overlay.Last?.Count == 3));
+
+        ocr.Lines = new List<OcrTextLine>();
+        grabber.Fill = 180;
+        await Task.Delay(100);
+        ocr.Lines = new List<OcrTextLine>
+        {
+            L("Active Quests", 100, 100, 260, 32),
+            L("Find the key", 100, 150, 200, 20),
+            L("Open the door", 100, 176, 220, 20),
+        };
+        grabber.Fill = 220;
+
+        await Task.Delay(350);
+        Assert.Equal(0, overlay.Clears);
+        Assert.Equal(3, overlay.Last?.Count);
+        await pipeline.DisposeAsync();
     }
 
     [Fact]
