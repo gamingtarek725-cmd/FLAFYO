@@ -1,144 +1,179 @@
 <Window x:Class="Flafyo.Desktop.GameFilesWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ترجمة ملفات اللعبة" Icon="Assets/flafyo.ico" Width="1040" Height="900" MinWidth="820" MinHeight="680"
+        Title="ترجمة ملفات اللعبة" Icon="Assets/flafyo.ico" Width="1120" Height="940" MinWidth="860" MinHeight="720"
         Background="{StaticResource Page}" FlowDirection="RightToLeft" FontFamily="Segoe UI, Tahoma" FontSize="13"
         WindowStartupLocation="CenterOwner">
-  <ScrollViewer VerticalScrollBarVisibility="Auto">
-    <StackPanel Margin="22">
-      <TextBlock Text="ترجمة ملفات اللعبة بالذكاء الاصطناعي" FontSize="19" FontWeight="Bold" Foreground="{StaticResource Ink}"/>
-      <Border Background="#FFF4E5" BorderBrush="#F7B955" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,10,0,12">
+  <Grid Margin="20">
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="150"/></Grid.RowDefinitions>
+    <StackPanel Grid.Row="0" Margin="0,0,0,14">
+      <TextBlock Text="تعريب ملفات اللعبة" Foreground="{StaticResource Accent}" FontSize="24" FontWeight="Bold"/>
+      <TextBlock Text="افحص ملفات اللعبة، راجع النصوص المكتشفة، ثم أنشئ نسخة مترجمة قبل تطبيقها." Foreground="{StaticResource Muted}" Margin="0,5,0,10" TextWrapping="Wrap"/>
+      <Border Background="#FFF4E5" BorderBrush="#F7B955" BorderThickness="1" CornerRadius="10" Padding="11">
         <TextBlock TextWrapping="Wrap" Foreground="#7A4B00"
-                   Text="مهم: للألعاب الفردية بس. تعديل ملفات ألعاب أونلاين أو اللي عليها حماية ممكن يسبب حظر. البرنامج بيعمل نسخة مترجمة ومبيغيّرش الأصل غير لما تضغط «تطبيق»، وبيحفظ نسخة احتياطية. وخط اللعبة لازم يكون فيه حروف عربية، وإلا هتظهر مربعات."/>
+                   Text="تنبيه: استخدم أدوات تعديل الملفات في الألعاب الفردية فقط. قد يؤدي تعديل ملفات ألعاب الإنترنت أو الألعاب المحمية إلى حظر الحساب. البرنامج ينشئ نسخًا منفصلة ولا يغيّر الأصل إلا بعد تأكيدك، مع حفظ نسخة احتياطية. يلزم أن يدعم خط اللعبة الحروف العربية."/>
       </Border>
-
-      <Border Style="{StaticResource Card}">
-        <StackPanel>
-          <TextBlock Text="١) مجلد اللعبة" Style="{StaticResource H}"/>
-          <Grid Margin="0,10,0,0">
-            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-            <TextBox x:Name="FolderBox" IsReadOnly="True" Padding="7"/>
-            <Button Grid.Column="1" Content="اختر المجلد" Margin="8,0,0,0" Click="Browse_Click"/>
-          </Grid>
-          <CheckBox x:Name="PlainBox" Content="شمل ملفات .txt العادية (ممكن تضم ملفات مش للترجمة)"/>
-          <Button x:Name="ScanButton" Content="افحص الملفات" Margin="0,12,0,0" Style="{StaticResource PrimaryButton}" Click="Scan_Click"/>
-        </StackPanel>
-      </Border>
-
-      <Border Style="{StaticResource Card}">
-        <StackPanel>
-          <TextBlock Text="فحص ذكي: دوّر على ملفات النصوص الفعلية (حتى جوه الأرشيفات)" Style="{StaticResource H}"/>
-          <TextBlock Style="{StaticResource MutedText}" Margin="0,4,0,0"
-                     Text="بيفحص كل ملفات اللعبة وجوه أرشيفات ARC وZIP، وبيدوّر على جمل إنجليزي حقيقية ويرتّب الملفات حسب كمية النصوص. مفيش ملف بيتغيّر."/>
-          <WrapPanel Margin="0,10,0,0">
-            <Button x:Name="ProbeButton" Content="ابدأ الفحص الذكي" Click="Probe_Click"/>
-            <Button x:Name="CancelProbeButton" Content="إيقاف الفحص" Margin="8,0,0,0" IsEnabled="False" Click="CancelProbe_Click"/>
-          </WrapPanel>
-          <Button x:Name="AnalyzeFormatButton" Content="حلّل صيغة ملف تعريب (قراءة فقط)" Margin="0,8,0,0" Click="AnalyzeFormat_Click"/>
-          <TextBlock x:Name="ProbeStatus" Style="{StaticResource MutedText}" Margin="0,6,0,0"/>
-          <ListBox x:Name="ProbeList" Height="190" Margin="0,10,0,0" Background="{StaticResource SurfaceRaised}" BorderBrush="{StaticResource Line}" SelectionChanged="ProbeList_SelectionChanged">
-            <ListBox.ItemTemplate>
-              <DataTemplate><TextBlock Text="{Binding Text}" TextWrapping="Wrap" FlowDirection="LeftToRight"/></DataTemplate>
-            </ListBox.ItemTemplate>
-          </ListBox>
-          <TextBox x:Name="ProbePreview" Height="100" Margin="0,8,0,0" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FlowDirection="LeftToRight" Padding="6"/>
-          <TextBlock Text="تعديل نص من ملف مستقل (تجريبي وآمن)" Style="{StaticResource H}" Margin="0,12,0,0"/>
-          <TextBlock Text="متاح حاليًا للملفات المستقلة فقط، وليس النصوص داخل ARC/ZIP. التعديل يحافظ على نفس عدد البايتات ويُنشئ نسخة منفصلة؛ الملف الأصلي لا يتغير." Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,4,0,0"/>
-          <ListBox x:Name="ProbeEditList" Height="145" Margin="0,8,0,0" Background="{StaticResource SurfaceRaised}" BorderBrush="{StaticResource Line}" SelectionChanged="ProbeEditList_SelectionChanged">
-            <ListBox.ItemTemplate>
-              <DataTemplate><TextBlock Text="{Binding DisplayText}" TextWrapping="Wrap" FlowDirection="LeftToRight"/></DataTemplate>
-            </ListBox.ItemTemplate>
-          </ListBox>
-          <TextBlock Text="النص الأصلي" Style="{StaticResource L}" Margin="0,8,0,0"/>
-          <TextBox x:Name="ProbeOriginalText" IsReadOnly="True" Padding="6" TextWrapping="Wrap" FlowDirection="LeftToRight"/>
-          <TextBlock Text="النص البديل (نفس طول البايتات)" Style="{StaticResource L}" Margin="0,8,0,0"/>
-          <TextBox x:Name="ProbeReplacementText" Padding="6" TextWrapping="Wrap" FlowDirection="LeftToRight"/>
-          <WrapPanel Margin="0,8,0,0">
-            <Button Content="إضافة / تحديث التعديل" Click="QueueProbeEdit_Click"/>
-            <Button x:Name="SaveProbeEditsButton" Content="حفظ نسخة معدلة منفصلة" Margin="8,0,0,0" Style="{StaticResource PrimaryButton}" Click="SaveProbeEdits_Click"/>
-          </WrapPanel>
-          <TextBlock x:Name="ProbeEditStatus" Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,6,0,0"/>
-          <WrapPanel Margin="0,8,0,0">
-            <Button Content="تصدير نصوص العنصر المحدد" Margin="0,0,8,0" Click="ExportHit_Click"/>
-            <Button Content="استخراج الحاوية (ARC / ZIP / .pak)" Click="ExtractArc_Click"/>
-          </WrapPanel>
-          <TextBlock Style="{StaticResource MutedText}" Margin="0,6,0,0"
-                     Text="بعد الاستخراج: افحص المجلد الناتج من قسم «مجلد اللعبة» فوق، وحدد ملفاته وترجمها زي أي ملف عادي."/>
-        </StackPanel>
-      </Border>
-
-      <Border Style="{StaticResource Card}">
-        <StackPanel>
-          <TextBlock Text="٢) اختار الملفات" Style="{StaticResource H}"/>
-          <TextBlock x:Name="CountText" Style="{StaticResource MutedText}" Margin="0,4,0,0"/>
-          <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-            <Button Content="المقترحة بس" Click="SelectSuggested_Click"/>
-            <Button Content="الكل" Margin="8,0,0,0" Click="SelectAll_Click"/>
-            <Button Content="مفيش" Margin="8,0,0,0" Click="SelectNone_Click"/>
-          </StackPanel>
-          <ListBox x:Name="FilesList" Height="210" Margin="0,10,0,0" Background="{StaticResource SurfaceRaised}" BorderBrush="{StaticResource Line}">
-            <ListBox.ItemTemplate>
-              <DataTemplate>
-                <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Content="{Binding Text}" FlowDirection="LeftToRight" Margin="0,2,0,2"/>
-              </DataTemplate>
-            </ListBox.ItemTemplate>
-          </ListBox>
-          <TextBlock Text="نماذج من النصوص في الملف اللي دوست عليه (اتأكد إنها كلام فعلاً مش أكواد):" Style="{StaticResource L}"/>
-          <TextBox x:Name="PreviewBox" Height="130" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FlowDirection="LeftToRight" Padding="6"/>
-        </StackPanel>
-      </Border>
-
-      <Border Style="{StaticResource Card}">
-        <StackPanel>
-          <TextBlock Text="٣) الترجمة" Style="{StaticResource H}"/>
-          <CheckBox x:Name="QuickBox" IsChecked="True" Content="اختبار سريع: أول 30 نص من كل ملف بس (جرّبه الأول قبل الترجمة الكاملة)"/>
-          <CheckBox x:Name="ShapeBox" Content="تشكيل الحروف العربية وعكس الاتجاه (للألعاب اللي بتعرض الحروف مقطعة)"/>
-          <TextBlock Text="مكان الملفات المترجمة" Style="{StaticResource L}"/>
-          <TextBox x:Name="OutputBox" Padding="7"/>
-          <Grid Margin="0,12,0,0">
-            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-            <Button x:Name="StartButton" Content="ابدأ الترجمة" Style="{StaticResource PrimaryButton}" Click="Start_Click"/>
-            <Button x:Name="StopButton" Grid.Column="1" Content="إيقاف" Margin="8,0,0,0" IsEnabled="False" Click="Stop_Click"/>
-          </Grid>
-          <ProgressBar x:Name="Bar" Height="12" Margin="0,12,0,0" Minimum="0" Maximum="100"/>
-          <TextBlock x:Name="StatusText" TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{StaticResource Ink}"/>
-          <TextBlock x:Name="EtaText" Style="{StaticResource MutedText}" Margin="0,2,0,0"/>
-        </StackPanel>
-      </Border>
-
-      <Border Style="{StaticResource Card}">
-        <StackPanel>
-          <TextBlock Text="٤) بعد الترجمة" Style="{StaticResource H}"/>
-          <TextBlock Style="{StaticResource MutedText}" Margin="0,4,0,0"
-                     Text="افتح مجلد الناتج وراجع الملفات. لما تتأكد، «تطبيق على اللعبة» بيستبدل الملفات بعد ما يحفظ الأصل. لو اللعبة بوظت، «استرجاع الأصل» بيرجّع كل حاجة."/>
-          <WrapPanel Margin="0,10,0,0">
-            <Button Content="فتح مجلد الناتج" Margin="0,0,8,8" Click="OpenOutput_Click"/>
-            <Button x:Name="ApplyButton" Content="تطبيق على اللعبة (مع نسخة احتياطية)" Margin="0,0,8,8" Click="Apply_Click"/>
-            <Button Content="استرجاع الأصل" Margin="0,0,8,8" Click="Restore_Click"/>
-          </WrapPanel>
-
-          <TextBlock Text="إعادة بناء الحاوية بأمان (ARC / ZIP / .pak)" Style="{StaticResource L}"/>
-          <TextBlock Style="{StaticResource MutedText}" Margin="0,2,0,0"
-                     Text="أولًا ابنِ نسخة منفصلة وتأكد منها. لن يتم استبدال ملف اللعبة الأصلي إلا بعد الضغط على زر التطبيق المنفصل والتأكيد."/>
-          <Grid Margin="0,8,0,0">
-            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-            <TextBox x:Name="ExtractedFolderBox" IsReadOnly="True" Padding="6"/>
-            <Button Grid.Column="1" Content="اختر المجلد المستخرج" Margin="8,0,0,0" Click="BrowseExtracted_Click"/>
-          </Grid>
-          <Grid Margin="0,8,0,0">
-            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-            <TextBox x:Name="ContainerFileBox" IsReadOnly="True" Padding="6"/>
-            <Button Grid.Column="1" Content="اختر ملف الحاوية الأصلي" Margin="8,0,0,0" Click="BrowseContainer_Click"/>
-          </Grid>
-          <Button Content="١) ابنِ نسخة حاوية منفصلة" Margin="0,10,0,0" Click="RepackApply_Click"/>
-          <TextBlock Text="مسار النسخة الجديدة" Style="{StaticResource L}" Margin="0,8,0,0"/>
-          <TextBox x:Name="RebuiltContainerBox" IsReadOnly="True" Padding="6"/>
-          <Button Content="٢) تطبيق النسخة على الأصل (مع نسخة احتياطية)" Margin="0,8,0,0" Click="ApplyRebuiltContainer_Click"/>
-        </StackPanel>
-      </Border>
-
-      <TextBlock Text="تفاصيل" Style="{StaticResource L}"/>
-      <TextBox x:Name="LogBox" Height="130" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FontSize="12" Padding="6"/>
     </StackPanel>
-  </ScrollViewer>
+
+    <TabControl Grid.Row="1" Background="Transparent" BorderBrush="{StaticResource Line}" Padding="4">
+      <TabItem Header="١  اختيار اللعبة وفحص الملفات">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="12">
+            <Border Style="{StaticResource Card}">
+              <StackPanel>
+                <TextBlock Text="مجلد اللعبة" Style="{StaticResource H}"/>
+                <TextBlock Text="حدد مجلد اللعبة الذي يحتوي على الملفات المراد فحصها." Style="{StaticResource MutedText}" Margin="0,4,0,10"/>
+                <Grid>
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                  <TextBox x:Name="FolderBox" IsReadOnly="True" Padding="9"/>
+                  <Button Grid.Column="1" Content="اختيار المجلد" Margin="8,0,0,0" Padding="14,8" Click="Browse_Click"/>
+                </Grid>
+                <CheckBox x:Name="PlainBox" Content="تضمين ملفات TXT العادية (قد تحتوي على بيانات غير مخصصة للترجمة)" Margin="0,12,0,0"/>
+                <Button x:Name="ScanButton" Content="فحص ملفات اللعبة" Margin="0,12,0,0" Padding="12,9" Style="{StaticResource PrimaryButton}" Click="Scan_Click"/>
+              </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+              <StackPanel>
+                <Grid>
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                  <StackPanel>
+                    <TextBlock Text="الملفات المكتشفة" Style="{StaticResource H}"/>
+                    <TextBlock x:Name="CountText" Style="{StaticResource MutedText}" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                  </StackPanel>
+                  <WrapPanel Grid.Column="1" VerticalAlignment="Center">
+                    <Button Content="المقترحة" Padding="11,7" Margin="0,0,6,0" Click="SelectSuggested_Click"/>
+                    <Button Content="الكل" Padding="11,7" Margin="0,0,6,0" Click="SelectAll_Click"/>
+                    <Button Content="إلغاء التحديد" Padding="11,7" Click="SelectNone_Click"/>
+                  </WrapPanel>
+                </Grid>
+                <ListBox x:Name="FilesList" Height="220" Margin="0,12,0,0" Background="{StaticResource SurfaceRaised}" BorderBrush="{StaticResource Line}">
+                  <ListBox.ItemTemplate>
+                    <DataTemplate><CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Content="{Binding Text}" FlowDirection="LeftToRight" Margin="3"/></DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+                <TextBlock Text="معاينة نصوص الملف المحدد" Style="{StaticResource L}" Margin="0,12,0,5"/>
+                <TextBox x:Name="PreviewBox" Height="140" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FlowDirection="LeftToRight" Padding="8"/>
+                <TextBlock x:Name="StatusText" Foreground="{StaticResource Warn}" TextWrapping="Wrap" Margin="0,10,0,0"/>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <TabItem Header="٢  الفحص الذكي وتحليل النصوص">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="12">
+            <Border Style="{StaticResource Card}">
+              <StackPanel>
+                <TextBlock Text="اكتشاف أماكن النصوص" Style="{StaticResource H}"/>
+                <TextBlock Text="يفحص الملفات بحثًا عن الجمل الفعلية، ويرتب النتائج حسب كثافة النصوص. الفحص للقراءة فقط ولا يغيّر ملفات اللعبة." Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,4,0,10"/>
+                <WrapPanel>
+                  <Button x:Name="ProbeButton" Content="بدء الفحص الذكي" Padding="12,8" Style="{StaticResource PrimaryButton}" Click="Probe_Click"/>
+                  <Button x:Name="CancelProbeButton" Content="إيقاف الفحص" Padding="12,8" Margin="8,0,0,0" IsEnabled="False" Click="CancelProbe_Click"/>
+                  <Button x:Name="AnalyzeFormatButton" Content="تحليل صيغة ملف (قراءة فقط)" Padding="12,8" Margin="8,0,0,0" Click="AnalyzeFormat_Click"/>
+                </WrapPanel>
+                <TextBlock x:Name="ProbeStatus" Foreground="{StaticResource Warn}" TextWrapping="Wrap" Margin="0,10,0,0"/>
+                <ListBox x:Name="ProbeList" Height="185" Margin="0,10,0,0" Background="{StaticResource SurfaceRaised}" BorderBrush="{StaticResource Line}" SelectionChanged="ProbeList_SelectionChanged">
+                  <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Text}" TextWrapping="Wrap" FlowDirection="LeftToRight" Margin="4"/></DataTemplate></ListBox.ItemTemplate>
+                </ListBox>
+                <TextBlock Text="معاينة النصوص المكتشفة" Style="{StaticResource L}" Margin="0,12,0,5"/>
+                <TextBox x:Name="ProbePreview" Height="120" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FlowDirection="LeftToRight" Padding="8"/>
+                <WrapPanel Margin="0,10,0,0">
+                  <Button Content="تصدير نصوص النتيجة المحددة" Padding="11,7" Margin="0,0,8,0" Click="ExportHit_Click"/>
+                  <Button Content="استخراج حاوية ARC / ZIP / PAK" Padding="11,7" Click="ExtractArc_Click"/>
+                </WrapPanel>
+              </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+              <StackPanel>
+                <TextBlock Text="تعديل نصوص ملف مستقل (تجريبي)" Style="{StaticResource H}"/>
+                <TextBlock Text="متاح للملفات المستقلة فقط، وليس النصوص داخل الأرشيف. يتم إنشاء نسخة منفصلة مع الحفاظ على طول البايتات؛ الملف الأصلي لا يتغير." Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,4,0,10"/>
+                <ListBox x:Name="ProbeEditList" Height="150" Background="{StaticResource SurfaceRaised}" BorderBrush="{StaticResource Line}" SelectionChanged="ProbeEditList_SelectionChanged">
+                  <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding DisplayText}" TextWrapping="Wrap" FlowDirection="LeftToRight" Margin="4"/></DataTemplate></ListBox.ItemTemplate>
+                </ListBox>
+                <TextBlock Text="النص الأصلي" Style="{StaticResource L}" Margin="0,10,0,5"/>
+                <TextBox x:Name="ProbeOriginalText" IsReadOnly="True" Padding="8" TextWrapping="Wrap" FlowDirection="LeftToRight"/>
+                <TextBlock Text="النص البديل (نفس طول البايتات)" Style="{StaticResource L}" Margin="0,10,0,5"/>
+                <TextBox x:Name="ProbeReplacementText" Padding="8" TextWrapping="Wrap" FlowDirection="LeftToRight"/>
+                <WrapPanel Margin="0,10,0,0">
+                  <Button Content="إضافة / تحديث التعديل" Padding="11,7" Margin="0,0,8,0" Click="QueueProbeEdit_Click"/>
+                  <Button x:Name="SaveProbeEditsButton" Content="حفظ نسخة معدلة منفصلة" Padding="11,7" Style="{StaticResource PrimaryButton}" Click="SaveProbeEdits_Click"/>
+                </WrapPanel>
+                <TextBlock x:Name="ProbeEditStatus" Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,8,0,0"/>
+              </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+              <StackPanel>
+                <TextBlock Text="إعادة بناء الحاوية" Style="{StaticResource H}"/>
+                <TextBlock Text="ابنِ نسخة منفصلة ثم تحقق منها قبل تطبيقها على الملف الأصلي." Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,4,0,10"/>
+                <TextBlock Text="المجلد المستخرج" Style="{StaticResource L}"/>
+                <Grid Margin="0,4,0,10">
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                  <TextBox x:Name="ExtractedFolderBox" IsReadOnly="True" Padding="8"/>
+                  <Button Grid.Column="1" Content="اختيار المجلد" Margin="8,0,0,0" Click="BrowseExtracted_Click"/>
+                </Grid>
+                <TextBlock Text="ملف الحاوية الأصلي" Style="{StaticResource L}"/>
+                <Grid Margin="0,4,0,10">
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                  <TextBox x:Name="ContainerFileBox" IsReadOnly="True" Padding="8"/>
+                  <Button Grid.Column="1" Content="اختيار الملف" Margin="8,0,0,0" Click="BrowseContainer_Click"/>
+                </Grid>
+                <Button Content="١) إنشاء نسخة حاوية منفصلة والتحقق منها" Padding="11,8" Style="{StaticResource PrimaryButton}" Click="RepackApply_Click"/>
+                <TextBlock Text="مسار النسخة الجديدة" Style="{StaticResource L}" Margin="0,12,0,5"/>
+                <TextBox x:Name="RebuiltContainerBox" IsReadOnly="True" Padding="8"/>
+                <Button Content="٢) تطبيق النسخة على الأصل (مع نسخة احتياطية)" Margin="0,10,0,0" Padding="11,8" Click="ApplyRebuiltContainer_Click"/>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <TabItem Header="٣  الترجمة والتطبيق">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+          <StackPanel Margin="12">
+            <Border Style="{StaticResource Card}">
+              <StackPanel>
+                <TextBlock Text="إعدادات الترجمة" Style="{StaticResource H}"/>
+                <CheckBox x:Name="QuickBox" IsChecked="True" Content="اختبار سريع: أول 30 نصًا من كل ملف (ابدأ به قبل الترجمة الكاملة)" Margin="0,10,0,0"/>
+                <CheckBox x:Name="ShapeBox" Content="تشكيل الحروف العربية وضبط اتجاهها للألعاب التي تعرض الحروف بشكل غير صحيح" Margin="0,10,0,0"/>
+                <TextBlock Text="مجلد حفظ الملفات المترجمة" Style="{StaticResource L}" Margin="0,14,0,5"/>
+                <TextBox x:Name="OutputBox" Padding="9"/>
+                <Grid Margin="0,12,0,0">
+                  <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                  <Button x:Name="StartButton" Content="بدء الترجمة" Style="{StaticResource PrimaryButton}" Padding="14,9" Click="Start_Click"/>
+                  <Button x:Name="StopButton" Grid.Column="1" Content="إيقاف" Margin="8,0,0,0" Padding="14,9" IsEnabled="False" Click="Stop_Click"/>
+                </Grid>
+                <ProgressBar x:Name="Bar" Height="13" Margin="0,14,0,0" Minimum="0" Maximum="100"/>
+                <TextBlock x:Name="EtaText" Style="{StaticResource MutedText}" Margin="0,7,0,0"/>
+                <TextBlock Text="حالة العملية" Style="{StaticResource L}" Margin="0,12,0,5"/>
+                <TextBlock x:Name="TranslationStatusPlaceholder" Text="تابع حالة الترجمة هنا." Foreground="{StaticResource Muted}" TextWrapping="Wrap"/>
+              </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Card}">
+              <StackPanel>
+                <TextBlock Text="مراجعة الناتج وتطبيقه" Style="{StaticResource H}"/>
+                <TextBlock Text="افتح مجلد الناتج وراجع الملفات أولًا. التطبيق يستبدل ملفات اللعبة بعد حفظ نسخة احتياطية. أغلق اللعبة قبل المتابعة." Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,4,0,10"/>
+                <WrapPanel>
+                  <Button Content="فتح مجلد الناتج" Padding="12,8" Margin="0,0,8,8" Click="OpenOutput_Click"/>
+                  <Button x:Name="ApplyButton" Content="تطبيق على اللعبة (مع نسخة احتياطية)" Padding="12,8" Margin="0,0,8,8" Style="{StaticResource PrimaryButton}" Click="Apply_Click"/>
+                  <Button Content="استرجاع الملفات الأصلية" Padding="12,8" Margin="0,0,8,8" Click="Restore_Click"/>
+                </WrapPanel>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+    </TabControl>
+
+    <Border Grid.Row="2" Style="{StaticResource Card}" Padding="12" Margin="0,12,0,0">
+      <DockPanel>
+        <TextBlock DockPanel.Dock="Top" Text="سجل العمليات" Style="{StaticResource L}" Margin="0,0,0,6"/>
+        <TextBox x:Name="LogBox" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FontSize="12" Padding="7"/>
+      </DockPanel>
+    </Border>
+  </Grid>
 </Window>
