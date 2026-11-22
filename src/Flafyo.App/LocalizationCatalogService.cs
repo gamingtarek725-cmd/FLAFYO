@@ -53,6 +53,7 @@ internal sealed class LocalizationCatalogService
         var allowed = new[] { "ta3reebat.com", "muarrab.com", "ta3reb.com" };
         catalog.Entries = (catalog.Entries ?? new List<Entry>())
             .Where(e =>
+                e is not null &&
                 !string.IsNullOrWhiteSpace(e.Title) &&
                 !string.IsNullOrWhiteSpace(e.SourceName) &&
                 Uri.TryCreate(e.SourceUrl, UriKind.Absolute, out var uri) &&
