@@ -128,7 +128,7 @@ public class OnnxMadladIntegrationTests
             using var nllb = OnnxNllbTranslator.Load(NllbDir, threads: 1);
             foreach (var row in madladRows)
             {
-                var reference = Phrasebook.LoadEmbedded().Entries.First(x => x.English == row.English).Arabic;
+                var reference = Phrasebook.LoadEmbedded().Entries.First(x => x.En == row.English).Ar;
                 var translated = nllb.TranslateSync(row.English, CancellationToken.None);
                 nllbRows.Add(Quality.Dice(translated, reference));
             }
