@@ -16,7 +16,7 @@ The shared WPF resource dictionary in `src/Flafyo.App/App.xaml` defines the cano
 1. Home — engine state, quick actions, recent game and installed packs.
 2. Live translation — capture mode, OCR region, start/stop and latency.
 3. Localization Store — searchable game cards, platform/category filters, entry details, compatibility notes and original-source navigation.
-4. Translation packs — OPUS, NLLB and optional MADLAD, with install state, disk use and resource warnings.
+4. Translation packs — OPUS and NLLB are supported; MADLAD remains disabled until its ONNX graph architecture is integrated and validated.
 5. Game profiles — per-game settings, import/export and recovery.
 6. Game file localization — read-only scan, extraction, translation, separate output and backup-aware apply/restore.
 7. Glossaries — game terminology dictionaries and custom terms.
@@ -33,8 +33,8 @@ The shared WPF resource dictionary in `src/Flafyo.App/App.xaml` defines the cano
 - Store entries must disclose source, platform, version compatibility and missing metadata; link to original publishers and do not redistribute community files without permission.
 - Verify RTL, keyboard focus, resizing, high-DPI behavior and readable contrast.
 - Run unit tests and Windows publish/installer workflows after each migration batch.
-- Treat MADLAD as experimental until its exact model artifacts, tokenizer, ONNX graph inputs and real Arabic translation test all pass.
+- Keep MADLAD unavailable in the UI until a compatible ONNX graph set, tokenizer, cache behavior and real Arabic translation tests pass.
 
 ## Current implementation slice
 
-This branch establishes the shared Cyber theme, updates the main dashboard's visual treatment and gives the existing localization storefront more space and consistent cyber accents. The remaining feature-window layout migrations must be completed and verified in subsequent commits before calling the redesign complete.
+This branch establishes the shared Cyber theme, updates the main dashboard and storefront, and applies visual styling to the game-file, history, appearance, glossary and region-selection windows. It is a visual migration slice: the existing MainWindow settings flow still needs a more substantial information-architecture redesign. MADLAD is deliberately disabled because the currently referenced export does not match the decoder graph expected by the app. Build and unit-test validation is required after every subsequent code change.
