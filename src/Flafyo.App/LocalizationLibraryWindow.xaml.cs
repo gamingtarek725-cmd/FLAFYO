@@ -16,6 +16,7 @@ public partial class LocalizationLibraryWindow : Window
         public string Subtitle { get; init; } = "";
         public string KindLabel { get; init; } = "";
         public string Category { get; init; } = "";
+        public string Platform { get; init; } = "";
         public string Info { get; init; } = "";
         public string Install { get; init; } = "";
         public string Notes { get; init; } = "";
@@ -186,6 +187,7 @@ public partial class LocalizationLibraryWindow : Window
                 .Where(v => !string.IsNullOrWhiteSpace(v))),
             KindLabel = (x.UpdateType == "new" ? "تعريب جديد" : x.UpdateType == "update" ? "تحديث تعريب" : "صفحة تعريب") + " · " + x.SourceName,
             Category = "تعريبات موثقة",
+            Platform = string.IsNullOrWhiteSpace(x.Platform) ? InferPlatforms(x.Summary) : x.Platform,
             Info = string.IsNullOrWhiteSpace(x.Summary) ? "تم اكتشاف صفحة تعريب من المصدر." : x.Summary,
             Install = "تعليمات التثبيت التفصيلية تُراجع في صفحة المصدر؛ تختلف الطريقة حسب اللعبة وإصدارها.",
             Notes = "اكتُشف هذا الإدخال آليًا. لم يختبر FLAFYO التوافق أو ملف التعريب. راجع صفحة المصدر قبل التثبيت.",
@@ -203,14 +205,17 @@ public partial class LocalizationLibraryWindow : Window
         var query = SearchBox?.Text?.Trim() ?? "";
         var filtered = _catalog.Concat(_remoteCatalog).Where(x =>
             (_categoryFilter == "all" ||
-             (_categoryFilter == "pc" && (x.Subtitle.Contains("PC", StringComparison.OrdinalIgnoreCase) || x.Info.Contains("PC", StringComparison.OrdinalIgnoreCase))) ||
-             (_categoryFilter == "console" && (x.Subtitle.Contains("PS", StringComparison.OrdinalIgnoreCase) || x.Info.Contains("PlayStation", StringComparison.OrdinalIgnoreCase) || x.Info.Contains("Nintendo", StringComparison.OrdinalIgnoreCase) || x.Info.Contains("Xbox", StringComparison.OrdinalIgnoreCase))) ||
+             (_categoryFilter == "pc" && HasPlatform(x, "PC", "Steam", "Windows")) ||
+             (_categoryFilter == "console" && HasPlatform(x, "PS4", "PS5", "PlayStation", "Xbox", "Nintendo", "Switch", "Android")) ||
              (_categoryFilter == "new" && (x.KindLabel.Contains("جديد") || x.KindLabel.Contains("تحديث"))) ||
              (_categoryFilter == "directories" && x.IsDirectory)) &&
             (string.IsNullOrWhiteSpace(query) ||
-             x.Title.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-             x.Subtitle.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-             x.SourceName.Contains(query, StringComparison.OrdinalIgnoreCase)));
+             ContainsText(x.Title, query) ||
+             ContainsText(x.Subtitle, query) ||
+             ContainsText(x.SourceName, query) ||
+             ContainsText(x.Info, query) ||
+             ContainsText(x.KindLabel, query) ||
+             ContainsText(x.Platform, query)));
         var entriesList = EntriesList;
         if (entriesList is null) return;
 
@@ -221,6 +226,29 @@ public partial class LocalizationLibraryWindow : Window
         if (entriesList.SelectedItem == null && _visible.Count > 0) entriesList.SelectedIndex = 0;
         if (CountText is not null) CountText.Text = $"{_visible.Count} عنصر";
         if (_visible.Count == 0) ShowEmpty();
+    }
+
+    private static bool ContainsText(string? value, string query) =>
+        !string.IsNullOrWhiteSpace(value) && value.Contains(query, StringComparison.OrdinalIgnoreCase);
+
+    private static bool HasPlatform(LibraryEntry entry, params string[] platforms)
+    {
+        var source = string.Join(" ", entry.Platform, entry.Subtitle, entry.Info);
+        return platforms.Any(platform => System.Text.RegularExpressions.Regex.IsMatch(
+            source,
+            @"(?<![A-Za-z0-9])" + System.Text.RegularExpressions.Regex.Escape(platform) + @"(?![A-Za-z0-9])",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase));
+    }
+
+    private static string InferPlatforms(string? summary)
+    {
+        if (string.IsNullOrWhiteSpace(summary)) return "";
+        var known = new[] { "PC", "PS4", "PS5", "PlayStation", "Xbox", "Nintendo Switch", "Switch", "Android" };
+        return string.Join(", ", known.Where(platform =>
+            System.Text.RegularExpressions.Regex.IsMatch(
+                summary,
+                @"(?<![A-Za-z0-9])" + System.Text.RegularExpressions.Regex.Escape(platform) + @"(?![A-Za-z0-9])",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase)));
     }
 
     private void SearchBox_TextChanged(object sender, TextChangedEventArgs e) => RefreshList();
