@@ -211,12 +211,15 @@ public partial class LocalizationLibraryWindow : Window
              x.Title.Contains(query, StringComparison.OrdinalIgnoreCase) ||
              x.Subtitle.Contains(query, StringComparison.OrdinalIgnoreCase) ||
              x.SourceName.Contains(query, StringComparison.OrdinalIgnoreCase)));
-        var selected = EntriesList?.SelectedItem as LibraryEntry;
+        var entriesList = EntriesList;
+        if (entriesList is null) return;
+
+        var selected = entriesList.SelectedItem as LibraryEntry;
         _visible.Clear();
         foreach (var item in filtered) _visible.Add(item);
-        if (selected != null) EntriesList.SelectedItem = _visible.FirstOrDefault(x => x.Title == selected.Title);
-        if (EntriesList.SelectedItem == null && _visible.Count > 0) EntriesList.SelectedIndex = 0;
-        CountText.Text = $"{_visible.Count} عنصر";
+        if (selected != null) entriesList.SelectedItem = _visible.FirstOrDefault(x => x.Title == selected.Title);
+        if (entriesList.SelectedItem == null && _visible.Count > 0) entriesList.SelectedIndex = 0;
+        if (CountText is not null) CountText.Text = $"{_visible.Count} عنصر";
         if (_visible.Count == 0) ShowEmpty();
     }
 
