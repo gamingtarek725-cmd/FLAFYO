@@ -131,7 +131,7 @@
               <CheckBox x:Name="MasculineBox" Content="صيغة المذكر في الترجمة" IsChecked="True" Checked="Masculine_Changed" Unchecked="Masculine_Changed"/>
               <CheckBox x:Name="PreciseBox" Content="دقة أعلى (أبطأ 2 لـ 4 مرات، للحزمة الخفيفة)" IsChecked="False" Checked="Precise_Changed" Unchecked="Precise_Changed"/>
               <CheckBox x:Name="TranslateBrandsBox" Content="ترجمة الشعارات والعلامات التجارية" IsChecked="False" Checked="TranslateBrands_Changed" Unchecked="TranslateBrands_Changed" Margin="0,8,0,0"/>
-              <TextBlock Text="عند التفعيل، يستخدم قاموسًا لأسماء العلامات التجارية المعروفة. لا يضمن قراءة الشعارات المرسومة كصور." Style="{StaticResource MutedText}" Margin="22,2,0,0" TextWrapping="Wrap"/>
+              <TextBlock Text="عند التفعيل، يستخدم قاموسًا لأسماء العلامات التجارية المعروفة وتجربة OCR إضافية عالية التباين عند الحاجة. قد تزيد المعالجة قليلًا، ولا يضمن قراءة الشعارات المرسومة بلا حروف واضحة." Style="{StaticResource MutedText}" Margin="22,2,0,0" TextWrapping="Wrap"/>
 
               <TextBlock Text="سرعة المعالجة" Style="{StaticResource L}"/>
               <ComboBox x:Name="SpeedBox" SelectedIndex="1" SelectionChanged="Speed_Changed">
