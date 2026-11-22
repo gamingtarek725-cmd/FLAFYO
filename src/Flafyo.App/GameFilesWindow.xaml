@@ -54,7 +54,6 @@
                 </ListBox>
                 <TextBlock Text="معاينة نصوص الملف المحدد" Style="{StaticResource L}" Margin="0,12,0,5"/>
                 <TextBox x:Name="PreviewBox" Height="140" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FlowDirection="LeftToRight" Padding="8"/>
-                <TextBlock x:Name="StatusText" Foreground="{StaticResource Warn}" TextWrapping="Wrap" Margin="0,10,0,0"/>
               </StackPanel>
             </Border>
           </StackPanel>
@@ -149,7 +148,6 @@
                 <ProgressBar x:Name="Bar" Height="13" Margin="0,14,0,0" Minimum="0" Maximum="100"/>
                 <TextBlock x:Name="EtaText" Style="{StaticResource MutedText}" Margin="0,7,0,0"/>
                 <TextBlock Text="حالة العملية" Style="{StaticResource L}" Margin="0,12,0,5"/>
-                <TextBlock x:Name="StatusText" Text="تابع حالة الترجمة هنا." Foreground="{StaticResource Muted}" TextWrapping="Wrap"/>
               </StackPanel>
             </Border>
 
