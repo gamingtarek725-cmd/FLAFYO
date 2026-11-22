@@ -45,6 +45,7 @@ public sealed class AppSettings
     public int TextSizeIndex { get; set; } = 1;
     public int PackIndex { get; set; } = 0;
     public bool Masculine { get; set; } = true;
+    public bool TranslateBrands { get; set; } = false;
     public bool Precise { get; set; } = false;
     public OverlayStyle Style { get; set; } = new();
     public int ModeIndex { get; set; }                     // 0 = one text region, 1 = whole screen
