@@ -206,7 +206,8 @@ public partial class LocalizationLibraryWindow : Window
         var filtered = _catalog.Concat(_remoteCatalog).Where(x =>
             (_categoryFilter == "all" ||
              (_categoryFilter == "pc" && HasPlatform(x, "PC", "Steam", "Windows")) ||
-             (_categoryFilter == "console" && HasPlatform(x, "PS4", "PS5", "PlayStation", "Xbox", "Nintendo", "Switch", "Android")) ||
+             (_categoryFilter == "console" && HasPlatform(x, "PS4", "PS5", "PlayStation", "Xbox", "Nintendo", "Switch")) ||
+             (_categoryFilter == "mobile" && HasPlatform(x, "Android", "iOS", "iPhone", "iPad")) ||
              (_categoryFilter == "new" && (x.KindLabel.Contains("جديد") || x.KindLabel.Contains("تحديث"))) ||
              (_categoryFilter == "directories" && x.IsDirectory)) &&
             (string.IsNullOrWhiteSpace(query) ||
