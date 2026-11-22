@@ -715,6 +715,7 @@ public partial class MainWindow : Window
         if (!screen && (Region.Width < 20 || Region.Height < 10)) { StatusText.Text = "اختر منطقة النص أولًا (الزر الأول)"; return; }
 
         var ocr = new WindowsOcrEngine("en-US", screen ? 1 : TextScale());
+        ocr.EnhancedRecognition = _settings.TranslateBrands;
         if (!ocr.IsAvailable)
         {
             StatusText.Text = "حزمة OCR الإنجليزية غير مثبتة: Settings ← Time & language ← Language & region ← أضف English";
