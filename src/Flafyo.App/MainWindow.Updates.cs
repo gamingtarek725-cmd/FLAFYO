@@ -113,7 +113,18 @@ public partial class MainWindow
         }
     }
 
-    private void DashboardLive_Click(object sender, RoutedEventArgs e) => Start_Click(sender, e);
+    private void DashboardLive_Click(object sender, RoutedEventArgs e)
+    {
+        if (!ScreenMode && (Region.Width < 20 || Region.Height < 10))
+        {
+            StatusText.Text = "حدد مكان النص أولًا، وبعدها اضغط ابدأ الترجمة.";
+            Select_Click(sender, e);
+            return;
+        }
+
+        StartTranslation();
+        StatusText.Focus();
+    }
     private void DashboardFiles_Click(object sender, RoutedEventArgs e) => GameFiles_Click(sender, e);
     private void DashboardLanguages_Click(object sender, RoutedEventArgs e) => SettingsTabs.SelectedIndex = 0;
     private void DashboardGameSettings_Click(object sender, RoutedEventArgs e) => SettingsTabs.SelectedIndex = 3;
