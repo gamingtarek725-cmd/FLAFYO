@@ -109,7 +109,7 @@ public class OnnxMadladIntegrationTests
             {
                 var result = translator.TranslateSync(sample, CancellationToken.None);
                 Assert.False(string.IsNullOrWhiteSpace(result), "Empty translation for: " + sample);
-                Assert.Matches(new Regex(@"\\p{IsArabic}"), result);
+                Assert.Matches(new Regex(@"\p{IsArabic}"), result);
                 _output.WriteLine("MADLAD | " + sample + " => " + result);
             }
 
