@@ -130,7 +130,7 @@
               <ComboBox x:Name="PackBox" SelectedIndex="0" SelectionChanged="Pack_Changed">
                 <ComboBoxItem Content="الخفيفة: أسرع وتناسب الأجهزة الضعيفة"/>
                 <ComboBoxItem Content="التقيلة NLLB-600M: توازن بين الحجم والتنوع"/>
-                <ComboBoxItem Content="MADLAD-400 3B: أكبر وأشمل، لكنها أبطأ وتحتاج موارد أعلى"/>
+                <ComboBoxItem Content="MADLAD-400 3B: نموذج أكبر ومتعدد اللغات؛ جودة العربية تحتاج اختبارًا، وهو أبطأ ويحتاج موارد أعلى"/>
               </ComboBox>
               <CheckBox x:Name="MasculineBox" Content="صيغة المذكر في الترجمة" IsChecked="True" Checked="Masculine_Changed" Unchecked="Masculine_Changed"/>
               <CheckBox x:Name="PreciseBox" Content="دقة أعلى (أبطأ 2 لـ 4 مرات، للحزمة الخفيفة)" IsChecked="False" Checked="Precise_Changed" Unchecked="Precise_Changed"/>
