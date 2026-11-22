@@ -6,6 +6,6 @@
   <Canvas x:Name="Root" Background="Transparent">
     <TextBlock x:Name="Hint" Text="اسحب بالماوس حول مكان النص (الترجمة/الحوار). Esc للإلغاء" Foreground="White" FontSize="22"
                Canvas.Left="40" Canvas.Top="30" FlowDirection="RightToLeft"/>
-    <Rectangle x:Name="Box" Stroke="#00D9A5" StrokeThickness="2" Fill="#2200D9A5" Visibility="Collapsed"/>
+    <Rectangle x:Name="Box" Stroke="#A78BFA" StrokeThickness="2" Fill="#22A78BFA" Visibility="Collapsed"/>
   </Canvas>
 </Window>
