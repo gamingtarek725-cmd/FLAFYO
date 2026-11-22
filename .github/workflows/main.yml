@@ -62,5 +62,3 @@ jobs:
       - name: Real heavy translation test
         continue-on-error: true
         run: dotnet test tests/Flafyo.Core.Tests -c Release --filter "FullyQualifiedName~OnnxNllbHeavyIntegration" --logger "console;verbosity=detailed"
-        if: github.event_name == 'workflow_dispatch' && inputs.validate_madlad
-        run: dotnet test tests/Flafyo.Core.Tests -c Release --filter "FullyQualifiedName~OnnxMadladIntegrationTests" --logger "console;verbosity=detailed"
