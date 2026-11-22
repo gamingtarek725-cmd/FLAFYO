@@ -55,6 +55,11 @@
               <Button Content="▦&#10;مكتبة التعريبات&#10;بحث وتحديثات الألعاب" Click="DashboardLibrary_Click" Margin="4" Padding="18,16" FontSize="15" Background="#1C2B45" BorderBrush="#2B4265" MinHeight="92"/>
               <Button Content="◷&#10;سجل الترجمة والأداء&#10;التشخيص والنتائج" Click="DashboardLogs_Click" Margin="4" Padding="18,16" FontSize="15" Background="#1C2B45" BorderBrush="#2B4265" MinHeight="92"/>
             </UniformGrid>
+            <WrapPanel Margin="2,8,2,0" HorizontalAlignment="Stretch">
+              <Button Content="شكل الترجمة" ToolTip="تخصيص الخط واللون والموضع والشفافية" Click="Appearance_Click" Margin="2" Padding="12,8"/>
+              <Button Content="سجل الترجمة" ToolTip="عرض النصوص المترجمة ومراجعتها" Click="History_Click" Margin="2" Padding="12,8"/>
+              <Button Content="قواميس الألعاب" ToolTip="إدارة المصطلحات والتعبيرات الشائعة" Click="Glossary_Click" Margin="2" Padding="12,8"/>
+            </WrapPanel>
             <Border Background="#1C2B45" CornerRadius="12" Padding="14" Margin="4,10,4,0">
               <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
