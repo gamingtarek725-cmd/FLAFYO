@@ -5,7 +5,7 @@
         Background="{StaticResource Page}" FlowDirection="RightToLeft" FontFamily="Segoe UI, Tahoma" FontSize="13"
         WindowStartupLocation="CenterOwner">
   <Grid Margin="20">
-    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="150"/></Grid.RowDefinitions>
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="140"/></Grid.RowDefinitions>
     <StackPanel Grid.Row="0" Margin="0,0,0,14">
       <TextBlock Text="تعريب ملفات اللعبة" Foreground="{StaticResource Accent}" FontSize="24" FontWeight="Bold"/>
       <TextBlock Text="افحص ملفات اللعبة، راجع النصوص المكتشفة، ثم أنشئ نسخة مترجمة قبل تطبيقها." Foreground="{StaticResource Muted}" Margin="0,5,0,10" TextWrapping="Wrap"/>
@@ -169,7 +169,10 @@
       </TabItem>
     </TabControl>
 
-    <Border Grid.Row="2" Style="{StaticResource Card}" Padding="12" Margin="0,12,0,0">
+    <Border Grid.Row="2" Background="{StaticResource SurfaceRaised}" BorderBrush="{StaticResource Line}" BorderThickness="1" CornerRadius="10" Padding="10" Margin="0,10,0,0">
+      <TextBlock x:Name="StatusText" Foreground="{StaticResource Warn}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+    </Border>
+    <Border Grid.Row="3" Style="{StaticResource Card}" Padding="12" Margin="0,10,0,0">
       <DockPanel>
         <TextBlock DockPanel.Dock="Top" Text="سجل العمليات" Style="{StaticResource L}" Margin="0,0,0,6"/>
         <TextBox x:Name="LogBox" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FontSize="12" Padding="7"/>
