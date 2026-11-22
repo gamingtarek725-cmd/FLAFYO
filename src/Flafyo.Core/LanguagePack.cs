@@ -47,8 +47,8 @@ public sealed class LanguagePack
         "https://huggingface.co/tonythethompson/madlad400-3b-mt-onnx/resolve/c165d741425c82365761aae98d0891bd9e7995ed/mixed_fp16_int4/",
         new[]
         {
-            new ModelFile("config.json", 850, ExactLength: true),
-            new ModelFile("generation_config.json", 184, ExactLength: true),
+            new ModelFile("config.json", 850),
+            new ModelFile("generation_config.json", 184),
             new ModelFile("spiece.model", 4_427_844,
                 "ef11ac9a22c7503492f56d48dce53be20e339b63605983e9f27d2cd0e0f3922c", true),
             new ModelFile("onnx/encoder_model.onnx", 1_473_277,
