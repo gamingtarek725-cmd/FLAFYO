@@ -149,7 +149,7 @@
                 <ProgressBar x:Name="Bar" Height="13" Margin="0,14,0,0" Minimum="0" Maximum="100"/>
                 <TextBlock x:Name="EtaText" Style="{StaticResource MutedText}" Margin="0,7,0,0"/>
                 <TextBlock Text="حالة العملية" Style="{StaticResource L}" Margin="0,12,0,5"/>
-                <TextBlock x:Name="TranslationStatusPlaceholder" Text="تابع حالة الترجمة هنا." Foreground="{StaticResource Muted}" TextWrapping="Wrap"/>
+                <TextBlock x:Name="StatusText" Text="تابع حالة الترجمة هنا." Foreground="{StaticResource Muted}" TextWrapping="Wrap"/>
               </StackPanel>
             </Border>
 
