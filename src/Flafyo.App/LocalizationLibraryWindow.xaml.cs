@@ -17,6 +17,9 @@ public partial class LocalizationLibraryWindow : Window
         public string KindLabel { get; init; } = "";
         public string Category { get; init; } = "";
         public string Platform { get; init; } = "";
+        public string GameVersion { get; init; } = "";
+        public string TranslationVersion { get; init; } = "";
+        public string PublishedAt { get; init; } = "";
         public string Info { get; init; } = "";
         public string Install { get; init; } = "";
         public string Notes { get; init; } = "";
@@ -35,6 +38,8 @@ public partial class LocalizationLibraryWindow : Window
         {
             Title = "Resident Evil 4 (2005)",
             Subtitle = "PC · الإصدار المذكور في صفحة المصدر: v1.0",
+            Platform = "PC",
+            GameVersion = "v1.0",
             KindLabel = "تعريب موثق · مصدر خارجي",
             Category = "تعريبات موثقة",
             Info = "صفحة تعريب منشورة على Ta3reebat. الصفحة تذكر أن التعريب مجاني، وحجمه المنشور 880.90 MB، وتنسب العمل إلى IBRAHIM ALOBAIDI. تحقق من إصدار لعبتك قبل التنزيل.",
@@ -47,6 +52,7 @@ public partial class LocalizationLibraryWindow : Window
         {
             Title = "Resident Evil 4 Ultimate HD Edition",
             Subtitle = "PC · عدة مشاريع تعريب مدرجة",
+            Platform = "PC",
             KindLabel = "دليل تعريبات · روابط أصحاب الأعمال",
             Category = "تعريبات موثقة",
             Info = "يعرض دليل Muarrab أكثر من مشروع لهذه النسخة، مع أسماء المترجمين والمنصات ونوع الترجمة. تختلف الملفات وطريقة التثبيت بين المشاريع.",
@@ -59,6 +65,7 @@ public partial class LocalizationLibraryWindow : Window
         {
             Title = "Muarrab — دليل شامل للتعريبات",
             Subtitle = "آلاف الألعاب · رسمي ومجتمعي · منصات متعددة",
+            Platform = "منصات متعددة",
             KindLabel = "مكتبة خارجية",
             Category = "مكتبات خارجية",
             Info = "دليل يجمع التعريبات الرسمية وتعريبات المجتمع، ويعرض المنصات ونوع الترجمة وروابط أصحاب التعريبات.",
@@ -72,6 +79,7 @@ public partial class LocalizationLibraryWindow : Window
         {
             Title = "Ta3reb — مكتبة التعريبات",
             Subtitle = "PC · PlayStation · Nintendo Switch وغيرها",
+            Platform = "PC، PlayStation، Nintendo Switch",
             KindLabel = "مكتبة خارجية",
             Category = "مكتبات خارجية",
             Info = "مكتبة عربية تعرض تعريبات ألعاب متعددة حسب المنصة، ومنها مشاريع للحاسب وأجهزة أخرى.",
@@ -98,6 +106,7 @@ public partial class LocalizationLibraryWindow : Window
         {
             Title = "أبو يزن — تعريبات PC وSteam",
             Subtitle = "تعريبات مع صفحات تثبيت وإزالة",
+            Platform = "PC، Steam",
             KindLabel = "مكتبة خارجية",
             Category = "مكتبات خارجية",
             Info = "موقع يصف تعريبات PC وSteam، ويذكر أن صفحات الألعاب تتضمن تفاصيل التعريب وأداة التثبيت وخيارات الإزالة.",
@@ -111,6 +120,7 @@ public partial class LocalizationLibraryWindow : Window
         {
             Title = "Matrix Arabic — أداة بناء التعريب",
             Subtitle = "Windows 10/11 · يعتمد على ملفات اللعبة الأصلية",
+            Platform = "Windows 10/11",
             KindLabel = "مكتبة خارجية",
             Category = "مكتبات خارجية",
             Info = "مشروع يذكر أنه يبني ملفات التعريب محليًا على جهاز المستخدم بدل توزيع ملفات اللعبة نفسها. راجع قائمة الألعاب المدعومة داخل موقعه.",
@@ -188,6 +198,9 @@ public partial class LocalizationLibraryWindow : Window
             KindLabel = (x.UpdateType == "new" ? "تعريب جديد" : x.UpdateType == "update" ? "تحديث تعريب" : "صفحة تعريب") + " · " + x.SourceName,
             Category = "تعريبات موثقة",
             Platform = string.IsNullOrWhiteSpace(x.Platform) ? InferPlatforms(x.Summary) : x.Platform,
+            GameVersion = x.GameVersion,
+            TranslationVersion = x.TranslationVersion,
+            PublishedAt = x.PublishedAt,
             Info = string.IsNullOrWhiteSpace(x.Summary) ? "تم اكتشاف صفحة تعريب من المصدر." : x.Summary,
             Install = "تعليمات التثبيت التفصيلية تُراجع في صفحة المصدر؛ تختلف الطريقة حسب اللعبة وإصدارها.",
             Notes = "اكتُشف هذا الإدخال آليًا. لم يختبر FLAFYO التوافق أو ملف التعريب. راجع صفحة المصدر قبل التثبيت.",
@@ -275,7 +288,14 @@ public partial class LocalizationLibraryWindow : Window
     {
         if (EntriesList.SelectedItem is not LibraryEntry item) return;
         DetailTitle.Text = item.Title;
-        DetailSubtitle.Text = item.Subtitle;
+        DetailSubtitle.Text = item.KindLabel;
+        DetailMetadata.Text = string.Join(Environment.NewLine, new[]
+        {
+            string.IsNullOrWhiteSpace(item.Platform) ? null : "المنصة: " + item.Platform,
+            string.IsNullOrWhiteSpace(item.GameVersion) ? null : "إصدار اللعبة: " + item.GameVersion,
+            string.IsNullOrWhiteSpace(item.TranslationVersion) ? null : "إصدار التعريب: " + item.TranslationVersion,
+            string.IsNullOrWhiteSpace(item.PublishedAt) ? null : "تاريخ النشر/التحديث: " + item.PublishedAt
+        }.Where(value => !string.IsNullOrWhiteSpace(value)));
         DetailInfo.Text = item.Info;
         InstallSteps.Text = "طريقة التثبيت: " + item.Install;
         SafetyNotes.Text = item.Notes;
@@ -287,6 +307,7 @@ public partial class LocalizationLibraryWindow : Window
     {
         DetailTitle.Text = "مفيش نتائج مطابقة";
         DetailSubtitle.Text = "جرّب اسم لعبة أو اختار «كل المصادر».";
+        DetailMetadata.Text = "";
         DetailInfo.Text = "لا توجد عناصر تطابق البحث أو التصنيف الحالي.";
         InstallSteps.Text = "";
         SafetyNotes.Text = "";
