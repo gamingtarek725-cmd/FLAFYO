@@ -7,12 +7,12 @@ namespace Flafyo.Core;
 public sealed class ScreenPipelineOptions
 {
     public TimeSpan Interval { get; init; } = TimeSpan.FromMilliseconds(700);
-    /// <summary>The screen must stay unchanged this long before it is scanned (so camera motion never triggers scans).</summary>
-    public TimeSpan Settle { get; init; } = TimeSpan.FromMilliseconds(500);
-    /// <summary>...but scan anyway after this long, even if the picture keeps moving.</summary>
-    public TimeSpan MaxWait { get; init; } = TimeSpan.FromSeconds(3);
-    /// <summary>Translations stay this long after all text disappears.</summary>
-    public TimeSpan ClearDelay { get; init; } = TimeSpan.FromMilliseconds(2500);
+    /// <summary>Wait briefly for a scene to settle, but do not let subtle idle animation delay OCR for seconds.</summary>
+    public TimeSpan Settle { get; init; } = TimeSpan.FromMilliseconds(250);
+    /// <summary>Force a scan periodically even when idle animation keeps changing pixels.</summary>
+    public TimeSpan MaxWait { get; init; } = TimeSpan.FromMilliseconds(1200);
+    /// <summary>Keep the last good translation through intermittent OCR misses caused by animation or blur.</summary>
+    public TimeSpan ClearDelay { get; init; } = TimeSpan.FromSeconds(6);
     /// <summary>false = scan only when <see cref="ScreenPipeline.ScanNow"/> is called (hotkey).</summary>
     public bool Continuous { get; init; } = true;
     public double ChangeThreshold { get; init; } = 2.0;
@@ -39,9 +39,6 @@ public sealed class ScreenPipeline : IAsyncDisposable
     private List<ScreenBlock>? _lastBlocks;
     private long _emptySince;
     private Frame? _lastFrame;
-    private readonly object _scanLock = new();
-    private CancellationTokenSource? _activeScan;
-    private long _scanGeneration;
     public long DroppedFrames { get; private set; }
 
     public event Action<IReadOnlyList<TranslatedBlock>>? Updated;
@@ -97,7 +94,7 @@ public sealed class ScreenPipeline : IAsyncDisposable
         }
     }
 
-    private sealed record FrameWork(Frame Frame, long Generation);
+    private sealed record FrameWork(Frame Frame);
 
     private async Task CaptureLoopAsync(LatestQueue<FrameWork> latest, CancellationToken ct)
     {
@@ -160,18 +157,8 @@ public sealed class ScreenPipeline : IAsyncDisposable
 
     private void OfferLatest(LatestQueue<FrameWork> latest, Frame frame)
     {
-        var generation = Interlocked.Increment(ref _scanGeneration);
-        CancelActiveScan();
-        latest.Offer(new FrameWork(frame, generation));
+        latest.Offer(new FrameWork(frame));
         DroppedFrames = latest.Dropped;
-    }
-
-    private void CancelActiveScan()
-    {
-        lock (_scanLock)
-        {
-            try { _activeScan?.Cancel(); } catch (ObjectDisposedException) { }
-        }
     }
 
     private async Task ConsumeLatestAsync(LatestQueue<FrameWork> latest, CancellationToken ct)
@@ -182,20 +169,12 @@ public sealed class ScreenPipeline : IAsyncDisposable
             try { work = await latest.TakeAsync(ct).ConfigureAwait(false); }
             catch (ChannelClosedException) { return; }
 
-            using var scan = CancellationTokenSource.CreateLinkedTokenSource(ct);
-            lock (_scanLock) _activeScan = scan;
             try
             {
-                await ScanAsync(work.Frame, scan.Token, work.Generation).ConfigureAwait(false);
+                // New animation frames replace queued work, but never cancel an OCR/translation already in progress.
+                await ScanAsync(work.Frame, ct).ConfigureAwait(false);
             }
-            catch (OperationCanceledException) when (!ct.IsCancellationRequested) { }
-            finally
-            {
-                lock (_scanLock)
-                {
-                    if (ReferenceEquals(_activeScan, scan)) _activeScan = null;
-                }
-            }
+            catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
         }
     }
 
@@ -205,7 +184,7 @@ public sealed class ScreenPipeline : IAsyncDisposable
         catch { /* diagnostics must never interrupt the game translation worker */ }
     }
 
-    private async Task ScanAsync(Frame frame, CancellationToken ct, long generation)
+    private async Task ScanAsync(Frame frame, CancellationToken ct)
     {
         var total = Stopwatch.StartNew();
         Scans++;
@@ -224,7 +203,6 @@ public sealed class ScreenPipeline : IAsyncDisposable
         catch (Exception ex) { _log?.Invoke("OCR failed: " + ex.Message); return; }
 
         var ocrMs = sw.Elapsed.TotalMilliseconds;
-        if (generation != Interlocked.Read(ref _scanGeneration)) return; // discard OCR from an obsolete frame
         var blocks = BlockBuilder.Build(lines).Take(_opt.MaxBlocks).ToList();
         try { Scanned?.Invoke(lines.Count, blocks.Count, ocrMs); } catch { }
         if (blocks.Count == 0)
@@ -251,7 +229,6 @@ public sealed class ScreenPipeline : IAsyncDisposable
             {
                 var (ar, _) = await _resolver.ResolveAsync(block.Text, ct).ConfigureAwait(false);
                 ct.ThrowIfCancellationRequested();
-                if (generation != Interlocked.Read(ref _scanGeneration)) return;
                 if (!string.IsNullOrWhiteSpace(ar)) translated.Add(new TranslatedBlock(block, ar));
             }
             catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
@@ -260,13 +237,11 @@ public sealed class ScreenPipeline : IAsyncDisposable
             if (translated.Count > 0 && Seconds(lastPublish, Stopwatch.GetTimestamp()) > 1.0)
             {
                 ct.ThrowIfCancellationRequested();
-                if (generation != Interlocked.Read(ref _scanGeneration)) return;
                 Publish(translated, area);
                 lastPublish = Stopwatch.GetTimestamp();
             }
         }
         ct.ThrowIfCancellationRequested();
-        if (generation != Interlocked.Read(ref _scanGeneration)) return;
         translation.Stop();
         Publish(translated, area);
         _lastBlocks = blocks;
@@ -294,7 +269,6 @@ public sealed class ScreenPipeline : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         _stop.Cancel();
-        CancelActiveScan();
         if (_worker != null) { try { await _worker.ConfigureAwait(false); } catch { } }
         _stop.Dispose();
     }
