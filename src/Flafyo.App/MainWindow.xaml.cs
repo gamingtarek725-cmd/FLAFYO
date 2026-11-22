@@ -58,7 +58,7 @@ public partial class MainWindow : Window
         }
         SpeedBox.SelectedIndex = Math.Clamp(_settings.SpeedIndex, 0, 2);
         TextSizeBox.SelectedIndex = Math.Clamp(_settings.TextSizeIndex, 0, 2);
-        PackBox.SelectedIndex = Math.Clamp(_settings.PackIndex, 0, 1);
+        PackBox.SelectedIndex = Math.Clamp(_settings.PackIndex, 0, 2);
         ModeIndexValue = Math.Clamp(_settings.ModeIndex, 0, 1);
         CaptureBox.SelectedIndex = Math.Clamp(_settings.CaptureIndex, 0, 1);
         ContinuousBox.IsChecked = _settings.Continuous;
@@ -184,17 +184,21 @@ public partial class MainWindow : Window
     private void UpdatePackStatus()
     {
         bool light = LanguagePack.Light.IsInstalled(), heavy = LanguagePack.Heavy.IsInstalled();
+        bool madlad = LanguagePack.Madlad.IsInstalled();
         LightText.Text = light ? "✅ الحزمة الخفيفة مثبتة (سريعة)" : "الحزمة الخفيفة (حوالي 145 ميجا): مش مثبتة";
-        HeavyText.Text = heavy ? "✅ الحزمة التقيلة مثبتة (أدق)" : "الحزمة التقيلة (حوالي 0.9 جيجا): مش مثبتة";
+        HeavyText.Text = heavy ? "✅ الحزمة التقيلة مثبتة (حوالي 0.9 جيجا)" : "الحزمة التقيلة NLLB-600M (حوالي 0.9 جيجا): مش مثبتة";
+        MadladText.Text = madlad ? "✅ MADLAD-400 3B مثبتة (كبيرة وبطيئة)" : "MADLAD-400 3B INT4 (حوالي 3.7 جيجا): غير مثبتة";
         LightButton.Visibility = light ? Visibility.Collapsed : Visibility.Visible;
         HeavyButton.Visibility = heavy ? Visibility.Collapsed : Visibility.Visible;
-        LightButton.IsEnabled = HeavyButton.IsEnabled = !_downloading;
+        MadladButton.Visibility = madlad ? Visibility.Collapsed : Visibility.Visible;
+        LightButton.IsEnabled = HeavyButton.IsEnabled = MadladButton.IsEnabled = !_downloading;
     }
 
     private async Task DownloadPackAsync(LanguagePack pack, TextBlock text)
     {
         if (_downloading) return;
-        _downloading = true; LightButton.IsEnabled = HeavyButton.IsEnabled = false;
+        _downloading = true;
+        LightButton.IsEnabled = HeavyButton.IsEnabled = MadladButton.IsEnabled = false;
         string? error = null;
         var progress = new Progress<double>(v => text.Text = $"جاري تنزيل الحزمة {pack.ShortName}… {v * 100:0}%");
         try { await pack.DownloadAsync(progress, CancellationToken.None); }
@@ -205,6 +209,7 @@ public partial class MainWindow : Window
 
     private async void Light_Click(object sender, RoutedEventArgs e) => await DownloadPackAsync(LanguagePack.Light, LightText);
     private async void Heavy_Click(object sender, RoutedEventArgs e) => await DownloadPackAsync(LanguagePack.Heavy, HeavyText);
+    private async void Madlad_Click(object sender, RoutedEventArgs e) => await DownloadPackAsync(LanguagePack.Madlad, MadladText);
 
     private void Pack_Changed(object sender, SelectionChangedEventArgs e)
     {
@@ -513,7 +518,7 @@ public partial class MainWindow : Window
         if (_monitors.Count > 0) MonitorBox.SelectedIndex = Math.Clamp(p.MonitorIndex, 0, _monitors.Count - 1);
         SpeedBox.SelectedIndex = Math.Clamp(p.SpeedIndex, 0, 2);
         TextSizeBox.SelectedIndex = Math.Clamp(p.TextSizeIndex, 0, 2);
-        PackBox.SelectedIndex = Math.Clamp(p.PackIndex, 0, 1);
+        PackBox.SelectedIndex = Math.Clamp(p.PackIndex, 0, 2);
         ContinuousBox.IsChecked = p.Continuous; MasculineBox.IsChecked = p.Masculine; PreciseBox.IsChecked = p.Precise;
         AutoStartBox.IsChecked = p.AutoStart;
         _settings.Style.CopyFrom(p.Style);
@@ -656,23 +661,27 @@ public partial class MainWindow : Window
             return BuildWithInner(apiTranslator, "عن طريق حسابك");
         }
 
-        // chosen pack → (if missing) the other pack → (if none) the temporary online service
-        var chosen = PackBox.SelectedIndex == 1 ? LanguagePack.Heavy : LanguagePack.Light;
-        var other = chosen.Kind == PackKind.Heavy ? LanguagePack.Light : LanguagePack.Heavy;
-        var pack = chosen.IsInstalled() ? chosen : other.IsInstalled() ? other : null;
+        // Preferred pack → next installed offline pack → temporary online fallback.
+        var ordered = PackBox.SelectedIndex switch
+        {
+            2 => new[] { LanguagePack.Madlad, LanguagePack.Heavy, LanguagePack.Light },
+            1 => new[] { LanguagePack.Heavy, LanguagePack.Madlad, LanguagePack.Light },
+            _ => new[] { LanguagePack.Light, LanguagePack.Heavy, LanguagePack.Madlad }
+        };
+        var installed = ordered.Where(p => p.IsInstalled()).ToArray();
+        var pack = installed.FirstOrDefault();
 
         ITranslator inner; string mode;
         if (pack != null)
         {
-            var backup = pack == chosen ? other : chosen;
-            bool backupInstalled = backup.IsInstalled();
+            var backup = installed.Skip(1).FirstOrDefault();
             var lazy = new LazyTranslator(
                 () => pack.CreateTranslator(threads, beams),
-                () => backupInstalled ? backup.CreateTranslator(threads, beams) : new OnlineTranslator("en", "ar"));
+                () => backup != null ? backup.CreateTranslator(threads, beams) : new OnlineTranslator("en", "ar"));
             lazy.EngineReady += (eng, err) => { ShowEngine(eng, err, pack.ShortName); onEngine?.Invoke(EngineLabel(eng, err, pack.ShortName)); };
-            ShowEngine(lazy.Engine, lazy.Error, pack.ShortName);   // in case it finished before we subscribed
+            ShowEngine(lazy.Engine, lazy.Error, pack.ShortName);
             onEngine?.Invoke(EngineLabel(lazy.Engine, lazy.Error, pack.ShortName));
-            inner = lazy; mode = "بدون إنترنت";
+            inner = lazy; mode = "بدون إنترنت — " + pack.ShortName;
         }
         else
         {
