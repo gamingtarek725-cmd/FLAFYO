@@ -28,6 +28,7 @@
         <Button Content="الكل" Tag="all" Click="Category_Click" Background="#20BFD0" Foreground="#FFFFFF" Padding="15,7" Margin="0,0,7,0"/>
         <Button Content="PC" Tag="pc" Click="Category_Click" Padding="15,7" Margin="0,0,7,0"/>
         <Button Content="منصات أخرى" Tag="console" Click="Category_Click" Padding="15,7" Margin="0,0,7,0"/>
+        <Button Content="Android" Tag="mobile" Click="Category_Click" Padding="15,7" Margin="0,0,7,0"/>
         <Button Content="تعريبات جديدة" Tag="new" Click="Category_Click" Padding="15,7" Margin="0,0,7,0"/>
         <Button Content="مكتبات خارجية" Tag="directories" Click="Category_Click" Padding="15,7" Margin="0,0,7,0"/>
       </WrapPanel>
