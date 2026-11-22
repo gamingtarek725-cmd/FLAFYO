@@ -83,14 +83,17 @@ public class MadladPackTests
 
 public class OnnxMadladIntegrationTests
 {
+    private readonly Xunit.Abstractions.ITestOutputHelper _output;
+    public OnnxMadladIntegrationTests(Xunit.Abstractions.ITestOutputHelper output) => _output = output;
+
     private static string? Dir => Environment.GetEnvironmentVariable("FLAFYO_MADLAD_MODEL_DIR");
+    private static string? NllbDir => Environment.GetEnvironmentVariable("FLAFYO_HEAVY_MODEL_DIR");
 
     [Fact]
-    public void Madlad_model_produces_arabic_for_english_game_text()
+    public void Madlad_model_produces_arabic_and_reports_reference_quality()
     {
         if (string.IsNullOrWhiteSpace(Dir)) return;
 
-        using var translator = OnnxMadladTranslator.Load(Dir, threads: 1);
         var samples = new[]
         {
             "Find the key and open the door.",
@@ -98,11 +101,38 @@ public class OnnxMadladIntegrationTests
             "The enemy is approaching. Stay alert.",
             "Press E to interact with the object."
         };
-        foreach (var sample in samples)
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        var madladRows = new List<(string English, string Arabic, double Score)>();
+        using (var translator = OnnxMadladTranslator.Load(Dir, threads: 1))
         {
-            var result = translator.TranslateSync(sample, CancellationToken.None);
-            Assert.False(string.IsNullOrWhiteSpace(result), "Empty translation for: " + sample);
-            Assert.Matches(new Regex(@"\p{IsArabic}"), result);
+            foreach (var sample in samples)
+            {
+                var result = translator.TranslateSync(sample, CancellationToken.None);
+                Assert.False(string.IsNullOrWhiteSpace(result), "Empty translation for: " + sample);
+                Assert.Matches(new Regex(@"\\p{IsArabic}"), result);
+                _output.WriteLine("MADLAD | " + sample + " => " + result);
+            }
+
+            var references = Phrasebook.LoadEmbedded().Entries.Where((_, i) => i % 15 == 0).Take(12);
+            foreach (var (english, referenceArabic) in references)
+            {
+                var translated = translator.TranslateSync(english, CancellationToken.None);
+                madladRows.Add((english, translated, Quality.Dice(translated, referenceArabic)));
+            }
+        }
+        _output.WriteLine($"MADLAD reference similarity: {madladRows.Average(x => x.Score):0.000} across {madladRows.Count} game phrases; elapsed {sw.Elapsed.TotalSeconds:0.0}s");
+
+        if (!string.IsNullOrWhiteSpace(NllbDir))
+        {
+            var nllbRows = new List<double>();
+            using var nllb = OnnxNllbTranslator.Load(NllbDir, threads: 1);
+            foreach (var row in madladRows)
+            {
+                var reference = Phrasebook.LoadEmbedded().Entries.First(x => x.English == row.English).Arabic;
+                var translated = nllb.TranslateSync(row.English, CancellationToken.None);
+                nllbRows.Add(Quality.Dice(translated, reference));
+            }
+            _output.WriteLine($"NLLB-600M reference similarity: {nllbRows.Average():0.000} on the same phrases");
         }
     }
 }
