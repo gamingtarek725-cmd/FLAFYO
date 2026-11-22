@@ -57,6 +57,8 @@ internal sealed class LocalizationCatalogService
                 !string.IsNullOrWhiteSpace(e.SourceName) &&
                 Uri.TryCreate(e.SourceUrl, UriKind.Absolute, out var uri) &&
                 uri.Scheme == Uri.UriSchemeHttps &&
+                uri.IsDefaultPort &&
+                string.IsNullOrEmpty(uri.UserInfo) &&
                 allowed.Any(host => uri.Host.Equals(host, StringComparison.OrdinalIgnoreCase) ||
                                     uri.Host.EndsWith("." + host, StringComparison.OrdinalIgnoreCase)) &&
                 !uri.AbsolutePath.TrimEnd('/').EndsWith("/home", StringComparison.OrdinalIgnoreCase))
