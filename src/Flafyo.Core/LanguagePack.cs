@@ -205,9 +205,12 @@ public sealed class LanguagePack
                 var validExisting = File.Exists(target) && new FileInfo(target).Length == file.Bytes;
                 if (validExisting)
                 {
-                    await using var existing = File.OpenRead(target);
-                    var existingHash = Convert.ToHexString(
-                        await SHA256.HashDataAsync(existing, ct).ConfigureAwait(false)).ToLowerInvariant();
+                    string existingHash;
+                    await using (var existing = File.OpenRead(target))
+                    {
+                        existingHash = Convert.ToHexString(
+                            await SHA256.HashDataAsync(existing, ct).ConfigureAwait(false)).ToLowerInvariant();
+                    }
                     validExisting = existingHash.Equals(file.Sha256, StringComparison.OrdinalIgnoreCase);
                 }
 
@@ -224,9 +227,12 @@ public sealed class LanguagePack
                         if (actualLength != file.Bytes)
                             throw new InvalidDataException("حجم ملف MADLAD بعد فك الضغط غير مطابق: " + file.File);
 
-                        await using var extracted = File.OpenRead(part);
-                        var hash = Convert.ToHexString(
-                            await SHA256.HashDataAsync(extracted, ct).ConfigureAwait(false)).ToLowerInvariant();
+                        string hash;
+                        await using (var extracted = File.OpenRead(part))
+                        {
+                            hash = Convert.ToHexString(
+                                await SHA256.HashDataAsync(extracted, ct).ConfigureAwait(false)).ToLowerInvariant();
+                        }
                         if (!hash.Equals(file.Sha256, StringComparison.OrdinalIgnoreCase))
                             throw new InvalidDataException("فشل التحقق من SHA-256 لملف MADLAD: " + file.File);
 
