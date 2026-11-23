@@ -1,3 +1,4 @@
+using System.Threading.Channels;
 using Flafyo.Core;
 using Xunit;
 
@@ -23,7 +24,6 @@ public class LatestQueueTests
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => new LatestQueue<int>(0));
     }
-}
 
     [Fact]
     public async Task Capacity_two_preserves_order_of_the_newest_items()
@@ -45,7 +45,7 @@ public class LatestQueueTests
     {
         var queue = new LatestQueue<string>(2);
         Assert.True(queue.Offer("frame"));
-        
+
         queue.Complete();
 
         Assert.Equal("frame", await queue.TakeAsync(CancellationToken.None));
