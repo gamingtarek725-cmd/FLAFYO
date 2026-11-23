@@ -61,6 +61,9 @@ jobs:
                       record["inputs"] = [vi(v) for v in model.graph.input]
                       record["outputs"] = [vi(v) for v in model.graph.output]
                       record["opsets"] = [{"domain": x.domain, "version": x.version} for x in model.opset_import]
+                      record["ir_version"] = model.ir_version
+                      if model.ir_version > 11:
+                          raise SystemExit(f"{name}: ONNX IR {model.ir_version} exceeds the ONNX Runtime 1.23.2 ceiling (11)")
 
                       # Fail CI if the pinned export no longer matches the tensors required by the .NET runtime.
                       inputs = {item["name"]: item for item in record["inputs"]}
