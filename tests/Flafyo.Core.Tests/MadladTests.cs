@@ -79,6 +79,13 @@ public class MadladPackTests
         Assert.True(LanguagePack.Madlad.ApproxBytes > 3_500_000_000);
         Assert.Contains("madlad", LanguagePack.Madlad.Folder, StringComparison.OrdinalIgnoreCase);
     }
+
+    [Fact]
+    public void Madlad_factory_fails_clearly_until_compatible_runtime_is_available()
+    {
+        var error = Assert.Throws<NotSupportedException>(() => LanguagePack.Madlad.CreateTranslator(1, 1));
+        Assert.Contains("temporarily unavailable", error.Message, StringComparison.OrdinalIgnoreCase);
+    }
 }
 
 public class OnnxMadladIntegrationTests
