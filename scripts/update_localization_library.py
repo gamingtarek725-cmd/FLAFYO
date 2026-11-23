@@ -27,6 +27,7 @@ TITLE_OVERRIDES = {
     "007-first-light": "007 First Light",
     "a-plague-tale-innocence": "A Plague Tale: Innocence",
     "grand-theft-auto-v": "Grand Theft Auto V",
+    "grand-theft-auto-vi": "Grand Theft Auto VI",
     "red-dead-redemption-2": "Red Dead Redemption 2",
     "resident-evil-4-ultimate-hd-edition": "Resident Evil 4 Ultimate HD Edition",
     "the-last-of-us-2": "The Last of Us Part II",
@@ -244,6 +245,17 @@ def main():
                 match["coverUrl"] = cached_url
 
     entries.sort(key=lambda item: (item["sourceName"], item["title"].casefold()))
+    # Remove stale cached files after source artwork changes so the repository
+    # contains only the covers referenced by the current catalog.
+    used_covers = {
+        Path(urlparse(item["coverUrl"]).path).name
+        for item in entries if item.get("coverUrl")
+    }
+    if COVERS_DIR.exists():
+        for cached_file in COVERS_DIR.glob("*.jpg"):
+            if cached_file.name not in used_covers:
+                cached_file.unlink()
+
     with_cover = sum(bool(item["coverUrl"]) for item in entries)
     print(f"Cached optimized JPEG artwork for {with_cover}/{len(entries)} game pages.")
     unchanged = previous.get("entries") == entries and previous.get("sourceCount") == len(SOURCES)
