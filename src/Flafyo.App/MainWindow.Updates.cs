@@ -140,8 +140,16 @@ public partial class MainWindow
         StatusText.Focus();
     }
     private void DashboardFiles_Click(object sender, RoutedEventArgs e) => GameFiles_Click(sender, e);
-    private void DashboardLanguages_Click(object sender, RoutedEventArgs e) => SettingsTabs.SelectedIndex = 0;
-    private void DashboardGameSettings_Click(object sender, RoutedEventArgs e) => SettingsTabs.SelectedIndex = 3;
+    private void DashboardLanguages_Click(object sender, RoutedEventArgs e)
+    {
+        MainTabs.SelectedIndex = 2;
+        SettingsTabs.SelectedIndex = 0;
+    }
+    private void DashboardGameSettings_Click(object sender, RoutedEventArgs e)
+    {
+        MainTabs.SelectedIndex = 2;
+        SettingsTabs.SelectedIndex = 3;
+    }
     private void DashboardLibrary_Click(object sender, RoutedEventArgs e) => GameLibrary_Click(sender, e);
     private void DashboardLogs_Click(object sender, RoutedEventArgs e) => OpenLog_Click(sender, e);
 }
