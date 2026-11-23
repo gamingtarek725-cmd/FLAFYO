@@ -95,14 +95,17 @@ def safe_image_url(page_url: str, candidates: list[str]) -> str:
     return ""
 
 def discover_cover(entry: dict) -> tuple[str, str]:
+    # Prefer the full-size social preview on the game's detail page over tiny
+    # listing thumbnails. Keep the listing image only as a fallback.
+    fallback = entry.get("coverSourceUrl", "")
     try:
         parser = PageImageParser()
         parser.feed(fetch(entry["sourceUrl"]))
         cover = safe_image_url(entry["sourceUrl"], parser.candidates)
-        return entry["sourceUrl"], cover
+        return entry["sourceUrl"], cover or fallback
     except Exception as exc:
-        print(f"WARN: artwork unavailable for {entry['title']}: {exc}")
-        return entry["sourceUrl"], ""
+        print(f"WARN: artwork metadata unavailable for {entry['title']}: {exc}")
+        return entry["sourceUrl"], fallback
 
 def title_from_slug(path: str, fallback: str) -> str:
     slug = unquote(path.rstrip("/").split("/")[-1]).lower()
@@ -191,7 +194,7 @@ def main():
         entry["coverUrl"] = ""
 
     from concurrent.futures import ThreadPoolExecutor, as_completed
-    missing_artwork = [entry for entry in entries if not entry["coverSourceUrl"]]
+    missing_artwork = list(entries)
     with ThreadPoolExecutor(max_workers=8) as executor:
         futures = [executor.submit(discover_cover, entry) for entry in missing_artwork[:400]]
         for future in as_completed(futures):
