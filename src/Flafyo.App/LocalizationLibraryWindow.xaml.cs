@@ -230,8 +230,13 @@ public partial class LocalizationLibraryWindow : Window
              ContainsText(x.Subtitle, query) ||
              ContainsText(x.SourceName, query) ||
              ContainsText(x.Info, query) ||
+             ContainsText(x.Install, query) ||
              ContainsText(x.KindLabel, query) ||
-             ContainsText(x.Platform, query)))
+             ContainsText(x.Platform, query) ||
+             ContainsText(x.GameVersion, query) ||
+             ContainsText(x.TranslationVersion, query) ||
+             ContainsText(x.PublishedAt, query) ||
+             ContainsText(x.SourceUrl, query)))
             .OrderByDescending(x =>
                 x.KindLabel.Contains("تحديث", StringComparison.OrdinalIgnoreCase) ||
                 x.KindLabel.Contains("جديد", StringComparison.OrdinalIgnoreCase))
