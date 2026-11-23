@@ -259,10 +259,26 @@ public partial class LocalizationLibraryWindow : UserControl
         if (_visible.Count == 0) ShowEmpty();
     }
 
-    private static bool IsSafeCoverUrl(string? value) =>
-        Uri.TryCreate(value, UriKind.Absolute, out var uri) &&
-        uri.Scheme == Uri.UriSchemeHttps &&
-        string.IsNullOrEmpty(uri.UserInfo);
+    private static bool IsSafeCoverUrl(string? value)
+    {
+        if (!Uri.TryCreate(value, UriKind.Absolute, out var uri) ||
+            uri.Scheme != Uri.UriSchemeHttps ||
+            !uri.IsDefaultPort ||
+            !string.IsNullOrEmpty(uri.UserInfo))
+            return false;
+
+        bool catalogArtwork =
+            uri.Host.Equals("raw.githubusercontent.com", StringComparison.OrdinalIgnoreCase) &&
+            uri.AbsolutePath.StartsWith(
+                "/gamingtarek725-cmd/FLAFYO/main/data/covers/",
+                StringComparison.Ordinal);
+
+        bool verifiedSteamArtwork =
+            uri.Host.Equals("cdn.akamai.steamstatic.com", StringComparison.OrdinalIgnoreCase) &&
+            uri.AbsolutePath.StartsWith("/steam/apps/", StringComparison.Ordinal);
+
+        return catalogArtwork || verifiedSteamArtwork;
+    }
 
     private static bool ContainsText(string? value, string query) =>
         !string.IsNullOrWhiteSpace(value) && value.Contains(query, StringComparison.OrdinalIgnoreCase);
