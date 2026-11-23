@@ -80,7 +80,10 @@ public sealed class AppSettings
         try
         {
             Directory.CreateDirectory(UserData.Dir);
-            File.WriteAllText(UserData.SettingsFile, JsonSerializer.Serialize(this));
+            Flafyo.Core.AtomicFile.WriteAllText(
+                UserData.SettingsFile,
+                JsonSerializer.Serialize(this),
+                keepBackup: File.Exists(UserData.SettingsFile));
         }
         catch { }
     }
