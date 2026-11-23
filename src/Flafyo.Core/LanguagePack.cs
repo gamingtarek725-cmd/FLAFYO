@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using System.Security.Cryptography;
 
 namespace Flafyo.Core;
@@ -41,24 +42,21 @@ public sealed class LanguagePack
             new ModelFile("onnx/decoder_model_merged_quantized.onnx", 476_000_000),
         });
 
-    // Pinned Apache-2.0 MADLAD-400-3B INT4 ONNX export. External weight sidecars are required by ONNX Runtime.
+    // Pinned Apache-2.0 MADLAD-400 ReducedRam INT4 export. Each extracted graph is SHA-256 verified.
     public static LanguagePack Madlad { get; } = new(PackKind.Madlad, "MADLAD-400 3B",
-        "madlad-400-3b-int4",
-        "https://huggingface.co/tonythethompson/madlad400-3b-mt-onnx/resolve/c165d741425c82365761aae98d0891bd9e7995ed/mixed_fp16_int4/",
+        "madlad-400-3b-int4", "",
         new[]
         {
-            new ModelFile("config.json", 850),
-            new ModelFile("generation_config.json", 184),
-            new ModelFile("spiece.model", 4_427_844,
+            new ModelFile("Madlad/madlad_embed_8bit.onnx", 262_144_789,
+                "350bc365a3f4f3d9d48762e079526fcf9efe7a4ab7a789178dcda1a8996aeb65", true),
+            new ModelFile("Madlad/Int4Acc4/madlad_encoder_4bit.onnx", 575_492_499,
+                "0ec36a3020415b6e07b731d4d5d259850b1e5247436a21cb77be8af55dc4eac1", true),
+            new ModelFile("Madlad/Int4Acc4/madlad_cache_initializer_4bit.onnx", 71_888_403,
+                "0c053db1692e263e1d4e5e74389164623c6bc6548555151fa258876979b2c5cf", true),
+            new ModelFile("Madlad/Int4Acc4/madlad_decoder_4bit.onnx", 788_164_973,
+                "fe76451876d3fa167879dd4e643172697bea7bbf72baa264528219401240fd8a", true),
+            new ModelFile("Madlad/spiece.model", 4_427_844,
                 "ef11ac9a22c7503492f56d48dce53be20e339b63605983e9f27d2cd0e0f3922c", true),
-            new ModelFile("onnx/encoder_model.onnx", 1_473_277,
-                "2be68c85bb5c9468e389aed3d4d7563b503f05918f244c560bf3729709380bb2", true),
-            new ModelFile("onnx/encoder_model.onnx.data", 1_610_746_877,
-                "612c552d68ff5e702f95bcc56996da5069a4c5e50895599e797f7bb27cd0c422", true),
-            new ModelFile("onnx/decoder_model_merged.onnx", 3_228_557,
-                "0b2dcd996563fea546576cb38e2195da5f0069f01fd08c77c6b6b9408ea1dbc5", true),
-            new ModelFile("onnx/decoder_model_merged.onnx.data", 2_051_607_552,
-                "62d253bc68aca845129dbba3c04a6e21d2fcf080ab4cb8cad982622a8374e3f9", true),
         });
 
     public string Dir => Path.Combine(
@@ -78,6 +76,12 @@ public sealed class LanguagePack
 
     public async Task DownloadAsync(IProgress<double>? progress, CancellationToken ct)
     {
+        if (Kind == PackKind.Madlad)
+        {
+            await DownloadMadladArchiveAsync(progress, ct).ConfigureAwait(false);
+            return;
+        }
+
         var dir = Dir;
         Directory.CreateDirectory(dir);
         long total = ApproxBytes, done = 0;
@@ -144,6 +148,109 @@ public sealed class LanguagePack
         }
         File.WriteAllText(Path.Combine(dir, Marker), DateTime.UtcNow.ToString("O"));
         progress?.Report(1.0);
+    }
+
+    private const long MadladArchiveBytes = 1_482_639_037;
+    private const string MadladArchiveUrl =
+        "https://github.com/niedev/OnnxModelsEnhancer/releases/download/v1.0.0-beta/Madlad.zip";
+
+    private async Task DownloadMadladArchiveAsync(IProgress<double>? progress, CancellationToken ct)
+    {
+        var dir = Dir;
+        Directory.CreateDirectory(dir);
+        if (IsInstalled())
+        {
+            progress?.Report(1.0);
+            return;
+        }
+
+        var archivePath = Path.Combine(dir, "Madlad.zip");
+        var partialArchivePath = archivePath + ".part";
+        try
+        {
+            using (var http = new HttpClient { Timeout = Timeout.InfiniteTimeSpan })
+            using (var response = await http.GetAsync(MadladArchiveUrl,
+                HttpCompletionOption.ResponseHeadersRead, ct).ConfigureAwait(false))
+            {
+                response.EnsureSuccessStatusCode();
+                await using var source = await response.Content.ReadAsStreamAsync(ct).ConfigureAwait(false);
+                await using var destination = File.Create(partialArchivePath);
+                var buffer = new byte[1024 * 1024];
+                long downloaded = 0;
+                int read;
+                while ((read = await source.ReadAsync(buffer, ct).ConfigureAwait(false)) > 0)
+                {
+                    await destination.WriteAsync(buffer.AsMemory(0, read), ct).ConfigureAwait(false);
+                    downloaded += read;
+                    progress?.Report(0.65 * Math.Min(1.0, (double)downloaded / MadladArchiveBytes));
+                }
+            }
+
+            if (new FileInfo(partialArchivePath).Length != MadladArchiveBytes)
+                throw new InvalidDataException("حجم أرشيف MADLAD لا يطابق النسخة المعتمدة.");
+
+            File.Move(partialArchivePath, archivePath, overwrite: true);
+            using var archive = ZipFile.OpenRead(archivePath);
+            long extractedBytes = 0;
+            foreach (var file in _files)
+            {
+                ct.ThrowIfCancellationRequested();
+                var entry = archive.GetEntry(file.File)
+                    ?? throw new InvalidDataException("ملف MADLAD غير موجود داخل الأرشيف: " + file.File);
+                if (entry.Length != file.Bytes)
+                    throw new InvalidDataException("حجم ملف MADLAD غير مطابق: " + file.File);
+
+                var target = Path.Combine(dir, file.File);
+                Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+                var validExisting = File.Exists(target) && new FileInfo(target).Length == file.Bytes;
+                if (validExisting)
+                {
+                    await using var existing = File.OpenRead(target);
+                    var existingHash = Convert.ToHexString(
+                        await SHA256.HashDataAsync(existing, ct).ConfigureAwait(false)).ToLowerInvariant();
+                    validExisting = existingHash.Equals(file.Sha256, StringComparison.OrdinalIgnoreCase);
+                }
+
+                if (!validExisting)
+                {
+                    var part = target + ".part";
+                    try
+                    {
+                        await using (var input = entry.Open())
+                        await using (var output = File.Create(part))
+                            await input.CopyToAsync(output, 1024 * 1024, ct).ConfigureAwait(false);
+
+                        var actualLength = new FileInfo(part).Length;
+                        if (actualLength != file.Bytes)
+                            throw new InvalidDataException("حجم ملف MADLAD بعد فك الضغط غير مطابق: " + file.File);
+
+                        await using var extracted = File.OpenRead(part);
+                        var hash = Convert.ToHexString(
+                            await SHA256.HashDataAsync(extracted, ct).ConfigureAwait(false)).ToLowerInvariant();
+                        if (!hash.Equals(file.Sha256, StringComparison.OrdinalIgnoreCase))
+                            throw new InvalidDataException("فشل التحقق من SHA-256 لملف MADLAD: " + file.File);
+
+                        File.Move(part, target, overwrite: true);
+                    }
+                    catch
+                    {
+                        try { if (File.Exists(part)) File.Delete(part); } catch { }
+                        throw;
+                    }
+                }
+
+                extractedBytes += file.Bytes;
+                progress?.Report(0.65 + 0.35 * ((double)extractedBytes / ApproxBytes));
+            }
+
+            File.WriteAllText(Path.Combine(dir, Marker), DateTime.UtcNow.ToString("O"));
+            progress?.Report(1.0);
+        }
+        finally
+        {
+            try { if (File.Exists(partialArchivePath)) File.Delete(partialArchivePath); } catch { }
+            try { if (File.Exists(archivePath)) File.Delete(archivePath); } catch { }
+        }
     }
 
     /// <summary>Loads the selected pack; do this through LazyTranslator so model loading stays off the UI thread.</summary>
