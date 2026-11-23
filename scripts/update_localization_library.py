@@ -83,7 +83,7 @@ def safe_image_url(page_url: str, candidates: list[str]) -> str:
             continue
         path = parsed.path.lower()
         # WPF's built-in image decoder supports these common formats; skip SVG/WebP.
-        if path and not re.search(r"\\.(?:jpe?g|png|gif|bmp|tiff?)$", path):
+        if path and not re.search(r"\.(?:jpe?g|png|gif|bmp|tiff?)$", path):
             continue
         if any(token in path for token in ("/logo", "favicon", "avatar", "icon")):
             continue
