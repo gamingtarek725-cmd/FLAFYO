@@ -38,26 +38,58 @@ internal static class ProfileStore
     public static string DictionaryFile(string exe) => Path.Combine(UserData.Dir, $"dictionary.{Safe(exe)}.txt");
     public static string IdiomsFile(string exe) => Path.Combine(UserData.Dir, $"idioms.{Safe(exe)}.txt");
 
-    public static List<GameProfile> LoadAll()
+    public static List<GameProfile> LoadAll() => LoadAllFrom(Dir);
+
+    internal static List<GameProfile> LoadAllFrom(string directory)
     {
         var list = new List<GameProfile>();
         try
         {
-            if (!Directory.Exists(Dir)) return list;
-            foreach (var f in Directory.EnumerateFiles(Dir, "*.json"))
+            if (!Directory.Exists(directory)) return list;
+            foreach (var path in Directory.EnumerateFiles(directory, "*.json"))
             {
-                try
+                if (TryLoadProfile(path, out var profile))
                 {
-                    var info = new FileInfo(f);
-                    if (info.Length <= 0 || info.Length > MaxImportBytes) continue;
-                    var p = JsonSerializer.Deserialize<GameProfile>(File.ReadAllText(f));
-                    if (p != null && Validate(p, out _)) list.Add(p);
+                    list.Add(profile);
+                    continue;
                 }
-                catch { }
+
+                var backupPath = path + ".bak";
+                if (TryLoadProfile(backupPath, out profile))
+                {
+                    // Restore the last known-good profile after a damaged or interrupted save.
+                    try { Flafyo.Core.AtomicFile.WriteAllText(path, File.ReadAllText(backupPath)); }
+                    catch { }
+                    list.Add(profile);
+                }
             }
         }
         catch { }
         return list.OrderBy(p => p.ExeName, StringComparer.OrdinalIgnoreCase).ToList();
+    }
+
+    private static bool TryLoadProfile(string path, out GameProfile profile)
+    {
+        try
+        {
+            var info = new FileInfo(path);
+            if (info.Length <= 0 || info.Length > MaxImportBytes)
+            {
+                profile = null!;
+                return false;
+            }
+
+            var loaded = JsonSerializer.Deserialize<GameProfile>(File.ReadAllText(path));
+            if (loaded != null && Validate(loaded, out _))
+            {
+                profile = loaded;
+                return true;
+            }
+        }
+        catch { }
+
+        profile = null!;
+        return false;
     }
 
     public static bool Validate(GameProfile? p, out string error)
