@@ -38,6 +38,7 @@ public partial class LocalizationLibraryWindow : UserControl
         new()
         {
             Title = "Resident Evil 4 (2005)",
+            CoverUrl = "https://cdn.akamai.steamstatic.com/steam/apps/254700/library_600x900.jpg",
             Subtitle = "PC · الإصدار المذكور في صفحة المصدر: v1.0",
             Platform = "PC",
             GameVersion = "v1.0",
@@ -52,6 +53,7 @@ public partial class LocalizationLibraryWindow : UserControl
         new()
         {
             Title = "Resident Evil 4 Ultimate HD Edition",
+            CoverUrl = "https://cdn.akamai.steamstatic.com/steam/apps/254700/library_600x900.jpg",
             Subtitle = "PC · عدة مشاريع تعريب مدرجة",
             Platform = "PC",
             KindLabel = "دليل تعريبات · روابط أصحاب الأعمال",
