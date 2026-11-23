@@ -26,7 +26,7 @@
             </StackPanel>
           </Border>
           <TextBlock Text="مساحة العمل" FontSize="10" FontWeight="Bold" Foreground="{StaticResource Muted}" Margin="4,0,0,10"/>
-          <Button Content="⌂   لوحة التحكم" Click="DashboardLive_Click" HorizontalContentAlignment="Right" Background="#17233B" BorderBrush="#2D456A" Padding="13,12"/>
+          <Button Content="⌂   لوحة التحكم" Click="DashboardHome_Click" HorizontalContentAlignment="Right" Background="#17233B" BorderBrush="#2D456A" Padding="13,12"/>
           <Button Content="◉   الترجمة الفورية" Click="DashboardLive_Click" HorizontalContentAlignment="Right" Padding="13,12"/>
           <Button Content="▤   تعريب ملفات الألعاب" Click="DashboardFiles_Click" HorizontalContentAlignment="Right" Padding="13,12"/>
           <Button Content="文   حزم اللغات" Click="DashboardLanguages_Click" HorizontalContentAlignment="Right" Padding="13,12"/>
@@ -70,7 +70,7 @@
       </Grid>
     </Border>
 
-    <ScrollViewer Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Auto">
+    <ScrollViewer x:Name="MainScrollViewer" Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Auto">
       <StackPanel Margin="22">
         <!-- FLAFYO dashboard -->
         <Border Background="#15172B" BorderBrush="{StaticResource Line}" BorderThickness="1" CornerRadius="18" Padding="18" Margin="0,0,0,14">
