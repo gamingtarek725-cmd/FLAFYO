@@ -40,9 +40,12 @@
       <DockPanel LastChildFill="True">
         <StackPanel DockPanel.Dock="Top">
           <Border Background="#17223A" CornerRadius="16" Padding="13" Margin="0,0,0,24">
-            <StackPanel>
-              <TextBlock Text="FLAFYO" FontSize="25" FontWeight="Bold" Foreground="{StaticResource Accent2}" FlowDirection="LeftToRight" HorizontalAlignment="Left"/>
-              <TextBlock Text="GAME TRANSLATOR" FontSize="9" FontWeight="Bold" Foreground="{StaticResource Muted}" FlowDirection="LeftToRight" HorizontalAlignment="Left" Margin="0,3,0,0"/>
+            <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight" VerticalAlignment="Center">
+              <Image Source="{StaticResource FlafyoLogoImage}" Width="42" Height="42" Stretch="Uniform" Margin="0,0,10,0"/>
+              <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="FLAFYO" FontSize="22" FontWeight="Bold" Foreground="{StaticResource Accent2}" FlowDirection="LeftToRight"/>
+                <TextBlock Text="GAME TRANSLATOR" FontSize="8" FontWeight="Bold" Foreground="{StaticResource Muted}" FlowDirection="LeftToRight" Margin="0,2,0,0"/>
+              </StackPanel>
             </StackPanel>
           </Border>
           <TextBlock Text="مساحة العمل" FontSize="10" FontWeight="Bold" Foreground="{StaticResource Muted}" Margin="4,0,0,10"/>
