@@ -59,6 +59,47 @@ def fetch(url):
         charset = response.headers.get_content_charset() or "utf-8"
         return response.read(8_000_000).decode(charset, errors="replace")
 
+class PageImageParser(HTMLParser):
+    """Read social preview artwork from a game's own localization page."""
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.candidates = []
+    def handle_starttag(self, tag, attrs):
+        values = {str(k).lower(): (v or "").strip() for k, v in attrs}
+        if tag.lower() == "meta":
+            key = (values.get("property") or values.get("name") or values.get("itemprop") or "").lower()
+            image = values.get("content", "")
+            if image and key in {"og:image", "og:image:url", "twitter:image", "twitter:image:src", "image"}:
+                self.candidates.append(image)
+        elif tag.lower() == "link" and "image_src" in values.get("rel", "").lower().split():
+            if values.get("href"):
+                self.candidates.append(values["href"])
+
+def safe_image_url(page_url: str, candidates: list[str]) -> str:
+    for candidate in candidates:
+        absolute = urljoin(page_url, html.unescape(candidate.strip()))
+        parsed = urlparse(absolute)
+        if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password:
+            continue
+        path = parsed.path.lower()
+        # WPF's built-in image decoder supports these common formats; skip SVG/WebP.
+        if path and not re.search(r"\\.(?:jpe?g|png|gif|bmp|tiff?)$", path):
+            continue
+        if any(token in path for token in ("/logo", "favicon", "avatar", "icon")):
+            continue
+        return absolute
+    return ""
+
+def discover_cover(entry: dict) -> tuple[str, str]:
+    try:
+        parser = PageImageParser()
+        parser.feed(fetch(entry["sourceUrl"]))
+        cover = safe_image_url(entry["sourceUrl"], parser.candidates)
+        return entry["sourceUrl"], cover
+    except Exception as exc:
+        print(f"WARN: artwork unavailable for {entry['title']}: {exc}")
+        return entry["sourceUrl"], ""
+
 def title_from_slug(path: str, fallback: str) -> str:
     slug = path.rstrip("/").split("/")[-1].lower()
     if slug in TITLE_OVERRIDES:
@@ -131,6 +172,32 @@ def main():
             previous = json.loads(OUTPUT.read_text(encoding="utf-8"))
         except Exception:
             previous = {}
+
+    # Preserve manually verified covers, then enrich missing artwork from each game's
+    # own page metadata. Fetch concurrently so the scheduled catalog refresh stays bounded.
+    previous_covers = {
+        item.get("sourceUrl"): item.get("coverUrl", "")
+        for item in previous.get("entries", [])
+        if item.get("sourceUrl") and item.get("coverUrl")
+    }
+    for entry in entries:
+        if not entry["coverUrl"] and previous_covers.get(entry["sourceUrl"]):
+            entry["coverUrl"] = previous_covers[entry["sourceUrl"]]
+
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    missing_artwork = [entry for entry in entries if not entry["coverUrl"]]
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        futures = [executor.submit(discover_cover, entry) for entry in missing_artwork[:400]]
+        for future in as_completed(futures):
+            source_url, cover_url = future.result()
+            if cover_url:
+                match = next((item for item in entries if item["sourceUrl"] == source_url), None)
+                if match is not None:
+                    match["coverUrl"] = cover_url
+
+    entries.sort(key=lambda item: (item["sourceName"], item["title"].casefold()))
+    with_cover = sum(bool(item["coverUrl"]) for item in entries)
+    print(f"Artwork found for {with_cover}/{len(entries)} game pages.")
     unchanged = previous.get("entries") == entries and previous.get("sourceCount") == len(SOURCES)
     generated_at = previous.get("generatedAt") if unchanged and previous.get("generatedAt") else dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
     catalog = {
