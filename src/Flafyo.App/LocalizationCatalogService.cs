@@ -25,6 +25,7 @@ internal sealed class LocalizationCatalogService
         public string Title { get; set; } = "";
         public string SourceUrl { get; set; } = "";
         public string SourceName { get; set; } = "";
+        public string CoverUrl { get; set; } = "";
         public string Platform { get; set; } = "";
         public string GameVersion { get; set; } = "";
         public string TranslationVersion { get; set; } = "";
