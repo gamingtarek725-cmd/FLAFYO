@@ -151,7 +151,10 @@ public sealed class LanguagePack
     {
         return Kind switch
         {
-            PackKind.Madlad => OnnxMadladTranslator.Load(Dir, Math.Min(threads, 1)),
+            // The currently pinned MADLAD export has a separate embedding graph and 32-layer cache initializer.
+            // Do not route it through the older merged-decoder implementation until a matching runtime is shipped.
+            PackKind.Madlad => throw new NotSupportedException(
+                "MADLAD-400 is temporarily unavailable: its ONNX graph contract is not yet supported by this runtime."),
             PackKind.Heavy => OnnxNllbTranslator.Load(Dir, threads),
             _ => CreateLightTranslator(threads, beams),
         };

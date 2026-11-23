@@ -79,6 +79,13 @@ public class MadladPackTests
         Assert.True(LanguagePack.Madlad.ApproxBytes > 3_500_000_000);
         Assert.Contains("madlad", LanguagePack.Madlad.Folder, StringComparison.OrdinalIgnoreCase);
     }
+
+    [Fact]
+    public void Madlad_factory_fails_clearly_until_compatible_runtime_is_available()
+    {
+        var error = Assert.Throws<NotSupportedException>(() => LanguagePack.Madlad.CreateTranslator(1, 1));
+        Assert.Contains("temporarily unavailable", error.Message, StringComparison.OrdinalIgnoreCase);
+    }
 }
 
 public class OnnxMadladIntegrationTests
@@ -89,10 +96,11 @@ public class OnnxMadladIntegrationTests
     private static string? Dir => Environment.GetEnvironmentVariable("FLAFYO_MADLAD_MODEL_DIR");
     private static string? NllbDir => Environment.GetEnvironmentVariable("FLAFYO_HEAVY_MODEL_DIR");
 
-    [Fact]
+    [Fact(Skip = "MADLAD integration is pending: the pinned ONNX archive contract is not yet wired to LanguagePack and the runtime decoder. Re-enable only after a real English-to-Arabic inference test runs against the packaged files.")]
     public void Madlad_model_produces_arabic_and_reports_reference_quality()
     {
-        if (string.IsNullOrWhiteSpace(Dir)) return;
+        if (string.IsNullOrWhiteSpace(Dir))
+            throw new InvalidOperationException("FLAFYO_MADLAD_MODEL_DIR must point to the extracted, supported MADLAD model.");
 
         var samples = new[]
         {
