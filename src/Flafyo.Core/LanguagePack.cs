@@ -95,8 +95,12 @@ public sealed class LanguagePack
                 (!file.ExactLength || new FileInfo(target).Length == file.Bytes);
             if (validExisting && file.Sha256 != null)
             {
-                await using var existing = File.OpenRead(target);
-                var hash = Convert.ToHexString(await SHA256.HashDataAsync(existing, ct).ConfigureAwait(false)).ToLowerInvariant();
+                string hash;
+                await using (var existing = File.OpenRead(target))
+                {
+                    hash = Convert.ToHexString(
+                        await SHA256.HashDataAsync(existing, ct).ConfigureAwait(false)).ToLowerInvariant();
+                }
                 validExisting = hash.Equals(file.Sha256, StringComparison.OrdinalIgnoreCase);
                 if (!validExisting) File.Delete(target);
             }
