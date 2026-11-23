@@ -64,15 +64,46 @@ public sealed class AppSettings
     public double WindowWidth { get; set; }
     public double WindowHeight { get; set; }
 
-    public static AppSettings Load()
+    public static AppSettings Load() => LoadFrom(UserData.SettingsFile);
+
+    internal static AppSettings LoadFrom(string path)
+    {
+        if (TryLoad(path, out var settings))
+            return settings;
+
+        var backupPath = path + ".bak";
+        if (TryLoad(backupPath, out settings))
+        {
+            // Recover the last known-good settings file after an interrupted or malformed write.
+            try
+            {
+                Flafyo.Core.AtomicFile.WriteAllText(path, File.ReadAllText(backupPath));
+            }
+            catch { }
+            return settings;
+        }
+
+        return new AppSettings();
+    }
+
+    private static bool TryLoad(string path, out AppSettings settings)
     {
         try
         {
-            if (File.Exists(UserData.SettingsFile))
-                return JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(UserData.SettingsFile)) ?? new AppSettings();
+            if (File.Exists(path))
+            {
+                var loaded = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(path));
+                if (loaded != null)
+                {
+                    settings = loaded;
+                    return true;
+                }
+            }
         }
         catch { }
-        return new AppSettings();
+
+        settings = new AppSettings();
+        return false;
     }
 
     public void Save()
@@ -80,7 +111,10 @@ public sealed class AppSettings
         try
         {
             Directory.CreateDirectory(UserData.Dir);
-            File.WriteAllText(UserData.SettingsFile, JsonSerializer.Serialize(this));
+            Flafyo.Core.AtomicFile.WriteAllText(
+                UserData.SettingsFile,
+                JsonSerializer.Serialize(this),
+                keepBackup: File.Exists(UserData.SettingsFile));
         }
         catch { }
     }

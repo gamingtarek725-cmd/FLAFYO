@@ -53,10 +53,13 @@ internal sealed class LocalizationCatalogService
         var allowed = new[] { "ta3reebat.com", "muarrab.com", "ta3reb.com" };
         catalog.Entries = (catalog.Entries ?? new List<Entry>())
             .Where(e =>
+                e is not null &&
                 !string.IsNullOrWhiteSpace(e.Title) &&
                 !string.IsNullOrWhiteSpace(e.SourceName) &&
                 Uri.TryCreate(e.SourceUrl, UriKind.Absolute, out var uri) &&
                 uri.Scheme == Uri.UriSchemeHttps &&
+                uri.IsDefaultPort &&
+                string.IsNullOrEmpty(uri.UserInfo) &&
                 allowed.Any(host => uri.Host.Equals(host, StringComparison.OrdinalIgnoreCase) ||
                                     uri.Host.EndsWith("." + host, StringComparison.OrdinalIgnoreCase)) &&
                 !uri.AbsolutePath.TrimEnd('/').EndsWith("/home", StringComparison.OrdinalIgnoreCase))
@@ -85,8 +88,11 @@ internal sealed class LocalizationCatalogService
         var catalog = JsonSerializer.Deserialize<Catalog>(json, Options)
                       ?? throw new InvalidDataException("Invalid localization catalog.");
         catalog = NormalizeCatalog(catalog);
-        Directory.CreateDirectory(Path.GetDirectoryName(CachePath)!);
-        await File.WriteAllTextAsync(CachePath, JsonSerializer.Serialize(catalog, Options));
+        // Keep the last good cache intact if refresh is interrupted or the disk write fails.
+        await Flafyo.Core.AtomicFile.WriteAllTextAsync(
+            CachePath,
+            JsonSerializer.Serialize(catalog, Options));
+
         return catalog;
     }
 }

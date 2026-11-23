@@ -70,8 +70,10 @@ public partial class ScreenOverlayWindow : Window
         {
             Child = text,
             Width = width,
-            Padding = new Thickness(6, 2, 6, 2),
-            CornerRadius = new CornerRadius(4),
+            Padding = new Thickness(8, 5, 8, 5),
+            CornerRadius = new CornerRadius(8),
+            SnapsToDevicePixels = true,
+            Effect = new DropShadowEffect { Color = Colors.Black, BlurRadius = 8, ShadowDepth = 2, Opacity = 0.32 },
             FlowDirection = FlowDirection.RightToLeft,
             Background = OverlayWindow.MakeBrush(s.BackColor, s.BackOpacity),
             BorderBrush = OverlayWindow.MakeBrush(heading ? s.HeadingTextColor : s.BorderColor),

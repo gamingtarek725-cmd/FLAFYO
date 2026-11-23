@@ -16,6 +16,10 @@ public partial class LocalizationLibraryWindow : Window
         public string Subtitle { get; init; } = "";
         public string KindLabel { get; init; } = "";
         public string Category { get; init; } = "";
+        public string Platform { get; init; } = "";
+        public string GameVersion { get; init; } = "";
+        public string TranslationVersion { get; init; } = "";
+        public string PublishedAt { get; init; } = "";
         public string Info { get; init; } = "";
         public string Install { get; init; } = "";
         public string Notes { get; init; } = "";
@@ -34,6 +38,8 @@ public partial class LocalizationLibraryWindow : Window
         {
             Title = "Resident Evil 4 (2005)",
             Subtitle = "PC · الإصدار المذكور في صفحة المصدر: v1.0",
+            Platform = "PC",
+            GameVersion = "v1.0",
             KindLabel = "تعريب موثق · مصدر خارجي",
             Category = "تعريبات موثقة",
             Info = "صفحة تعريب منشورة على Ta3reebat. الصفحة تذكر أن التعريب مجاني، وحجمه المنشور 880.90 MB، وتنسب العمل إلى IBRAHIM ALOBAIDI. تحقق من إصدار لعبتك قبل التنزيل.",
@@ -46,6 +52,7 @@ public partial class LocalizationLibraryWindow : Window
         {
             Title = "Resident Evil 4 Ultimate HD Edition",
             Subtitle = "PC · عدة مشاريع تعريب مدرجة",
+            Platform = "PC",
             KindLabel = "دليل تعريبات · روابط أصحاب الأعمال",
             Category = "تعريبات موثقة",
             Info = "يعرض دليل Muarrab أكثر من مشروع لهذه النسخة، مع أسماء المترجمين والمنصات ونوع الترجمة. تختلف الملفات وطريقة التثبيت بين المشاريع.",
@@ -58,6 +65,7 @@ public partial class LocalizationLibraryWindow : Window
         {
             Title = "Muarrab — دليل شامل للتعريبات",
             Subtitle = "آلاف الألعاب · رسمي ومجتمعي · منصات متعددة",
+            Platform = "منصات متعددة",
             KindLabel = "مكتبة خارجية",
             Category = "مكتبات خارجية",
             Info = "دليل يجمع التعريبات الرسمية وتعريبات المجتمع، ويعرض المنصات ونوع الترجمة وروابط أصحاب التعريبات.",
@@ -71,6 +79,7 @@ public partial class LocalizationLibraryWindow : Window
         {
             Title = "Ta3reb — مكتبة التعريبات",
             Subtitle = "PC · PlayStation · Nintendo Switch وغيرها",
+            Platform = "PC، PlayStation، Nintendo Switch",
             KindLabel = "مكتبة خارجية",
             Category = "مكتبات خارجية",
             Info = "مكتبة عربية تعرض تعريبات ألعاب متعددة حسب المنصة، ومنها مشاريع للحاسب وأجهزة أخرى.",
@@ -97,6 +106,7 @@ public partial class LocalizationLibraryWindow : Window
         {
             Title = "أبو يزن — تعريبات PC وSteam",
             Subtitle = "تعريبات مع صفحات تثبيت وإزالة",
+            Platform = "PC، Steam",
             KindLabel = "مكتبة خارجية",
             Category = "مكتبات خارجية",
             Info = "موقع يصف تعريبات PC وSteam، ويذكر أن صفحات الألعاب تتضمن تفاصيل التعريب وأداة التثبيت وخيارات الإزالة.",
@@ -110,6 +120,7 @@ public partial class LocalizationLibraryWindow : Window
         {
             Title = "Matrix Arabic — أداة بناء التعريب",
             Subtitle = "Windows 10/11 · يعتمد على ملفات اللعبة الأصلية",
+            Platform = "Windows 10/11",
             KindLabel = "مكتبة خارجية",
             Category = "مكتبات خارجية",
             Info = "مشروع يذكر أنه يبني ملفات التعريب محليًا على جهاز المستخدم بدل توزيع ملفات اللعبة نفسها. راجع قائمة الألعاب المدعومة داخل موقعه.",
@@ -180,12 +191,18 @@ public partial class LocalizationLibraryWindow : Window
         var entries = catalog.Entries.Select(x => new LibraryEntry
         {
             Title = x.Title,
-            Subtitle = string.Join(" · ", new[] { x.Platform, x.GameVersion,
+            Subtitle = string.Join(" · ", new[] {
+                string.IsNullOrWhiteSpace(x.Platform) ? InferPlatforms(x.Summary) : x.Platform,
+                x.GameVersion,
                 string.IsNullOrWhiteSpace(x.TranslationVersion) ? null : "تعريب " + x.TranslationVersion,
                 string.IsNullOrWhiteSpace(x.PublishedAt) ? null : x.PublishedAt }
                 .Where(v => !string.IsNullOrWhiteSpace(v))),
             KindLabel = (x.UpdateType == "new" ? "تعريب جديد" : x.UpdateType == "update" ? "تحديث تعريب" : "صفحة تعريب") + " · " + x.SourceName,
             Category = "تعريبات موثقة",
+            Platform = string.IsNullOrWhiteSpace(x.Platform) ? InferPlatforms(x.Summary) : x.Platform,
+            GameVersion = x.GameVersion,
+            TranslationVersion = x.TranslationVersion,
+            PublishedAt = x.PublishedAt,
             Info = string.IsNullOrWhiteSpace(x.Summary) ? "تم اكتشاف صفحة تعريب من المصدر." : x.Summary,
             Install = "تعليمات التثبيت التفصيلية تُراجع في صفحة المصدر؛ تختلف الطريقة حسب اللعبة وإصدارها.",
             Notes = "اكتُشف هذا الإدخال آليًا. لم يختبر FLAFYO التوافق أو ملف التعريب. راجع صفحة المصدر قبل التثبيت.",
@@ -203,21 +220,62 @@ public partial class LocalizationLibraryWindow : Window
         var query = SearchBox?.Text?.Trim() ?? "";
         var filtered = _catalog.Concat(_remoteCatalog).Where(x =>
             (_categoryFilter == "all" ||
-             (_categoryFilter == "pc" && (x.Subtitle.Contains("PC", StringComparison.OrdinalIgnoreCase) || x.Info.Contains("PC", StringComparison.OrdinalIgnoreCase))) ||
-             (_categoryFilter == "console" && (x.Subtitle.Contains("PS", StringComparison.OrdinalIgnoreCase) || x.Info.Contains("PlayStation", StringComparison.OrdinalIgnoreCase) || x.Info.Contains("Nintendo", StringComparison.OrdinalIgnoreCase) || x.Info.Contains("Xbox", StringComparison.OrdinalIgnoreCase))) ||
+             (_categoryFilter == "pc" && HasPlatform(x, "PC", "Steam", "Windows")) ||
+             (_categoryFilter == "console" && HasPlatform(x, "PS4", "PS5", "PlayStation", "Xbox", "Nintendo", "Switch")) ||
+             (_categoryFilter == "mobile" && HasPlatform(x, "Android", "iOS", "iPhone", "iPad")) ||
              (_categoryFilter == "new" && (x.KindLabel.Contains("جديد") || x.KindLabel.Contains("تحديث"))) ||
              (_categoryFilter == "directories" && x.IsDirectory)) &&
             (string.IsNullOrWhiteSpace(query) ||
-             x.Title.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-             x.Subtitle.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-             x.SourceName.Contains(query, StringComparison.OrdinalIgnoreCase)));
-        var selected = EntriesList?.SelectedItem as LibraryEntry;
+             ContainsText(x.Title, query) ||
+             ContainsText(x.Subtitle, query) ||
+             ContainsText(x.SourceName, query) ||
+             ContainsText(x.Info, query) ||
+             ContainsText(x.Install, query) ||
+             ContainsText(x.KindLabel, query) ||
+             ContainsText(x.Platform, query) ||
+             ContainsText(x.GameVersion, query) ||
+             ContainsText(x.TranslationVersion, query) ||
+             ContainsText(x.PublishedAt, query) ||
+             ContainsText(x.SourceUrl, query)))
+            .OrderByDescending(x =>
+                x.KindLabel.Contains("تحديث", StringComparison.OrdinalIgnoreCase) ||
+                x.KindLabel.Contains("جديد", StringComparison.OrdinalIgnoreCase))
+            .ThenBy(x => x.Title, StringComparer.CurrentCultureIgnoreCase);
+        var entriesList = EntriesList;
+        if (entriesList is null) return;
+
+        var selected = entriesList.SelectedItem as LibraryEntry;
         _visible.Clear();
         foreach (var item in filtered) _visible.Add(item);
-        if (selected != null) EntriesList.SelectedItem = _visible.FirstOrDefault(x => x.Title == selected.Title);
-        if (EntriesList.SelectedItem == null && _visible.Count > 0) EntriesList.SelectedIndex = 0;
-        CountText.Text = $"{_visible.Count} عنصر";
+        if (selected != null) entriesList.SelectedItem = _visible.FirstOrDefault(x =>
+            !string.IsNullOrWhiteSpace(selected.SourceUrl) &&
+            x.SourceUrl.Equals(selected.SourceUrl, StringComparison.OrdinalIgnoreCase));
+        if (entriesList.SelectedItem == null && _visible.Count > 0) entriesList.SelectedIndex = 0;
+        if (CountText is not null) CountText.Text = $"{_visible.Count} عنصر";
         if (_visible.Count == 0) ShowEmpty();
+    }
+
+    private static bool ContainsText(string? value, string query) =>
+        !string.IsNullOrWhiteSpace(value) && value.Contains(query, StringComparison.OrdinalIgnoreCase);
+
+    private static bool HasPlatform(LibraryEntry entry, params string[] platforms)
+    {
+        var source = string.Join(" ", entry.Platform, entry.Subtitle, entry.Info);
+        return platforms.Any(platform => System.Text.RegularExpressions.Regex.IsMatch(
+            source,
+            @"(?<![A-Za-z0-9])" + System.Text.RegularExpressions.Regex.Escape(platform) + @"(?![A-Za-z0-9])",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase));
+    }
+
+    private static string InferPlatforms(string? summary)
+    {
+        if (string.IsNullOrWhiteSpace(summary)) return "";
+        var known = new[] { "PC", "PS4", "PS5", "PlayStation", "Xbox", "Nintendo Switch", "Switch", "Android", "iOS", "iPhone", "iPad" };
+        return string.Join(", ", known.Where(platform =>
+            System.Text.RegularExpressions.Regex.IsMatch(
+                summary,
+                @"(?<![A-Za-z0-9])" + System.Text.RegularExpressions.Regex.Escape(platform) + @"(?![A-Za-z0-9])",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase)));
     }
 
     private void SearchBox_TextChanged(object sender, TextChangedEventArgs e) => RefreshList();
@@ -243,7 +301,14 @@ public partial class LocalizationLibraryWindow : Window
     {
         if (EntriesList.SelectedItem is not LibraryEntry item) return;
         DetailTitle.Text = item.Title;
-        DetailSubtitle.Text = item.Subtitle;
+        DetailSubtitle.Text = item.KindLabel;
+        DetailMetadata.Text = string.Join(Environment.NewLine, new[]
+        {
+            string.IsNullOrWhiteSpace(item.Platform) ? null : "المنصة: " + item.Platform,
+            string.IsNullOrWhiteSpace(item.GameVersion) ? null : "إصدار اللعبة: " + item.GameVersion,
+            string.IsNullOrWhiteSpace(item.TranslationVersion) ? null : "إصدار التعريب: " + item.TranslationVersion,
+            string.IsNullOrWhiteSpace(item.PublishedAt) ? null : "تاريخ النشر/التحديث: " + item.PublishedAt
+        }.Where(value => !string.IsNullOrWhiteSpace(value)));
         DetailInfo.Text = item.Info;
         InstallSteps.Text = "طريقة التثبيت: " + item.Install;
         SafetyNotes.Text = item.Notes;
@@ -255,6 +320,7 @@ public partial class LocalizationLibraryWindow : Window
     {
         DetailTitle.Text = "مفيش نتائج مطابقة";
         DetailSubtitle.Text = "جرّب اسم لعبة أو اختار «كل المصادر».";
+        DetailMetadata.Text = "";
         DetailInfo.Text = "لا توجد عناصر تطابق البحث أو التصنيف الحالي.";
         InstallSteps.Text = "";
         SafetyNotes.Text = "";

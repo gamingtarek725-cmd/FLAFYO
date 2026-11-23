@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="FLAFYO GAME TRANSLATOR" Icon="Assets/flafyo.ico"
-        Width="1080" Height="900" MinWidth="820" MinHeight="680" ResizeMode="CanResize"
+        Width="1240" Height="900" MinWidth="940" MinHeight="700" ResizeMode="CanResize"
         Background="{StaticResource Page}" FlowDirection="RightToLeft" FontFamily="Segoe UI, Tahoma" FontSize="13"
         WindowStartupLocation="CenterScreen">
   <Grid>
@@ -12,7 +12,7 @@
     </Grid.RowDefinitions>
 
     <!-- header -->
-    <Border Grid.Row="0" Background="#111827" BorderBrush="{StaticResource Line}" BorderThickness="0,0,0,1" Padding="24,16">
+    <Border Grid.Row="0" Background="#101326" BorderBrush="{StaticResource Line}" BorderThickness="0,0,0,1" Padding="24,16">
       <Grid>
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
@@ -25,7 +25,7 @@
         <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left">
           <Button x:Name="CheckUpdatesButton" Content="تحديث التطبيق" Padding="12,7" Margin="0,0,0,6" Click="CheckUpdates_Click"/>
           <TextBlock x:Name="UpdateStatusText" Text="الإصدار 0.3.1" Foreground="{StaticResource Muted}" FontSize="10" TextAlignment="Center" Margin="0,0,0,5"/>
-          <Border CornerRadius="14" Background="#1B2942" Padding="12,7" HorizontalAlignment="Center">
+          <Border CornerRadius="14" Background="#25213F" Padding="12,7" HorizontalAlignment="Center">
           <TextBlock x:Name="StateText" Text="● جاهز" Foreground="{StaticResource Muted}" FontWeight="SemiBold"/>
         </Border>
           </StackPanel>
@@ -35,7 +35,7 @@
     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
       <StackPanel Margin="22">
         <!-- FLAFYO dashboard -->
-        <Border Background="#111B2D" BorderBrush="{StaticResource Line}" BorderThickness="1" CornerRadius="18" Padding="18" Margin="0,0,0,14">
+        <Border Background="#15172B" BorderBrush="{StaticResource Line}" BorderThickness="1" CornerRadius="18" Padding="18" Margin="0,0,0,14">
           <StackPanel>
             <Grid Margin="0,0,0,14">
               <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
@@ -43,18 +43,23 @@
                 <TextBlock Text="Game Translator" FontSize="22" FontWeight="Bold" Foreground="{StaticResource Ink}" FlowDirection="LeftToRight" HorizontalAlignment="Right"/>
                 <TextBlock Text="منصة ترجمة وتعريب الألعاب" Style="{StaticResource MutedText}" Margin="0,5,0,0" HorizontalAlignment="Right"/>
               </StackPanel>
-              <Border Grid.Column="1" Background="#173D3B" CornerRadius="12" Padding="10,5" VerticalAlignment="Top">
-                <TextBlock Text="تصميم مقترح" Foreground="#45D6A0" FontSize="10" FontWeight="Bold"/>
+              <Border Grid.Column="1" Background="#30234D" CornerRadius="12" Padding="10,5" VerticalAlignment="Top">
+                <TextBlock Text="CYBER GAMING" Foreground="#C4B5FD" FontSize="10" FontWeight="Bold"/>
               </Border>
             </Grid>
             <UniformGrid Columns="2" Rows="3">
-              <Button Content="⛶&#10;الترجمة الفورية&#10;OCR و Overlay" Click="DashboardLive_Click" Margin="4" Padding="18,16" FontSize="15" Background="#1C2B45" BorderBrush="#2B4265" MinHeight="92"/>
-              <Button Content="▱&#10;تعريب الألعاب&#10;تحليل الملفات" Click="DashboardFiles_Click" Margin="4" Padding="18,16" FontSize="15" Background="#1C2B45" BorderBrush="#2B4265" MinHeight="92"/>
+              <Button Content="⛶&#10;الترجمة الفورية&#10;OCR و Overlay" Click="DashboardLive_Click" Margin="4" Padding="18,16" FontSize="15" Background="#211D3A" BorderBrush="#7657B5" MinHeight="92"/>
+              <Button Content="▱&#10;تعريب الألعاب&#10;تحليل الملفات" Click="DashboardFiles_Click" Margin="4" Padding="18,16" FontSize="15" Background="#1B2340" BorderBrush="#465A91" MinHeight="92"/>
               <Button Content="文&#10;إدارة اللغات&#10;حزم Offline" Click="DashboardLanguages_Click" Margin="4" Padding="18,16" FontSize="15" Background="#1C2B45" BorderBrush="#2B4265" MinHeight="92"/>
               <Button Content="⌘&#10;إعدادات الألعاب&#10;ملفات مستقلة" Click="DashboardGameSettings_Click" Margin="4" Padding="18,16" FontSize="15" Background="#1C2B45" BorderBrush="#2B4265" MinHeight="92"/>
               <Button Content="▦&#10;مكتبة التعريبات&#10;بحث وتحديثات الألعاب" Click="DashboardLibrary_Click" Margin="4" Padding="18,16" FontSize="15" Background="#1C2B45" BorderBrush="#2B4265" MinHeight="92"/>
               <Button Content="◷&#10;سجل الترجمة والأداء&#10;التشخيص والنتائج" Click="DashboardLogs_Click" Margin="4" Padding="18,16" FontSize="15" Background="#1C2B45" BorderBrush="#2B4265" MinHeight="92"/>
             </UniformGrid>
+            <WrapPanel Margin="2,8,2,0" HorizontalAlignment="Stretch">
+              <Button Content="شكل الترجمة" ToolTip="تخصيص الخط واللون والموضع والشفافية" Click="Appearance_Click" Margin="2" Padding="12,8"/>
+              <Button Content="سجل الترجمة" ToolTip="عرض النصوص المترجمة ومراجعتها" Click="History_Click" Margin="2" Padding="12,8"/>
+              <Button Content="قواميس الألعاب" ToolTip="إدارة المصطلحات والتعبيرات الشائعة" Click="Glossary_Click" Margin="2" Padding="12,8"/>
+            </WrapPanel>
             <Border Background="#1C2B45" CornerRadius="12" Padding="14" Margin="4,10,4,0">
               <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
@@ -62,8 +67,8 @@
                   <TextBlock Text="حالة محرك الترجمة" FontSize="15" FontWeight="Bold" Foreground="{StaticResource Ink}"/>
                   <TextBlock x:Name="DashboardEngineStatus" Text="OCR · Translation · Overlay · Offline" Style="{StaticResource MutedText}" Margin="0,5,0,0"/>
                 </StackPanel>
-                <Border Grid.Column="1" Background="#16483D" CornerRadius="10" Padding="9,5" VerticalAlignment="Center">
-                  <TextBlock x:Name="DashboardState" Text="جاهز" Foreground="#42D6A0" FontWeight="SemiBold"/>
+                <Border Grid.Column="1" Background="#183C3B" CornerRadius="10" Padding="9,5" VerticalAlignment="Center">
+                  <TextBlock x:Name="DashboardState" Text="جاهز" Foreground="#6EE7B7" FontWeight="SemiBold"/>
                 </Border>
               </Grid>
             </Border>
@@ -111,6 +116,20 @@
           </StackPanel>
         </Border>
 
+        <!-- settings navigation -->
+        <Border Background="#15172B" BorderBrush="{StaticResource Line}" BorderThickness="1" CornerRadius="16" Padding="16" Margin="0,0,0,10">
+          <StackPanel>
+            <TextBlock Text="مركز التحكم والإعدادات" Style="{StaticResource H}"/>
+            <TextBlock Text="اختار القسم المطلوب مباشرة بدل التنقل داخل صفحة طويلة." Style="{StaticResource MutedText}" Margin="0,3,0,10"/>
+            <UniformGrid Columns="4">
+              <Button Content="محرك الترجمة" Tag="0" Click="SettingsSection_Click" Margin="3" Padding="10,12" Background="#211D3A" BorderBrush="#7657B5"/>
+              <Button Content="التصوير والشاشة" Tag="1" Click="SettingsSection_Click" Margin="3" Padding="10,12" Background="#1B2340" BorderBrush="#465A91"/>
+              <Button Content="الشكل والصوت" Tag="2" Click="SettingsSection_Click" Margin="3" Padding="10,12" Background="#1C2B45" BorderBrush="#2B4265"/>
+              <Button Content="الألعاب والملفات" Tag="3" Click="SettingsSection_Click" Margin="3" Padding="10,12" Background="#1C2B45" BorderBrush="#2B4265"/>
+            </UniformGrid>
+          </StackPanel>
+        </Border>
+
         <!-- settings tabs -->
         <TabControl x:Name="SettingsTabs" Padding="0" Margin="0,0,0,12">
 
@@ -123,14 +142,14 @@
               <TextBlock x:Name="HeavyText" Style="{StaticResource MutedText}" Margin="0,10,0,0"/>
               <Button x:Name="HeavyButton" Content="تنزيل الحزمة التقيلة (حوالي 0.9 جيجا)" Margin="0,6,0,0" Click="Heavy_Click"/>
               <TextBlock x:Name="MadladText" Style="{StaticResource MutedText}" Margin="0,10,0,0"/>
-              <Button x:Name="MadladButton" Content="تنزيل MADLAD-400 3B (حوالي 3.7 جيجا)" Margin="0,6,0,0" Click="Madlad_Click"/>
+              <Button x:Name="MadladButton" Content="MADLAD-400 3B — متوقف مؤقتًا" Margin="0,6,0,0" IsEnabled="False" Click="Madlad_Click"/>
               <TextBlock Text="تنبيه: الحزمة الأكبر تحتاج مساحة وتنزيلًا كبيرًا، وقد تكون أبطأ وتستهلك ذاكرة ومعالجًا أكثر أثناء اللعب." Style="{StaticResource MutedText}" Margin="0,4,0,8" TextWrapping="Wrap"/>
 
               <TextBlock Text="الحزمة المستخدمة" Style="{StaticResource L}"/>
               <ComboBox x:Name="PackBox" SelectedIndex="0" SelectionChanged="Pack_Changed">
                 <ComboBoxItem Content="الخفيفة: أسرع وتناسب الأجهزة الضعيفة"/>
                 <ComboBoxItem Content="التقيلة NLLB-600M: توازن بين الحجم والتنوع"/>
-                <ComboBoxItem Content="MADLAD-400 3B: نموذج أكبر ومتعدد اللغات؛ جودة العربية تحتاج اختبارًا، وهو أبطأ ويحتاج موارد أعلى"/>
+                <ComboBoxItem Content="MADLAD-400 3B: غير متاح حاليًا لحين دمج بنية ONNX متوافقة واختبارها"/>
               </ComboBox>
               <CheckBox x:Name="MasculineBox" Content="صيغة المذكر في الترجمة" IsChecked="True" Checked="Masculine_Changed" Unchecked="Masculine_Changed"/>
               <CheckBox x:Name="PreciseBox" Content="دقة أعلى (أبطأ 2 لـ 4 مرات، للحزمة الخفيفة)" IsChecked="False" Checked="Precise_Changed" Unchecked="Precise_Changed"/>
@@ -150,7 +169,7 @@
                 <ComboBoxItem Content="صغير (تكبير أكتر قبل القراءة)"/>
               </ComboBox>
 
-              <Border Style="{StaticResource Card}" Margin="0,16,0,0" Background="#17233A">
+              <Border Style="{StaticResource Card}" Margin="0,16,0,0" Background="#1B1D35">
                 <StackPanel>
                   <TextBlock Text="أو: ترجمة بحسابك الخاص في موقع ذكاء اصطناعي" Style="{StaticResource H}"/>
                   <TextBlock Style="{StaticResource MutedText}" Margin="0,4,0,0"
