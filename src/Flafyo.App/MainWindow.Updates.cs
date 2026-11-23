@@ -113,6 +113,10 @@ public partial class MainWindow
         }
     }
 
+    private void NavigateLive_Click(object sender, RoutedEventArgs e) => MainTabs.SelectedIndex = 1;
+
+    private void NavigateSettings_Click(object sender, RoutedEventArgs e) => MainTabs.SelectedIndex = 2;
+
     private void SettingsSection_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button { Tag: string indexText } && int.TryParse(indexText, out var index) &&
