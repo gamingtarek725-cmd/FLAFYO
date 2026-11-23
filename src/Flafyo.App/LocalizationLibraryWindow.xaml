@@ -3,6 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Background="{StaticResource Page}" FlowDirection="RightToLeft"
         FontFamily="Segoe UI, Tahoma" FontSize="13">
+  <UserControl.Resources>
+    <Style x:Key="FilterButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+      <Setter Property="Padding" Value="13,7"/>
+      <Setter Property="Margin" Value="0,0,7,0"/>
+      <Setter Property="FontSize" Value="11"/>
+      <Setter Property="Background" Value="#17233A"/>
+      <Setter Property="BorderBrush" Value="#2B3B5A"/>
+    </Style>
+  </UserControl.Resources>
   <Grid Margin="22">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto"/>
@@ -11,45 +20,61 @@
       <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
 
-    <!-- Compact library heading -->
-    <Grid Grid.Row="0" Margin="0,0,0,16">
+    <Grid Grid.Row="0" Margin="0,0,0,18">
       <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
       <StackPanel>
-        <TextBlock Text="مكتبة التعريبات" FontSize="26" FontWeight="Bold" Foreground="{StaticResource Ink}"/>
-        <TextBlock Text="ابحث عن لعبتك، راجع توافق التعريب، وانتقل مباشرةً إلى صفحة صاحبه." Style="{StaticResource MutedText}" Margin="0,5,0,0"/>
-        <TextBlock x:Name="UpdateStatus" Text="يتم فحص آخر تحديثات المكتبة عند فتح القسم" Style="{StaticResource MutedText}" Margin="0,6,0,0"/>
+        <TextBlock Text="مكتبة التعريبات" FontSize="27" FontWeight="Bold" Foreground="{StaticResource Ink}"/>
+        <TextBlock Text="اكتشف التعريبات حسب اللعبة والمنصة، وافحص بيانات المصدر قبل التثبيت."
+                   Foreground="#B1BED5" FontSize="12" Margin="0,5,0,0"/>
+        <TextBlock x:Name="UpdateStatus" Text="يتم فحص آخر تحديثات المكتبة عند فتح القسم."
+                   Style="{StaticResource MutedText}" Margin="0,7,0,0"/>
       </StackPanel>
-      <Button x:Name="RefreshButton" Grid.Column="1" Content="⟳  تحديث المكتبة" Style="{StaticResource PrimaryButton}" VerticalAlignment="Center" Margin="14,0,0,0" Padding="16,11" Click="RefreshLibrary_Click"/>
+      <Button x:Name="RefreshButton" Grid.Column="1" Content="⟳  تحديث المكتبة"
+              Style="{StaticResource PrimaryButton}" VerticalAlignment="Center"
+              Margin="14,0,0,0" Padding="16,11" Click="RefreshLibrary_Click"/>
     </Grid>
 
-    <!-- One search and filter toolbar -->
-    <Grid Grid.Row="1" Margin="0,0,0,14">
-      <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-      <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-      <TextBox x:Name="SearchBox" Grid.Column="0" Padding="13,10" FontSize="14" TextChanged="SearchBox_TextChanged"
-               ToolTip="ابحث باسم اللعبة أو فريق التعريب أو المنصة" VerticalContentAlignment="Center"/>
-      <TextBlock Grid.Column="1" x:Name="CountText" Text="0 لعبة" Foreground="{StaticResource Muted}" VerticalAlignment="Center" Margin="16,0,4,0" FontWeight="SemiBold"/>
-      <WrapPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="0,10,0,0" x:Name="CategoryFilters">
-        <Button Content="الكل" Tag="all" Click="Category_Click" Background="#20BFD0" Foreground="#071321" Padding="14,7" Margin="0,0,7,0"/>
-        <Button Content="PC" Tag="pc" Click="Category_Click" Padding="14,7" Margin="0,0,7,0"/>
-        <Button Content="PlayStation / Xbox" Tag="console" Click="Category_Click" Padding="14,7" Margin="0,0,7,0"/>
-        <Button Content="Android / iOS" Tag="mobile" Click="Category_Click" Padding="14,7" Margin="0,0,7,0"/>
-        <Button Content="الجديد والتحديثات" Tag="new" Click="Category_Click" Padding="14,7" Margin="0,0,7,0"/>
-        <Button Content="المكتبات" Tag="directories" Click="Category_Click" Padding="14,7" Margin="0,0,7,0"/>
-      </WrapPanel>
-    </Grid>
+    <Border Grid.Row="1" Background="{StaticResource Surface}" BorderBrush="{StaticResource Line}"
+            BorderThickness="1" CornerRadius="14" Padding="12" Margin="0,0,0,14">
+      <Grid>
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <TextBox x:Name="SearchBox" Grid.Column="0" Padding="13,10" FontSize="14"
+                 TextChanged="SearchBox_TextChanged" ToolTip="ابحث باسم اللعبة أو فريق التعريب أو المنصة"
+                 VerticalContentAlignment="Center"/>
+        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="14,0,4,0">
+          <TextBlock x:Name="CountText" Text="0 لعبة" Foreground="{StaticResource Ink}"
+                     FontWeight="Bold" FontSize="14" TextAlignment="Center"/>
+          <TextBlock Text="نتيجة" Foreground="{StaticResource Muted}" FontSize="10"
+                     TextAlignment="Center" Margin="0,2,0,0"/>
+        </StackPanel>
+        <WrapPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="0,11,0,0" x:Name="CategoryFilters">
+          <Button Style="{StaticResource FilterButton}" Content="الكل" Tag="all" Click="Category_Click"
+                  Background="#20BFD0" Foreground="#071321" BorderBrush="#20BFD0"/>
+          <Button Style="{StaticResource FilterButton}" Content="PC" Tag="pc" Click="Category_Click"/>
+          <Button Style="{StaticResource FilterButton}" Content="PlayStation / Xbox" Tag="console" Click="Category_Click"/>
+          <Button Style="{StaticResource FilterButton}" Content="Android / iOS" Tag="mobile" Click="Category_Click"/>
+          <Button Style="{StaticResource FilterButton}" Content="الجديد والتحديثات" Tag="new" Click="Category_Click"/>
+          <Button Style="{StaticResource FilterButton}" Content="المكتبات" Tag="directories" Click="Category_Click"/>
+        </WrapPanel>
+      </Grid>
+    </Border>
 
-    <!-- Gallery and details stay inside the same application page -->
     <Grid Grid.Row="2">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*"/>
-        <ColumnDefinition Width="350"/>
+        <ColumnDefinition Width="318"/>
       </Grid.ColumnDefinitions>
 
-      <Border Grid.Column="0" Background="{StaticResource Surface}" BorderBrush="{StaticResource Line}" BorderThickness="1" CornerRadius="16" Padding="10" Margin="0,0,12,0">
-        <ListBox x:Name="EntriesList" BorderThickness="0" Background="Transparent" SelectionChanged="EntriesList_SelectionChanged"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
-          <ListBox.ItemsPanel><ItemsPanelTemplate><WrapPanel Orientation="Horizontal" IsItemsHost="True"/></ItemsPanelTemplate></ListBox.ItemsPanel>
+      <Border Grid.Column="0" Background="#0D1425" BorderBrush="{StaticResource Line}"
+              BorderThickness="1" CornerRadius="16" Padding="9" Margin="0,0,12,0">
+        <ListBox x:Name="EntriesList" BorderThickness="0" Background="Transparent"
+                 SelectionChanged="EntriesList_SelectionChanged"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate><WrapPanel Orientation="Horizontal" IsItemsHost="True"/></ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
           <ListBox.ItemContainerStyle>
             <Style TargetType="ListBoxItem">
               <Setter Property="Padding" Value="0"/>
@@ -60,14 +85,15 @@
               <Setter Property="Template">
                 <Setter.Value>
                   <ControlTemplate TargetType="ListBoxItem">
-                    <Border x:Name="CardBorder" Background="#141D31" BorderBrush="#293956" BorderThickness="1" CornerRadius="13" Padding="7">
+                    <Border x:Name="CardBorder" Background="#141E32" BorderBrush="#263653"
+                            BorderThickness="1" CornerRadius="12" Padding="7">
                       <ContentPresenter/>
                     </Border>
                     <ControlTemplate.Triggers>
                       <Trigger Property="IsSelected" Value="True">
                         <Setter TargetName="CardBorder" Property="BorderBrush" Value="#22D3EE"/>
                         <Setter TargetName="CardBorder" Property="BorderThickness" Value="2"/>
-                        <Setter TargetName="CardBorder" Property="Background" Value="#1B2942"/>
+                        <Setter TargetName="CardBorder" Property="Background" Value="#1A2942"/>
                       </Trigger>
                       <Trigger Property="IsMouseOver" Value="True">
                         <Setter TargetName="CardBorder" Property="BorderBrush" Value="#6479A5"/>
@@ -80,36 +106,45 @@
           </ListBox.ItemContainerStyle>
           <ListBox.ItemTemplate>
             <DataTemplate>
-              <Grid Width="190" Height="252">
-                <Grid.RowDefinitions><RowDefinition Height="164"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-                <Border CornerRadius="9" ClipToBounds="True" Background="#10182B">
+              <Grid Width="176" Height="248">
+                <Grid.RowDefinitions><RowDefinition Height="174"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                <Border CornerRadius="9" ClipToBounds="True" Background="#18243C">
                   <Grid>
-                    <!-- A deliberate fallback remains visible whenever no verified cover exists. -->
-                    <Border Background="#18243C">
-                      <Grid>
-                        <TextBlock Text="FLAFYO" Foreground="#52688F" FontSize="22" FontWeight="Black"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center" FlowDirection="LeftToRight"/>
-                        <TextBlock Text="GAME ARTWORK" Foreground="#7F91B4" FontSize="8" FontWeight="Bold"
-                                   HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,12" FlowDirection="LeftToRight"/>
-                      </Grid>
+                    <Grid>
+                      <TextBlock Text="FLAFYO" Foreground="#52688F" FontSize="22" FontWeight="Black"
+                                 HorizontalAlignment="Center" VerticalAlignment="Center" FlowDirection="LeftToRight"/>
+                      <TextBlock Text="GAME ARTWORK" Foreground="#7F91B4" FontSize="8" FontWeight="Bold"
+                                 HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,12" FlowDirection="LeftToRight"/>
+                    </Grid>
+                    <Image Source="{Binding CoverUrl}" Stretch="UniformToFill"
+                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                    <Border VerticalAlignment="Bottom" Height="78">
+                      <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                          <GradientStop Color="#0010182B" Offset="0"/>
+                          <GradientStop Color="#E6101728" Offset="1"/>
+                        </LinearGradientBrush>
+                      </Border.Background>
                     </Border>
-                    <Image Source="{Binding CoverUrl}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality"/>
-                    <Border Background="#99070B16"/>
-                    <Border VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8" Background="#D9142038" CornerRadius="6" Padding="7,4">
-                      <TextBlock Text="{Binding SourceName}" Foreground="#C5F5FF" FontSize="9" FontWeight="Bold"/>
+                    <Border VerticalAlignment="Top" HorizontalAlignment="Left" Margin="7"
+                            Background="#E0142038" BorderBrush="#536889" BorderThickness="1"
+                            CornerRadius="6" Padding="7,3">
+                      <TextBlock Text="{Binding SourceName}" Foreground="#E6F8FF" FontSize="9" FontWeight="Bold"/>
                     </Border>
-                    <StackPanel VerticalAlignment="Bottom" Margin="10,8">
-                      <TextBlock Text="{Binding Title}" Foreground="White" FontSize="14" FontWeight="Bold"
-                                 TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxHeight="42"/>
-                      <TextBlock Text="{Binding Platform}" Foreground="#8DEBFA" FontSize="10" Margin="0,4,0,0"/>
+                    <StackPanel VerticalAlignment="Bottom" Margin="9,0,9,9">
+                      <TextBlock Text="{Binding Title}" Foreground="White" FontSize="13"
+                                 FontWeight="Bold" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
+                                 MaxHeight="39"/>
+                      <TextBlock Text="{Binding Platform}" Foreground="#8DEBFA" FontSize="10"
+                                 Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
                   </Grid>
                 </Border>
-                <StackPanel Grid.Row="1" Margin="3,7,3,0">
-                  <TextBlock Text="{Binding Subtitle}" Foreground="{StaticResource Muted}" FontSize="10"
+                <StackPanel Grid.Row="1" Margin="3,7,3,0" VerticalAlignment="Top">
+                  <TextBlock Text="{Binding Subtitle}" Foreground="#AEBBD2" FontSize="10"
                              TextTrimming="CharacterEllipsis" TextAlignment="Center"/>
-                  <TextBlock Text="{Binding KindLabel}" Foreground="#67E8F9" FontSize="9" Margin="0,5,0,0"
-                             TextTrimming="CharacterEllipsis" TextAlignment="Center"/>
+                  <TextBlock Text="{Binding KindLabel}" Foreground="#67E8F9" FontSize="9"
+                             Margin="0,5,0,0" TextTrimming="CharacterEllipsis" TextAlignment="Center"/>
                 </StackPanel>
               </Grid>
             </DataTemplate>
@@ -117,38 +152,47 @@
         </ListBox>
       </Border>
 
-      <!-- Selected item information: no second window and no cramped bottom drawer. -->
-      <Border Grid.Column="1" Style="{StaticResource Card}" Padding="18" Margin="0" VerticalAlignment="Stretch">
+      <Border Grid.Column="1" Background="{StaticResource Surface}" BorderBrush="{StaticResource Line}"
+              BorderThickness="1" CornerRadius="16" Padding="16" Margin="0">
         <Grid>
-          <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-          </Grid.RowDefinitions>
+          <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
           <StackPanel Grid.Row="0">
-            <TextBlock Text="تفاصيل التعريب" Foreground="#7CE8F6" FontSize="10" FontWeight="Bold" Margin="0,0,0,8"/>
-            <TextBlock x:Name="DetailTitle" Text="اختار لعبة من المكتبة" Style="{StaticResource H}" FontSize="18"/>
+            <Border Background="#162A40" BorderBrush="#28516A" BorderThickness="1"
+                    CornerRadius="7" Padding="8,5" HorizontalAlignment="Right">
+              <TextBlock Text="تفاصيل العنصر المحدد" Foreground="#8DEBFA" FontSize="10" FontWeight="Bold"/>
+            </Border>
+            <TextBlock x:Name="DetailTitle" Text="اختار لعبة من المكتبة" Foreground="{StaticResource Ink}"
+                       FontSize="19" FontWeight="Bold" TextWrapping="Wrap" Margin="0,12,0,0"/>
             <TextBlock x:Name="DetailSubtitle" Style="{StaticResource MutedText}" Margin="0,5,0,0"/>
             <Separator Margin="0,12"/>
           </StackPanel>
           <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <StackPanel>
-              <TextBlock Text="التوافق والإصدار" Foreground="#8EA0C2" FontWeight="SemiBold" Margin="0,0,0,6"/>
-              <TextBlock x:Name="DetailMetadata" Foreground="#D6DEEF" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,12"/>
-              <TextBlock Text="عن التعريب" Foreground="#8EA0C2" FontWeight="SemiBold" Margin="0,0,0,6"/>
+              <TextBlock Text="التوافق والإصدار" Foreground="#8DEBFA" FontWeight="SemiBold" Margin="0,0,0,6"/>
+              <TextBlock x:Name="DetailMetadata" Foreground="#D6DEEF" FontSize="11"
+                         TextWrapping="Wrap" LineHeight="19" Margin="0,0,0,14"/>
+              <TextBlock Text="عن التعريب" Foreground="#8DEBFA" FontWeight="SemiBold" Margin="0,0,0,6"/>
               <TextBlock x:Name="DetailInfo" Foreground="{StaticResource Ink}" TextWrapping="Wrap" LineHeight="21"/>
-              <TextBlock x:Name="InstallSteps" Foreground="#C1CDE3" TextWrapping="Wrap" Margin="0,14,0,0" LineHeight="20"/>
+              <Border Background="#101A2D" BorderBrush="#263956" BorderThickness="1"
+                      CornerRadius="10" Padding="11" Margin="0,14,0,0">
+                <StackPanel>
+                  <TextBlock Text="طريقة التثبيت" Foreground="#8DEBFA" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                  <TextBlock x:Name="InstallSteps" Foreground="#D6DEEF" TextWrapping="Wrap" LineHeight="20"/>
+                </StackPanel>
+              </Border>
               <TextBlock x:Name="SafetyNotes" Style="{StaticResource WarnText}" Margin="0,12,0,0" LineHeight="19"/>
               <TextBlock x:Name="SourceAddress" Style="{StaticResource MutedText}" Margin="0,12,0,0" TextWrapping="Wrap"/>
             </StackPanel>
           </ScrollViewer>
-          <Button x:Name="OpenSourceButton" Grid.Row="2" Content="افتح صفحة المصدر  ↗" Style="{StaticResource PrimaryButton}"
-                  HorizontalAlignment="Stretch" Margin="0,14,0,0" IsEnabled="False" Click="OpenSource_Click"/>
+          <Button x:Name="OpenSourceButton" Grid.Row="2" Content="فتح صفحة المصدر  ↗"
+                  Style="{StaticResource PrimaryButton}" HorizontalAlignment="Stretch"
+                  Margin="0,13,0,0" IsEnabled="False" Click="OpenSource_Click"/>
         </Grid>
       </Border>
     </Grid>
 
-    <TextBlock Grid.Row="3" Text="FLAFYO يعرض بيانات وروابط المصادر الأصلية فقط. التوافق لم يُختبر تلقائيًا؛ راجع صفحة المصدر قبل تثبيت أي ملف."
-               Style="{StaticResource MutedText}" Margin="2,10,2,0"/>
+    <TextBlock Grid.Row="3"
+               Text="تنبيه: بيانات المكتبة وروابطها مصدرية؛ FLAFYO لا يثبت الملفات تلقائيًا ولا يضمن توافق التعريب مع كل إصدار. راجع صفحة المصدر وخذ نسخة احتياطية."
+               Foreground="#9AA4BD" FontSize="10" TextWrapping="Wrap" Margin="2,10,2,0"/>
   </Grid>
 </UserControl>
