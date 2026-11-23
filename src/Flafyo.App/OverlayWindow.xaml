@@ -21,7 +21,7 @@
         </Border>
         <StackPanel Grid.Column="1" Margin="9,0,0,0" VerticalAlignment="Center">
           <TextBlock Text="FLAFYO ISLAND" FontSize="10" FontWeight="Black"
-                     Foreground="#A9BBD4" CharacterSpacing="90" FlowDirection="LeftToRight"/>
+                     Foreground="#A9BBD4" FlowDirection="LeftToRight"/>
           <TextBlock x:Name="IslandCaption" Text="جاهز للترجمة" FontSize="11"
                      Foreground="#E7F0FF" Margin="0,2,0,0"/>
         </StackPanel>
