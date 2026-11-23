@@ -92,7 +92,8 @@ public class OnnxMadladIntegrationTests
     [Fact]
     public void Madlad_model_produces_arabic_and_reports_reference_quality()
     {
-        if (string.IsNullOrWhiteSpace(Dir))\n            throw Xunit.Sdk.SkipException.ForSkip("MADLAD INT4 integration test requires FLAFYO_MADLAD_MODEL_DIR; graph-contract CI does not execute inference.");
+        if (string.IsNullOrWhiteSpace(Dir))
+            throw Xunit.Sdk.SkipException.ForSkip("MADLAD INT4 integration test requires FLAFYO_MADLAD_MODEL_DIR; graph-contract CI does not execute inference.");
 
         var samples = new[]
         {
