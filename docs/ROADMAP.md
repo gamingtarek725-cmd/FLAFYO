@@ -3,13 +3,14 @@
 ## Product direction
 FLAFYO is a Windows-first game translation and localization platform. Existing translation and file-analysis features must remain usable as the platform grows.
 
-## Verified baseline (2026-11-22)
-- Latest published Windows release: **v0.3.3** — [release page](https://github.com/gamingtarek725-cmd/FLAFYO/releases/tag/v0.3.3).
+## Verified baseline (2026-11-23)
+- Latest published Windows release at this baseline: **v0.3.4** — [release page](https://github.com/gamingtarek725-cmd/FLAFYO/releases/latest); [direct Windows installer](https://github.com/gamingtarek725-cmd/FLAFYO/releases/latest/download/FLAFYO-GAME-TRANSLATOR-Setup.exe).
 - Release workflow `44921025565`: completed successfully, including its test/build/installer/release job.
 - Profile import/export security validation workflow `44921125902`: completed successfully.
 - Localization catalog refresh workflow `44995357361`: completed successfully.
 - Current source includes live OCR/translation, Windows capture and overlay, game-file analysis, localization library, per-game profiles, and offline translation pack workflows.
 - Latest documentation update: `7ad003d8ad46cfa944f0f9c902e86adf4a730f5d`.
+- Main CI run `45180715934` completed successfully, including unit tests, Windows EXE and installer builds, and light/heavy real-model translation tests.
 - CI success is not proof of in-game compatibility. Real-game acceptance testing and performance measurements remain outstanding.
 
 ## Delivery phases
@@ -20,7 +21,7 @@ FLAFYO is a Windows-first game translation and localization platform. Existing t
 - Keep the dark navy/blue visual system consistent.
 - Acceptance: Windows build and tests pass; every tile opens its intended feature.
 
-### Phase 1 — Safe updates and releases (v0.3.3 published; upgrade acceptance remains)
+### Phase 1 — Safe updates and releases (v0.3.4 published; upgrade acceptance remains)
 - Publish versioned Windows installers through GitHub Releases.
 - Verify installer SHA-256 against the release asset digest before execution.
 - Preserve user settings and data across upgrades.
