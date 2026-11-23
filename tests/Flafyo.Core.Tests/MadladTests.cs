@@ -110,7 +110,7 @@ public class OnnxMadladIntegrationTests
         {
             "Find the key and open the door.",
             "You have completed the mission.",
-            "The enemy is approaching. Stay alert.",
+            "A new quest is available. Check your map.",
             "Press E to interact with the object."
         };
         var sw = System.Diagnostics.Stopwatch.StartNew();
