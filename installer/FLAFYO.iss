@@ -1,7 +1,7 @@
 ; Inno Setup script — builds FLAFYO-GAME-TRANSLATOR-Setup.exe (Install / Uninstall; run it again over an install to repair)
 [Setup]
 AppName=FLAFYO GAME TRANSLATOR
-AppVersion=0.3.1
+AppVersion=0.3.4
 AppPublisher=FLAFYO
 DefaultDirName={autopf}\FLAFYO Game Translator
 DefaultGroupName=FLAFYO
