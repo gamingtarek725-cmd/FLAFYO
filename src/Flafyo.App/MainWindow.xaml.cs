@@ -644,7 +644,7 @@ public partial class MainWindow : Window
             preview: () => overlay.ShowPreview(PreviewRegion()),
             previewScreen: PreviewScreenCards)
         { Owner = this };
-        win.Closed += (_, _) => { if (_pipeline == null) overlay.Hide(); };
+        win.Closed += (_, _) => { if (_pipeline == null && _screen == null && !_settings.Style.IslandEnabled) overlay.Hide(); };
         win.Show();
     }
 
