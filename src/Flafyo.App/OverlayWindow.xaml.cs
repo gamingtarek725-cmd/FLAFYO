@@ -31,6 +31,7 @@ public partial class OverlayWindow : Window
         var hwnd = new WindowInteropHelper(this).EnsureHandle();
         OverlayWindowStyles.Apply(hwnd); // Island surface stays click-through.
         _controlWindow = new IslandControlWindow(); // only the small button receives mouse input.
+        _controlWindow.Owner = this;
         _controlWindow.ToggleRequested += () => ToggleRequested?.Invoke();
         SizeChanged += (_, _) => PositionControlWindow();
         LocationChanged += (_, _) => PositionControlWindow();
@@ -168,12 +169,17 @@ public partial class OverlayWindow : Window
         }
     }
 
-    private void PositionAtTopCenter(double width)
+    private double CenteredLeft(double width)
     {
         double scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
         if (scale <= 0) scale = 1;
         double screenWidth = GetSystemMetrics(SM_CXSCREEN) / scale;
-        Left = Math.Max(8, (screenWidth - width) / 2);
+        return Math.Max(8, (screenWidth - width) / 2);
+    }
+
+    private void PositionAtTopCenter(double width)
+    {
+        Left = CenteredLeft(width);
         Top = TopInset;
     }
 
@@ -186,9 +192,10 @@ public partial class OverlayWindow : Window
         IslandCaption.Text = _translationRunning ? "FLAFYO جاهز" : "الترجمة متوقفة";
         IslandStatus.Text = _translationRunning ? "ON" : "PAUSED";
         Card.Padding = new Thickness(14, 9, 14, 9);
-        BeginAnimation(WidthProperty, new DoubleAnimation(Width, CollapsedWidth,
-            TimeSpan.FromMilliseconds(260)) { EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut } });
-        PositionAtTopCenter(CollapsedWidth);
+        var duration = TimeSpan.FromMilliseconds(260);
+        var easing = new CubicEase { EasingMode = EasingMode.EaseOut };
+        BeginAnimation(WidthProperty, new DoubleAnimation(Width, CollapsedWidth, duration) { EasingFunction = easing });
+        BeginAnimation(LeftProperty, new DoubleAnimation(Left, CenteredLeft(CollapsedWidth), duration) { EasingFunction = easing });
         PositionControlWindow();
     }
 
@@ -207,6 +214,12 @@ public partial class OverlayWindow : Window
         _collapseTimer.Stop();
         _controlWindow.Hide();
         base.Hide();
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        _controlWindow.Close();
+        base.OnClosed(e);
     }
 }
 
