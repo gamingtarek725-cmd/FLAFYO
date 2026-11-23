@@ -17,16 +17,24 @@ public partial class OverlayWindow : Window
     private readonly DispatcherTimer _hideTimer = new();
     private readonly DispatcherTimer _collapseTimer = new();
     private OverlayStyle _style = new();
+    private readonly IslandControlWindow _controlWindow;
     private bool _expanded;
+    private bool _translationRunning;
+    public event Action? ToggleRequested;
     private const double ExpandedWidth = 540;
-    private const double CollapsedWidth = 226;
+    private const double CollapsedWidth = 292;
     private const double TopInset = 18;
 
     public OverlayWindow()
     {
         InitializeComponent();
         var hwnd = new WindowInteropHelper(this).EnsureHandle();
-        OverlayWindowStyles.Apply(hwnd); // click-through + never takes focus + hidden from capture
+        OverlayWindowStyles.Apply(hwnd); // Island surface stays click-through.
+        _controlWindow = new IslandControlWindow(); // only the small button receives mouse input.
+        _controlWindow.Owner = this;
+        _controlWindow.ToggleRequested += () => ToggleRequested?.Invoke();
+        SizeChanged += (_, _) => PositionControlWindow();
+        LocationChanged += (_, _) => PositionControlWindow();
         _hideTimer.Tick += (_, _) => { _hideTimer.Stop(); Hide(); };
         _collapseTimer.Tick += (_, _) => Collapse();
         ApplyStyle(_style);
@@ -61,6 +69,58 @@ public partial class OverlayWindow : Window
         Card.BorderBrush = MakeBrush("#526B8B", 78);
         Card.BorderThickness = new Thickness(1);
         Card.Effect = new DropShadowEffect { Color = Colors.Black, BlurRadius = 22, ShadowDepth = 5, Opacity = 0.55 };
+        _controlWindow.SetRunning(_translationRunning);
+        if (!s.IslandEnabled) Hide();
+        else if (IsVisible) PositionControlWindow();
+        if (!s.IslandShowToggleButton) _controlWindow.Hide();
+        else if (IsVisible) PositionControlWindow();
+    }
+
+    public void SetTranslationRunning(bool running)
+    {
+        _translationRunning = running;
+        _controlWindow.SetRunning(running);
+        if (!_style.IslandEnabled) { Hide(); return; }
+        if (!_expanded)
+        {
+            IslandCaption.Text = running ? "FLAFYO جاهز" : "الترجمة متوقفة";
+            IslandStatus.Text = running ? "ON" : "PAUSED";
+        }
+    }
+
+    public void ShowIdle()
+    {
+        if (!_style.IslandEnabled) { Hide(); return; }
+        _hideTimer.Stop();
+        _collapseTimer.Stop();
+        _expanded = false;
+        DetailsPanel.Visibility = Visibility.Collapsed;
+        IslandCaption.Text = _translationRunning ? "FLAFYO جاهز" : "الترجمة متوقفة";
+        IslandStatus.Text = _translationRunning ? "ON" : "PAUSED";
+        Card.Padding = new Thickness(14, 9, 14, 9);
+        Width = CollapsedWidth;
+        BeginAnimation(WidthProperty, null);
+        BeginAnimation(LeftProperty, null);
+        PositionAtTopCenter(CollapsedWidth);
+        if (!IsVisible) Show();
+        PositionControlWindow();
+    }
+
+    private void PositionControlWindow()
+    {
+        if (!IsVisible || !_style.IslandEnabled || !_style.IslandShowToggleButton)
+        {
+            _controlWindow.Hide();
+            return;
+        }
+        try
+        {
+            var point = IslandToggleSlot.PointToScreen(new Point(0, 0));
+            double scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
+            if (scale <= 0) scale = 1;
+            _controlWindow.ShowAt(point.X / scale + 3, point.Y / scale + 1);
+        }
+        catch { }
     }
 
     public static System.Drawing.Rectangle DefaultPreviewRegion()
@@ -76,6 +136,8 @@ public partial class OverlayWindow : Window
     /// <summary>Displays a click-through Dynamic Island style translation at the top-center of the primary display.</summary>
     public void ShowText(string text, string? original, System.Drawing.Rectangle regionPx, int hideAfter = -1)
     {
+        if (!_style.IslandEnabled) return;
+        _hideTimer.Stop();
         Label.Text = text;
         Original.Text = original ?? "";
         Original.Visibility = _style.ShowOriginal && !string.IsNullOrWhiteSpace(original)
@@ -83,17 +145,19 @@ public partial class OverlayWindow : Window
 
         DetailsPanel.Visibility = Visibility.Visible;
         IslandCaption.Text = "ترجمة جديدة";
-        IslandStatus.Text = "LIVE";
+        IslandStatus.Text = _translationRunning ? "LIVE" : "PREVIEW";
         _expanded = true;
         Card.Padding = new Thickness(18, 12, 18, 12);
-        Width = ExpandedWidth;
         BeginAnimation(WidthProperty, null);
+        BeginAnimation(LeftProperty, null);
+        Width = ExpandedWidth;
         UpdateLayout();
         PositionAtTopCenter(ExpandedWidth);
 
         if (!IsVisible) Show();
+        PositionControlWindow();
         _collapseTimer.Stop();
-        _collapseTimer.Interval = TimeSpan.FromSeconds(4.5);
+        _collapseTimer.Interval = TimeSpan.FromSeconds(Math.Clamp(_style.IslandCollapseSeconds, 1, 15));
         _collapseTimer.Start();
 
         _hideTimer.Stop();
@@ -105,12 +169,17 @@ public partial class OverlayWindow : Window
         }
     }
 
-    private void PositionAtTopCenter(double width)
+    private double CenteredLeft(double width)
     {
         double scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
         if (scale <= 0) scale = 1;
         double screenWidth = GetSystemMetrics(SM_CXSCREEN) / scale;
-        Left = Math.Max(8, (screenWidth - width / scale) / 2);
+        return Math.Max(8, (screenWidth - width) / 2);
+    }
+
+    private void PositionAtTopCenter(double width)
+    {
+        Left = CenteredLeft(width);
         Top = TopInset;
     }
 
@@ -120,19 +189,21 @@ public partial class OverlayWindow : Window
         if (!IsVisible || !_expanded) return;
         _expanded = false;
         DetailsPanel.Visibility = Visibility.Collapsed;
-        IslandCaption.Text = "FLAFYO جاهز";
-        IslandStatus.Text = "ON";
+        IslandCaption.Text = _translationRunning ? "FLAFYO جاهز" : "الترجمة متوقفة";
+        IslandStatus.Text = _translationRunning ? "ON" : "PAUSED";
         Card.Padding = new Thickness(14, 9, 14, 9);
-        BeginAnimation(WidthProperty, new DoubleAnimation(Width, CollapsedWidth,
-            TimeSpan.FromMilliseconds(260)) { EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut } });
-        PositionAtTopCenter(CollapsedWidth);
+        var duration = TimeSpan.FromMilliseconds(260);
+        var easing = new CubicEase { EasingMode = EasingMode.EaseOut };
+        BeginAnimation(WidthProperty, new DoubleAnimation(Width, CollapsedWidth, duration) { EasingFunction = easing });
+        BeginAnimation(LeftProperty, new DoubleAnimation(Left, CenteredLeft(CollapsedWidth), duration) { EasingFunction = easing });
+        PositionControlWindow();
     }
 
     private void SetCollapsedVisual()
     {
         DetailsPanel.Visibility = Visibility.Collapsed;
-        IslandCaption.Text = "FLAFYO جاهز";
-        IslandStatus.Text = "ON";
+        IslandCaption.Text = _translationRunning ? "FLAFYO جاهز" : "الترجمة متوقفة";
+        IslandStatus.Text = _translationRunning ? "ON" : "PAUSED";
         Width = CollapsedWidth;
         PositionAtTopCenter(CollapsedWidth);
     }
@@ -141,7 +212,14 @@ public partial class OverlayWindow : Window
     {
         _hideTimer.Stop();
         _collapseTimer.Stop();
+        _controlWindow.Hide();
         base.Hide();
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        _controlWindow.Close();
+        base.OnClosed(e);
     }
 }
 
@@ -166,5 +244,5 @@ public sealed class WpfOverlaySink : IOverlaySink
             catch (Exception ex) { AppLog.Write(ex); }
         });
 
-    public void Clear(int regionId) => _window.Dispatcher.InvokeAsync(() => _window.Hide());
+    public void Clear(int regionId) => _window.Dispatcher.InvokeAsync(() => _window.ShowIdle());
 }

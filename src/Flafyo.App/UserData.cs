@@ -141,6 +141,9 @@ public sealed class OverlayStyle
     public int AutoWidthPx { get; set; }                   // 0 = same width as the text region
     public int AutoHideSeconds { get; set; }               // 0 = stays until the text changes
     public bool ShowOriginal { get; set; }
+    public bool IslandEnabled { get; set; } = true;
+    public bool IslandShowToggleButton { get; set; } = true;
+    public double IslandCollapseSeconds { get; set; } = 4.5;
     // whole-screen mode: titles/headings get their own look
     public string HeadingTextColor { get; set; } = "#FFC857";
     public int HeadingScalePercent { get; set; } = 130;

@@ -75,6 +75,11 @@ public partial class MainWindow : Window
         TranslateBrandsBox.IsChecked = _settings.TranslateBrands;
         SpeakBox.IsChecked = _settings.Speak;
         AutoProfileBox.IsChecked = _settings.AutoProfile;
+        IslandEnabledBox.IsChecked = _settings.Style.IslandEnabled;
+        IslandToggleBox.IsChecked = _settings.Style.IslandShowToggleButton;
+        IslandOriginalBox.IsChecked = _settings.Style.ShowOriginal;
+        IslandCollapseBox.SelectedIndex = _settings.Style.IslandCollapseSeconds < 3.5 ? 0 :
+            _settings.Style.IslandCollapseSeconds > 5.5 ? 2 : 1;
         _masculine = _settings.Masculine;
 
         try { _monitors = Monitors.GetAll(); } catch { }
@@ -121,6 +126,13 @@ public partial class MainWindow : Window
         StateText.Foreground = (System.Windows.Media.Brush)FindResource(running ? "Ok" : "Muted");
         DashboardState.Text = running ? "الترجمة تعمل" : "متوقف";
         DashboardState.Foreground = (System.Windows.Media.Brush)FindResource(running ? "Ok" : "Muted");
+        if (_settings.Style.IslandEnabled)
+        {
+            var island = EnsureOverlay();
+            island.SetTranslationRunning(running);
+            island.ShowIdle();
+        }
+        else _overlay?.SetTranslationRunning(running);
     }
 
     private void SetStatus(string s) => Dispatcher.InvokeAsync(() => StatusText.Text = s);
@@ -181,6 +193,30 @@ public partial class MainWindow : Window
     {
         if (string.IsNullOrWhiteSpace(text)) return;
         try { var s = EnsureSpeaker(); if (s != null) await s.SpeakAsync(text); } catch { }
+    }
+
+    private void IslandSettings_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_ready) return;
+        _settings.Style.IslandEnabled = IslandEnabledBox.IsChecked == true;
+        _settings.Style.IslandShowToggleButton = IslandToggleBox.IsChecked == true;
+        _settings.Style.ShowOriginal = IslandOriginalBox.IsChecked == true;
+        _settings.Style.IslandCollapseSeconds = IslandCollapseBox.SelectedIndex switch
+        {
+            0 => 2.5,
+            2 => 7.0,
+            _ => 4.5
+        };
+        _settings.Save();
+
+        var island = EnsureOverlay();
+        island.ApplyStyle(_settings.Style);
+        if (_settings.Style.IslandEnabled)
+        {
+            island.SetTranslationRunning(_pipeline != null || _screen != null);
+            island.ShowIdle();
+        }
+        else island.Hide();
     }
 
     private void Speak_Changed(object sender, RoutedEventArgs e)
@@ -564,6 +600,8 @@ public partial class MainWindow : Window
     private OverlayWindow EnsureOverlay()
     {
         _overlay ??= new OverlayWindow();
+        _overlay.ToggleRequested -= ToggleTranslation;
+        _overlay.ToggleRequested += ToggleTranslation;
         _overlay.ApplyStyle(_settings.Style);
         return _overlay;
     }
@@ -606,7 +644,7 @@ public partial class MainWindow : Window
             preview: () => overlay.ShowPreview(PreviewRegion()),
             previewScreen: PreviewScreenCards)
         { Owner = this };
-        win.Closed += (_, _) => { if (_pipeline == null) overlay.Hide(); };
+        win.Closed += (_, _) => { if (_pipeline == null && _screen == null && !_settings.Style.IslandEnabled) overlay.Hide(); };
         win.Show();
     }
 
@@ -848,7 +886,6 @@ public partial class MainWindow : Window
         g?.Dispose();
         (_translator as IDisposable)?.Dispose(); _translator = null;
         _speaker?.Stop();
-        _overlay?.Hide();
         _screenWindow?.ClearAll();
         _loggedBlocks.Clear();
         EngineText.Text = "";

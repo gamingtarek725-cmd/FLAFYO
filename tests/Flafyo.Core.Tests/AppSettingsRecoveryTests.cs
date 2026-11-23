@@ -72,6 +72,46 @@ public sealed class AppSettingsRecoveryTests
         }
     }
 
+    [Fact]
+    public void Island_preferences_have_safe_defaults_and_survive_json_roundtrip()
+    {
+        var original = new AppSettings();
+        Assert.True(original.Style.IslandEnabled);
+        Assert.True(original.Style.IslandShowToggleButton);
+        Assert.Equal(4.5, original.Style.IslandCollapseSeconds);
+
+        var restored = JsonSerializer.Deserialize<AppSettings>(JsonSerializer.Serialize(original));
+        Assert.NotNull(restored);
+        Assert.True(restored!.Style.IslandEnabled);
+        Assert.True(restored.Style.IslandShowToggleButton);
+        Assert.Equal(4.5, restored.Style.IslandCollapseSeconds);
+    }
+
+    [Fact]
+    public void Loading_a_game_profile_style_does_not_override_global_Island_preferences()
+    {
+        var global = new OverlayStyle
+        {
+            IslandEnabled = false,
+            IslandShowToggleButton = false,
+            IslandCollapseSeconds = 7
+        };
+        var game = new OverlayStyle
+        {
+            FontSize = 28,
+            IslandEnabled = true,
+            IslandShowToggleButton = true,
+            IslandCollapseSeconds = 2.5
+        };
+
+        global.CopyFrom(game);
+
+        Assert.Equal(28, global.FontSize);
+        Assert.False(global.IslandEnabled);
+        Assert.False(global.IslandShowToggleButton);
+        Assert.Equal(7, global.IslandCollapseSeconds);
+    }
+
     private static string CreateTempDirectory()
     {
         var path = Path.Combine(Path.GetTempPath(), "FLAFYO-SettingsTests", Guid.NewGuid().ToString("N"));
