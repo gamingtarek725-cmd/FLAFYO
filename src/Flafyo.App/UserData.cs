@@ -141,6 +141,9 @@ public sealed class OverlayStyle
     public int AutoWidthPx { get; set; }                   // 0 = same width as the text region
     public int AutoHideSeconds { get; set; }               // 0 = stays until the text changes
     public bool ShowOriginal { get; set; }
+    public bool IslandEnabled { get; set; } = true;
+    public bool IslandShowToggleButton { get; set; } = true;
+    public double IslandCollapseSeconds { get; set; } = 4.5;
     // whole-screen mode: titles/headings get their own look
     public string HeadingTextColor { get; set; } = "#FFC857";
     public int HeadingScalePercent { get; set; } = 130;
@@ -153,6 +156,8 @@ public sealed class OverlayStyle
         BackOpacity = o.BackOpacity; Border = o.Border; BorderColor = o.BorderColor; Align = o.Align; Shadow = o.Shadow;
         OverlayMode = o.OverlayMode; AreaX = o.AreaX; AreaY = o.AreaY; AreaW = o.AreaW; AreaH = o.AreaH;
         AutoWidthPx = o.AutoWidthPx; AutoHideSeconds = o.AutoHideSeconds; ShowOriginal = o.ShowOriginal;
+        IslandEnabled = o.IslandEnabled; IslandShowToggleButton = o.IslandShowToggleButton;
+        IslandCollapseSeconds = o.IslandCollapseSeconds;
         HeadingTextColor = o.HeadingTextColor; HeadingScalePercent = o.HeadingScalePercent; HeadingBold = o.HeadingBold; AutoFit = o.AutoFit;
     }
 }
