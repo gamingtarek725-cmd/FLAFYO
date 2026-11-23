@@ -55,7 +55,7 @@ FLAFYO is a Windows-first game translation and localization platform. Existing t
 - Acceptance: clean Windows test machine, regression suite, and release checklist pass.
 
 ## Engineering rules
-- Persist mutable user data through the shared `Flafyo.Core.AtomicFile` helper: write a same-directory temporary file, then replace the destination; retain `.bak` recovery copies for application settings and game profiles.
+- Persist mutable user data through the shared `Flafyo.Core.AtomicFile` helper: write a same-directory temporary file, then replace the destination; retain `.bak` recovery copies and automatically restore valid settings or game profiles when the primary JSON is damaged.
 - Keep persistence behavior covered by unit tests, including backup creation, first-write behavior, cancellation, and temporary-file cleanup.
 - Never claim real-game compatibility without a real-game test.
 - Never guess archive formats or silently modify original game files.
