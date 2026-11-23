@@ -12,3 +12,10 @@ This product includes third-party components. Each remains the property of its o
 6. MyMemory Translation API (Translated) — optional online fallback; subject to the provider's terms of use.
 
 Windows is a trademark of Microsoft Corporation. All other trademarks belong to their owners.
+7. Google MADLAD-400-3B-MT translation model ... Apache License 2.0
+   Original model: https://huggingface.co/google/madlad400-3b-mt
+8. MADLAD-400 ONNX INT4 ReducedRam export (niedev / OnnxModelsEnhancer) ... Apache License 2.0
+   Export project: https://github.com/niedev/OnnxModelsEnhancer
+   Model archive: https://github.com/niedev/OnnxModelsEnhancer/releases/tag/v1.0.0-beta
+   The model archive is downloaded by the user on demand and is not bundled in the FLAFYO installer.
+See licenses/Apache-2.0.txt for the license text applicable to the MADLAD model and ONNX export.
