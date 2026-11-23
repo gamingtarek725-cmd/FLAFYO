@@ -22,7 +22,7 @@ public partial class OverlayWindow : Window
     private bool _translationRunning;
     public event Action? ToggleRequested;
     private const double ExpandedWidth = 540;
-    private const double CollapsedWidth = 226;
+    private const double CollapsedWidth = 292;
     private const double TopInset = 18;
 
     public OverlayWindow()
