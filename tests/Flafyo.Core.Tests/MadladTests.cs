@@ -104,7 +104,9 @@ public class OnnxMadladIntegrationTests
 
         var tokenProbe = "Press E to interact with the object.";
         var tokenizer = MadladTokenizer.Load(Path.Combine(Dir, "Madlad", "spiece.model"));
-        _output.WriteLine("MADLAD_CSHARP_SOURCE_IDS=" + string.Join(",", tokenizer.Encode(tokenProbe, "ar")));
+        Assert.Equal(
+            new[] { 805, 9, 25547, 951, 871, 199753, 2142, 1013, 65479, 807, 2 },
+            tokenizer.Encode(tokenProbe, "ar"));
 
         var samples = new[]
         {
@@ -122,6 +124,7 @@ public class OnnxMadladIntegrationTests
                 var result = translator.TranslateSync(sample, CancellationToken.None);
                 Assert.False(string.IsNullOrWhiteSpace(result), "Empty translation for: " + sample);
                 Assert.Matches(new Regex(@"\p{IsArabic}"), result);
+                Assert.False(".,!?;:،؛؟…".Contains(result[0]), "Unexpected leading punctuation: " + result);
                 _output.WriteLine("MADLAD | " + sample + " => " + result);
             }
 
