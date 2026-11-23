@@ -1,0 +1,50 @@
+name: Inspect MADLAD release archive
+
+on:
+  push:
+    paths:
+      - ".github/workflows/inspect-madlad-release.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Download pinned upstream MADLAD archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --retry-delay 5 \
+            "https://github.com/niedev/OnnxModelsEnhancer/releases/download/v1.0.0-beta/Madlad.zip" \
+            --output "$RUNNER_TEMP/Madlad.zip"
+          stat --printf="Archive bytes: %s\n" "$RUNNER_TEMP/Madlad.zip"
+      - name: Inspect archive paths, sizes, and SHA-256
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib, json, zipfile
+          archive = r"${{ runner.temp }}/Madlad.zip"
+          with zipfile.ZipFile(archive) as z:
+              rows = []
+              for info in z.infolist():
+                  name = info.filename
+                  if info.is_dir():
+                      continue
+                  if name.lower().endswith((".onnx", ".onnx.data", ".model", "config.json", "generation_config.json")):
+                      digest = hashlib.sha256()
+                      with z.open(info) as stream:
+                          for chunk in iter(lambda: stream.read(8 * 1024 * 1024), b""):
+                              digest.update(chunk)
+                      rows.append({
+                          "path": name,
+                          "bytes": info.file_size,
+                          "compressed_bytes": info.compress_size,
+                          "sha256": digest.hexdigest()
+                      })
+              print(json.dumps(rows, indent=2))
+              print("TOTAL_INSPECTED_FILES", len(rows))
+          PY
