@@ -4,7 +4,7 @@
     <RootNamespace>Flafyo.Core</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.22.0" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.23.2" />
     <EmbeddedResource Include="Data\phrasebook.tsv" LogicalName="phrasebook.tsv" />
     <EmbeddedResource Include="Data\glossary.*.tsv" LogicalName="%(Filename)%(Extension)" />
   </ItemGroup>
