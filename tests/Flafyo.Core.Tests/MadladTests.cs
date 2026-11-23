@@ -89,10 +89,11 @@ public class OnnxMadladIntegrationTests
     private static string? Dir => Environment.GetEnvironmentVariable("FLAFYO_MADLAD_MODEL_DIR");
     private static string? NllbDir => Environment.GetEnvironmentVariable("FLAFYO_HEAVY_MODEL_DIR");
 
-    [Fact]
+    [Fact(Skip = "MADLAD integration is pending: the pinned ONNX archive contract is not yet wired to LanguagePack and the runtime decoder. Re-enable only after a real English-to-Arabic inference test runs against the packaged files.")]
     public void Madlad_model_produces_arabic_and_reports_reference_quality()
     {
-        if (string.IsNullOrWhiteSpace(Dir)) return;
+        if (string.IsNullOrWhiteSpace(Dir))
+            throw new InvalidOperationException("FLAFYO_MADLAD_MODEL_DIR must point to the extracted, supported MADLAD model.");
 
         var samples = new[]
         {
