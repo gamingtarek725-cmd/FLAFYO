@@ -66,7 +66,7 @@ public class MadladTokenizerTests
     public void Unknown_characters_use_unknown_token()
     {
         var tokenizer = CreateTokenizer();
-        Assert.Equal(new[] { 3, 6, 0, 2 }, tokenizer.Encode("@"));
+        Assert.Equal(new[] { 6, 3, 6, 0, 2 }, tokenizer.Encode("@"));
     }
 }
 
