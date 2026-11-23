@@ -4,13 +4,62 @@ on:
   pull_request:
   workflow_dispatch:
 
-# Keep only the newest validation run for a branch. Push and pull_request events
-# for the same branch share a group, avoiding duplicate builds for every commit.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
+  madlad-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Download pinned MADLAD INT4 archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --retry-delay 5 \
+            "https://github.com/niedev/OnnxModelsEnhancer/releases/download/v1.0.0-beta/Madlad.zip" \
+            --output "$RUNNER_TEMP/Madlad.zip"
+          stat --printf="Archive bytes: %s\\n" "$RUNNER_TEMP/Madlad.zip"
+      - name: Verify archive files and inspect ONNX graph contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check onnx==1.19.0
+          python - <<'PY'
+          import hashlib, json, zipfile, onnx
+          archive = r"${{ runner.temp }}/Madlad.zip"
+          expected = [
+              "Madlad/Int4Acc4/madlad_embed_8bit.onnx",
+              "Madlad/Int4Acc4/madlad_encoder_4bit.onnx",
+              "Madlad/Int4Acc4/madlad_cache_initializer_4bit.onnx",
+              "Madlad/Int4Acc4/madlad_decoder_4bit.onnx",
+              "Madlad/spiece.model",
+          ]
+          with zipfile.ZipFile(archive) as z:
+              names = set(z.namelist())
+              missing = [name for name in expected if name not in names]
+              if missing:
+                  raise SystemExit("Required MADLAD files missing: " + ", ".join(missing))
+              for name in expected:
+                  info = z.getinfo(name)
+                  digest = hashlib.sha256()
+                  with z.open(info) as stream:
+                      for chunk in iter(lambda: stream.read(8 * 1024 * 1024), b""):
+                          digest.update(chunk)
+                  record = {"path": name, "bytes": info.file_size, "sha256": digest.hexdigest()}
+                  if name.endswith(".onnx"):
+                      model = onnx.load_model_from_string(z.read(name))
+                      def vi(v):
+                          t = v.type.tensor_type
+                          dims = [d.dim_param if d.dim_param else d.dim_value for d in t.shape.dim]
+                          return {"name": v.name, "elem_type": t.elem_type, "shape": dims}
+                      record["inputs"] = [vi(v) for v in model.graph.input]
+                      record["outputs"] = [vi(v) for v in model.graph.output]
+                      record["opsets"] = [{"domain": x.domain, "version": x.version} for x in model.opset_import]
+                  print(json.dumps(record, indent=2))
+          PY
+
   windows:
     runs-on: windows-latest
     timeout-minutes: 90
@@ -32,7 +81,7 @@ jobs:
         shell: pwsh
         run: |
           choco install innosetup -y --no-progress
-          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" installer\FLAFYO.iss
+          & "${env:ProgramFiles(x86)}\\Inno Setup 6\\ISCC.exe" installer\\FLAFYO.iss
           if (!(Test-Path installer-out/FLAFYO-GAME-TRANSLATOR-Setup.exe)) {
             throw "Installer output was not created."
           }
