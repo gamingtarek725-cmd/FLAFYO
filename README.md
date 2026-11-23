@@ -2,14 +2,14 @@
 
 **مترجم ألعاب لنظام Windows** — ترجمة نصوص الشاشة، إدارة إعدادات كل لعبة، وفحص ملفات الألعاب مع الحفاظ على الملفات الأصلية.
 
-[تحميل أحدث إصدار Windows](https://github.com/gamingtarek725-cmd/FLAFYO/releases/latest) · [سجل الإصدارات](https://github.com/gamingtarek725-cmd/FLAFYO/releases) · [خارطة الطريق](docs/ROADMAP.md)
+[تحميل أحدث إصدار Windows مباشرة](https://github.com/gamingtarek725-cmd/FLAFYO/releases/latest/download/FLAFYO-GAME-TRANSLATOR-Setup.exe) · [سجل الإصدارات](https://github.com/gamingtarek725-cmd/FLAFYO/releases) · [خارطة الطريق](docs/ROADMAP.md)
 
-## أحدث إصدار
+## أحدث إصدار منشور
 
-- الإصدار الحالي: **0.3.3**
-- ملف التثبيت: [FLAFYO-GAME-TRANSLATOR-Setup.exe](https://github.com/gamingtarek725-cmd/FLAFYO/releases/download/v0.3.3/FLAFYO-GAME-TRANSLATOR-Setup.exe)
-- صفحة الإصدار: https://github.com/gamingtarek725-cmd/FLAFYO/releases/tag/v0.3.3
-- SHA-256: `ae4269727608e786174f5bd79218ab9f4008f63cb3e9a8ee097a094a9ff4be0b`
+- الإصدار المستقر الحالي: **v0.3.4**.
+- [تحميل المثبّت مباشرةً (Windows x64)](https://github.com/gamingtarek725-cmd/FLAFYO/releases/latest/download/FLAFYO-GAME-TRANSLATOR-Setup.exe).
+- [صفحة الإصدار وسجل التغييرات](https://github.com/gamingtarek725-cmd/FLAFYO/releases/latest).
+- رابط التحميل المباشر أعلاه يتجه تلقائيًا إلى أحدث إصدار منشور، ولا يشير إلى ملفات CI المؤقتة.
 
 ## المزايا الموجودة في المشروع
 
@@ -77,7 +77,7 @@ dotnet publish src/Flafyo.App/Flafyo.App.csproj -c Release -r win-x64 --self-con
 - لا يُعلن دعم صيغة أرشيف لمجرد تشابه امتدادها؛ يلزم ملف عينة واختبار استخراج وإعادة بناء.
 - لا تستخدم خيار تطبيق أرشيف مُعاد بناؤه على ملفات مهمة قبل الاحتفاظ بنسخة احتياطية مستقلة.
 - دقة الترجمة تختلف حسب النموذج والمصدر والسياق، ولا يوجد ضمان بزمن استجابة فوري أو انعدام التأخير.
-- حزمة MADLAD-400 3B اختيارية وتجريبية على أجهزة الألعاب: قد تزيد استهلاك RAM وCPU بوضوح. يجب قياسها على الجهاز المستهدف قبل استخدامها أثناء اللعب. ترخيص أوزان النموذج وحزمة ONNX المشار إليها Apache-2.0.
+- لا تتوفر حزمة MADLAD للتشغيل في الإصدار الحالي؛ راجع قسم البحث المستقبلي لمعرفة متطلبات إعادة تفعيلها.
 
 ## بحث MADLAD المستقبلي
 
