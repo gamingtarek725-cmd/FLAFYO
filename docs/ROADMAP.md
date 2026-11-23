@@ -69,9 +69,9 @@ This is the single ordered checklist for future development. A checkbox is marke
 
 ### Track A — MADLAD-400 3B INT4 (priority 1)
 - [x] Pin the MADLAD ONNX export revision and record exact file sizes and SHA-256 hashes in `LanguagePack.Madlad`.
-- [x] Add a dedicated integration test that loads the full encoder/decoder pack and translates three English game/UI sentences to Arabic.
-- [x] Add a dedicated CI workflow that downloads the pinned model files and runs the real translation test on CPU.
-- [x] Correct the Arabic Unicode-range assertion in the integration test.
+- [ ] Add a dedicated integration test after selecting a verified model artifact whose graph layout matches the runtime. A duplicate test class was removed before it could contaminate the main test suite.
+- [ ] Add a dedicated CI workflow only after verifying the model repository's actual file tree and pinned revision. The initial workflow was removed after its first graph download returned HTTP 404.
+- [ ] Add and validate the Arabic Unicode assertion as part of the final integration test.
 - [ ] Confirm the CI model download completes with all seven files matching their pinned sizes/hashes.
 - [ ] Confirm ONNX Runtime successfully opens both encoder and merged decoder graphs, including external weight sidecars.
 - [ ] Confirm all three outputs are non-empty Arabic and manually review translation quality.
@@ -116,4 +116,11 @@ This is the single ordered checklist for future development. A checkbox is marke
 - [ ] Maintain this checklist by changing boxes only when acceptance evidence is available.
 
 ### Current gate
-**MADLAD is not yet accepted as working.** The real-model CI run must finish its download and execute the translation test before it can be marked operational. The test currently runs on CPU; GPU acceleration and target-device performance remain separate acceptance items.
+**MADLAD is blocked and not accepted as working.** The initial CI attempt downloaded the small config/tokenizer files but returned HTTP 404 for `mixed_fp16_int4/onnx/encoder_model.onnx`; inference never ran. The public model card for the pinned `tonythethompson/madlad400-3b-mt-onnx` repository describes quantized encoder/decoder files named `encoder_model_quantized.onnx` and `decoder_model_quantized.onnx`, not the merged INT4 graph currently expected by `OnnxMadladTranslator`. The pack manifest, model source, and inference graph contract must be reconciled before another runtime integration attempt. CPU/GPU acceleration and target-device performance remain unverified.
+
+
+### MADLAD investigation notes (2026-11-23)
+- CI run `45192378081` failed during model download, before ONNX session creation or translation. Logs show HTTP 404 for `mixed_fp16_int4/onnx/encoder_model.onnx`.
+- The attempted validation workflow and its duplicate test file were removed to avoid leaving a knowingly broken CI path or duplicate test type in the project.
+- Do not label MADLAD operational, do not ship it as a working pack, and do not publish a new release based on this failed attempt.
+- Next engineering task: identify a verifiable INT4 ONNX artifact with an architecture matching the implemented encoder/merged-decoder/cache interface, then pin actual file paths, sizes, and hashes. If no compatible merged-decoder artifact exists, adapt the runtime to the selected export and add fixture/metadata-based graph contract tests before full model download.
