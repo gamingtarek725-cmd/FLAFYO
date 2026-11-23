@@ -29,16 +29,25 @@ jobs:
           name: FLAFYO-GAME-TRANSLATOR
           path: publish/FLAFYO.GameTranslator.exe
       - name: Build installer (Setup.exe)
-        continue-on-error: true
         shell: pwsh
         run: |
           choco install innosetup -y --no-progress
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" installer\FLAFYO.iss
+          if (!(Test-Path installer-out/FLAFYO-GAME-TRANSLATOR-Setup.exe)) {
+            throw "Installer output was not created."
+          }
+      - name: SHA256 installer
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash installer-out/FLAFYO-GAME-TRANSLATOR-Setup.exe -Algorithm SHA256).Hash.ToLower()
+          "$hash  FLAFYO-GAME-TRANSLATOR-Setup.exe" | Set-Content installer-out/FLAFYO-GAME-TRANSLATOR-Setup.exe.sha256
+          Write-Host "Installer SHA256: $hash"
       - uses: actions/upload-artifact@v4
-        continue-on-error: true
         with:
           name: FLAFYO-Setup
-          path: installer-out/FLAFYO-GAME-TRANSLATOR-Setup.exe
+          path: |
+            installer-out/FLAFYO-GAME-TRANSLATOR-Setup.exe
+            installer-out/FLAFYO-GAME-TRANSLATOR-Setup.exe.sha256
       - name: Download light language pack (for the real-model test)
         continue-on-error: true
         shell: pwsh
