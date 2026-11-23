@@ -88,8 +88,23 @@ internal sealed class LocalizationCatalogService
         var catalog = JsonSerializer.Deserialize<Catalog>(json, Options)
                       ?? throw new InvalidDataException("Invalid localization catalog.");
         catalog = NormalizeCatalog(catalog);
-        Directory.CreateDirectory(Path.GetDirectoryName(CachePath)!);
-        await File.WriteAllTextAsync(CachePath, JsonSerializer.Serialize(catalog, Options));
+        var cacheDirectory = Path.GetDirectoryName(CachePath)!;
+        Directory.CreateDirectory(cacheDirectory);
+
+        // Write beside the cache, then replace it in one operation so an interrupted
+        // refresh cannot leave a truncated cache file behind.
+        var temporaryPath = CachePath + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        try
+        {
+            await File.WriteAllTextAsync(temporaryPath, JsonSerializer.Serialize(catalog, Options));
+            File.Move(temporaryPath, CachePath, overwrite: true);
+        }
+        finally
+        {
+            if (File.Exists(temporaryPath))
+                File.Delete(temporaryPath);
+        }
+
         return catalog;
     }
 }
