@@ -83,7 +83,7 @@
       </Grid>
     </Border>
 
-    <ScrollViewer x:Name="MainScrollViewer" Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <ScrollViewer x:Name="MainScrollViewer" Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Disabled">
       <TabControl x:Name="MainTabs" SelectedIndex="0" Background="Transparent" BorderThickness="0" Padding="0">
         <TabControl.Template>
           <ControlTemplate TargetType="TabControl">
