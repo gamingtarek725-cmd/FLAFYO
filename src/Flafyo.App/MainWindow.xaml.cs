@@ -100,6 +100,8 @@ public partial class MainWindow : Window
         SourceInitialized += OnSourceInitialized;
     }
 
+    private void DashboardHome_Click(object sender, RoutedEventArgs e) => MainScrollViewer.ScrollToTop();
+
     private System.Drawing.Rectangle Region => (System.Drawing.Rectangle)Volatile.Read(ref _regionBox);
     private bool ScreenMode => ModeIndexValue == 1;
 
