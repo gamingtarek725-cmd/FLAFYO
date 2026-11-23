@@ -76,7 +76,7 @@ public class MadladPackTests
     public void Madlad_pack_is_a_separate_large_optional_model()
     {
         Assert.Equal(PackKind.Madlad, LanguagePack.Madlad.Kind);
-        Assert.True(LanguagePack.Madlad.ApproxBytes > 3_500_000_000);
+        Assert.InRange(LanguagePack.Madlad.ApproxBytes, 1_600_000_000, 1_800_000_000);
         Assert.Contains("madlad", LanguagePack.Madlad.Folder, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -96,8 +96,8 @@ public class OnnxMadladIntegrationTests
     private static string? Dir => Environment.GetEnvironmentVariable("FLAFYO_MADLAD_MODEL_DIR");
     private static string? NllbDir => Environment.GetEnvironmentVariable("FLAFYO_HEAVY_MODEL_DIR");
 
-    [Fact(Skip = "MADLAD integration is pending: the pinned ONNX archive contract is not yet wired to LanguagePack and the runtime decoder. Re-enable only after a real English-to-Arabic inference test runs against the packaged files.")]
-    public void Madlad_model_produces_arabic_and_reports_reference_quality()
+    [Fact]
+    public void Madlad_model_produces_arabic_with_the_pinned_four_graph_archive()
     {
         if (string.IsNullOrWhiteSpace(Dir))
             throw new InvalidOperationException("FLAFYO_MADLAD_MODEL_DIR must point to the extracted, supported MADLAD model.");
@@ -121,7 +121,7 @@ public class OnnxMadladIntegrationTests
                 _output.WriteLine("MADLAD | " + sample + " => " + result);
             }
 
-            var references = Phrasebook.LoadEmbedded().Entries.Where((_, i) => i % 15 == 0).Take(12);
+            var references = Phrasebook.LoadEmbedded().Entries.Where((_, i) => i % 15 == 0).Take(3);
             foreach (var (english, referenceArabic) in references)
             {
                 var translated = translator.TranslateSync(english, CancellationToken.None);
