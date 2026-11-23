@@ -2,16 +2,20 @@
 """Index public Arabic game-localization pages without downloading patch files."""
 from __future__ import annotations
 import datetime as dt
+import hashlib
 import html
 import json
 import re
 import urllib.request
+from io import BytesIO
 from html.parser import HTMLParser
 from pathlib import Path
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, unquote
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "data" / "localization-library.json"
+COVERS_DIR = ROOT / "data" / "covers"
+RAW_COVER_BASE = "https://raw.githubusercontent.com/gamingtarek725-cmd/FLAFYO/main/data/covers/"
 UA = "FLAFYO-LibraryBot/1.1 (+https://github.com/gamingtarek-cmd/FLAFYO)"
 SOURCES = [
     ("Ta3reebat", "https://ta3reebat.com/"),
@@ -83,7 +87,7 @@ def safe_image_url(page_url: str, candidates: list[str]) -> str:
             continue
         path = parsed.path.lower()
         # WPF's built-in image decoder supports these common formats; skip SVG/WebP.
-        if path and not re.search(r"\.(?:jpe?g|png|gif|bmp|tiff?)$", path):
+        if path and not re.search(r"\.(?:jpe?g|png|gif|bmp|tiff?|webp)$", path):
             continue
         if any(token in path for token in ("/logo", "favicon", "avatar", "icon")):
             continue
@@ -101,12 +105,12 @@ def discover_cover(entry: dict) -> tuple[str, str]:
         return entry["sourceUrl"], ""
 
 def title_from_slug(path: str, fallback: str) -> str:
-    slug = path.rstrip("/").split("/")[-1].lower()
+    slug = unquote(path.rstrip("/").split("/")[-1]).lower()
     if slug in TITLE_OVERRIDES:
         return TITLE_OVERRIDES[slug]
     # URL slugs are more stable than link text polluted by badges, view counts and platform labels.
     words = re.sub(r"[-_]+", " ", slug).strip()
-    words = re.sub(r"(?i)^ta3reeb( of)? ", "", words)
+    words = re.sub(r"(?i)^(?:ta3reeb(?: of)?|تعريب(?: لعبة)?)\s*", "", words)
     if not words or words in {"home", "patches", "game", "translations"}:
         return fallback[:180]
     return words.title()[:180]
@@ -157,7 +161,7 @@ def main():
                 "title": title,
                 "sourceUrl": absolute,
                 "sourceName": source_name,
-                "coverUrl": urljoin(listing_url, link.get("cover", "")) if link.get("cover") else "",
+                "coverUrl": safe_image_url(absolute, [link.get("cover", "")]) if link.get("cover") else "",
                 "platform": ", ".join(platforms),
                 "gameVersion": "",
                 "translationVersion": translation_version,
@@ -176,16 +180,18 @@ def main():
     # Preserve manually verified covers, then enrich missing artwork from each game's
     # own page metadata. Fetch concurrently so the scheduled catalog refresh stays bounded.
     previous_covers = {
-        item.get("sourceUrl"): item.get("coverUrl", "")
+        item.get("sourceUrl"): item.get("coverSourceUrl") or (
+            item.get("coverUrl", "") if not item.get("coverUrl", "").startswith(RAW_COVER_BASE) else ""
+        )
         for item in previous.get("entries", [])
-        if item.get("sourceUrl") and item.get("coverUrl")
+        if item.get("sourceUrl")
     }
     for entry in entries:
-        if not entry["coverUrl"] and previous_covers.get(entry["sourceUrl"]):
-            entry["coverUrl"] = previous_covers[entry["sourceUrl"]]
+        entry["coverSourceUrl"] = entry["coverUrl"] or previous_covers.get(entry["sourceUrl"], "")
+        entry["coverUrl"] = ""
 
     from concurrent.futures import ThreadPoolExecutor, as_completed
-    missing_artwork = [entry for entry in entries if not entry["coverUrl"]]
+    missing_artwork = [entry for entry in entries if not entry["coverSourceUrl"]]
     with ThreadPoolExecutor(max_workers=8) as executor:
         futures = [executor.submit(discover_cover, entry) for entry in missing_artwork[:400]]
         for future in as_completed(futures):
@@ -193,11 +199,50 @@ def main():
             if cover_url:
                 match = next((item for item in entries if item["sourceUrl"] == source_url), None)
                 if match is not None:
-                    match["coverUrl"] = cover_url
+                    match["coverSourceUrl"] = cover_url
+
+    def cache_cover(entry: dict) -> tuple[str, str]:
+        source = entry.get("coverSourceUrl", "")
+        if not source:
+            return entry["sourceUrl"], ""
+        parsed = urlparse(source)
+        if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password:
+            return entry["sourceUrl"], ""
+        filename = hashlib.sha256(source.encode("utf-8")).hexdigest()[:20] + ".jpg"
+        destination = COVERS_DIR / filename
+        try:
+            if not destination.exists():
+                request = urllib.request.Request(source, headers={"User-Agent": UA, "Accept": "image/*"})
+                with urllib.request.urlopen(request, timeout=20) as response:
+                    content_type = response.headers.get("Content-Type", "").split(";", 1)[0].lower()
+                    data = response.read(8 * 1024 * 1024 + 1)
+                if not content_type.startswith("image/") or len(data) > 8 * 1024 * 1024:
+                    raise ValueError("not a supported image response or image exceeds 8 MB")
+                from PIL import Image, ImageOps
+                with Image.open(BytesIO(data)) as original:
+                    original.seek(0)
+                    image = ImageOps.exif_transpose(original).convert("RGB")
+                    if image.width < 80 or image.height < 80:
+                        raise ValueError("image is too small to be game artwork")
+                    image.thumbnail((420, 620), Image.Resampling.LANCZOS)
+                    COVERS_DIR.mkdir(parents=True, exist_ok=True)
+                    image.save(destination, "JPEG", quality=82, optimize=True, progressive=True)
+            return entry["sourceUrl"], RAW_COVER_BASE + filename
+        except Exception as exc:
+            print(f"WARN: cover cache failed for {entry['title']}: {exc}")
+            return entry["sourceUrl"], ""
+
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        futures = [executor.submit(cache_cover, entry) for entry in entries if entry["coverSourceUrl"]]
+        for future in as_completed(futures):
+            source_url, cached_url = future.result()
+            match = next((item for item in entries if item["sourceUrl"] == source_url), None)
+            if match is not None:
+                match["coverUrl"] = cached_url
 
     entries.sort(key=lambda item: (item["sourceName"], item["title"].casefold()))
     with_cover = sum(bool(item["coverUrl"]) for item in entries)
-    print(f"Artwork found for {with_cover}/{len(entries)} game pages.")
+    print(f"Cached optimized JPEG artwork for {with_cover}/{len(entries)} game pages.")
     unchanged = previous.get("entries") == entries and previous.get("sourceCount") == len(SOURCES)
     generated_at = previous.get("generatedAt") if unchanged and previous.get("generatedAt") else dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
     catalog = {
