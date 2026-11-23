@@ -105,8 +105,7 @@ jobs:
           path: |
             installer-out/FLAFYO-GAME-TRANSLATOR-Setup.exe
             installer-out/FLAFYO-GAME-TRANSLATOR-Setup.exe.sha256
-      - name: Download light language pack (for the real-model test)
-        continue-on-error: true
+      - name: Download light language pack (required for the real-model test)
         shell: pwsh
         run: |
           $ProgressPreference = 'SilentlyContinue'
@@ -117,8 +116,7 @@ jobs:
             Invoke-WebRequest "$base/$f" -OutFile (Join-Path $dir $f)
           }
           "FLAFYO_MODEL_DIR=$dir" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-      - name: Real light translation test
-        continue-on-error: true
+      - name: Real light translation test (required)
         run: dotnet test tests/Flafyo.Core.Tests -c Release --filter "FullyQualifiedName~OnnxMarianIntegration" --logger "console;verbosity=detailed"
       - name: Download heavy language pack (required for the heavy-model test)
         shell: pwsh
