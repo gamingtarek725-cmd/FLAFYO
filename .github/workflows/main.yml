@@ -3,6 +3,13 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+
+# Keep only the newest validation run for a branch. Push and pull_request events
+# for the same branch share a group, avoiding duplicate builds for every commit.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   windows:
     runs-on: windows-latest
