@@ -130,12 +130,17 @@
                 </Border>
               </UniformGrid>
 
-              <TextBlock Text="ابدأ من هنا" Style="{StaticResource SectionTitle}"/>
-              <UniformGrid Columns="2">
-                <Button Content="الترجمة الفورية  →" Click="NavigateLive_Click" Padding="22" Margin="0,0,8,10" FontSize="15"/>
-                <Button Content="مكتبة التعريبات  →" Click="DashboardLibrary_Click" Padding="22" Margin="8,0,0,10" FontSize="15"/>
-                <Button Content="تعريب ملفات الألعاب  →" Click="DashboardFiles_Click" Padding="22" Margin="0,0,8,0" FontSize="15"/>
-                <Button Content="إدارة حزم اللغات  →" Click="DashboardLanguages_Click" Padding="22" Margin="8,0,0,0" FontSize="15"/>
+              <TextBlock Text="أدوات FLAFYO" Style="{StaticResource SectionTitle}"/>
+              <UniformGrid Columns="3">
+                <Border Background="#111B30" BorderBrush="#263956" BorderThickness="1" CornerRadius="15" Padding="17" Margin="0,0,8,0">
+                  <StackPanel><TextBlock Text="01  /  LIVE OCR" Foreground="#7CE8F6" FontSize="10" FontWeight="Bold" FlowDirection="LeftToRight"/><TextBlock Text="التقاط النصوص وترجمتها فوق اللعبة" Foreground="#F7F8FF" FontWeight="SemiBold" Margin="0,9,0,0" TextWrapping="Wrap"/></StackPanel>
+                </Border>
+                <Border Background="#111B30" BorderBrush="#263956" BorderThickness="1" CornerRadius="15" Padding="17" Margin="4,0">
+                  <StackPanel><TextBlock Text="02  /  OFFLINE" Foreground="#A78BFA" FontSize="10" FontWeight="Bold" FlowDirection="LeftToRight"/><TextBlock Text="حزم ترجمة محلية تعمل دون اتصال" Foreground="#F7F8FF" FontWeight="SemiBold" Margin="0,9,0,0" TextWrapping="Wrap"/></StackPanel>
+                </Border>
+                <Border Background="#111B30" BorderBrush="#263956" BorderThickness="1" CornerRadius="15" Padding="17" Margin="8,0,0,0">
+                  <StackPanel><TextBlock Text="03  /  GAME LIBRARY" Foreground="#7CE8F6" FontSize="10" FontWeight="Bold" FlowDirection="LeftToRight"/><TextBlock Text="مكتبة تعريبات مع صور الألعاب ومعلومات المصدر" Foreground="#F7F8FF" FontWeight="SemiBold" Margin="0,9,0,0" TextWrapping="Wrap"/></StackPanel>
+                </Border>
               </UniformGrid>
             </StackPanel>
           </ScrollViewer>
