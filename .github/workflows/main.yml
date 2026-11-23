@@ -72,6 +72,11 @@ jobs:
         with: { dotnet-version: '8.0.x' }
       - name: Run tests
         run: dotnet test tests/Flafyo.Core.Tests -c Release
+      - name: Generate FLAFYO application icon
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check pillow
+          python scripts/generate_app_icon.py
       - name: Build EXE
         run: dotnet publish src/Flafyo.App/Flafyo.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish
       - name: SHA256

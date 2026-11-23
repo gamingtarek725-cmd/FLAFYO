@@ -15,6 +15,7 @@
   <ItemGroup>
     <Resource Include="Assets\flafyo.ico" />
     <Resource Include="Assets\logo.png" />
+    <Resource Include="Assets\flafyo-brand.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../Flafyo.Windows/Flafyo.Windows.csproj" />
