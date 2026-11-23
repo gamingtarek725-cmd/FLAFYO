@@ -100,7 +100,10 @@ internal static class ProfileStore
         if (!Validate(p, out var error)) throw new InvalidDataException(error);
         Directory.CreateDirectory(Dir);
         var target = Path.Combine(Dir, Safe(p.ExeName) + ".json");
-        AtomicWrite(target, JsonSerializer.Serialize(p, JsonOptions), keepBackup: File.Exists(target));
+        Flafyo.Core.AtomicFile.WriteAllText(
+            target,
+            JsonSerializer.Serialize(p, JsonOptions),
+            keepBackup: File.Exists(target));
     }
 
     public static void Export(GameProfile p, string path)
@@ -138,21 +141,6 @@ internal static class ProfileStore
         return profile;
     }
 
-    private static void AtomicWrite(string target, string content, bool keepBackup)
-    {
-        var temp = target + "." + Guid.NewGuid().ToString("N") + ".tmp";
-        try
-        {
-            File.WriteAllText(temp, content, new System.Text.UTF8Encoding(false));
-            if (keepBackup)
-                File.Copy(target, target + ".bak", overwrite: true);
-            File.Move(temp, target, overwrite: true);
-        }
-        finally
-        {
-            try { if (File.Exists(temp)) File.Delete(temp); } catch { }
-        }
-    }
 
     public static void Delete(string exe)
     {
