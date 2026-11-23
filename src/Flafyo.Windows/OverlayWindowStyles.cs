@@ -21,11 +21,18 @@ public static class OverlayWindowStyles
     [DllImport("user32.dll", SetLastError = true)]
     private static extern bool SetWindowDisplayAffinity(IntPtr hWnd, uint affinity);
 
-    /// <summary>Call once with the overlay HWND (before showing it).</summary>
-    public static void Apply(IntPtr hwnd)
+    /// <summary>Applies a fully click-through overlay style.</summary>
+    public static void Apply(IntPtr hwnd) => ApplyCore(hwnd, clickThrough: true);
+
+    /// <summary>Applies a non-activating style for the small, dedicated Island control window.</summary>
+    public static void ApplyInteractive(IntPtr hwnd) => ApplyCore(hwnd, clickThrough: false);
+
+    private static void ApplyCore(IntPtr hwnd, bool clickThrough)
     {
         var ex = GetWindowLongPtr(hwnd, GWL_EXSTYLE).ToInt64();
-        ex |= WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW | WS_EX_TOPMOST;
+        ex |= WS_EX_LAYERED | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW | WS_EX_TOPMOST;
+        if (clickThrough) ex |= WS_EX_TRANSPARENT;
+        else ex &= ~WS_EX_TRANSPARENT;
         SetWindowLongPtr(hwnd, GWL_EXSTYLE, new IntPtr(ex));
         SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
         // Keeps our own overlay out of our screenshots (Windows 10 2004+); ignored on older builds.
