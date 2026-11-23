@@ -3,11 +3,48 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent" Topmost="True"
         ShowInTaskbar="False" ShowActivated="False" Focusable="False" ResizeMode="NoResize"
-        SizeToContent="Height" Width="600" FlowDirection="RightToLeft">
-  <Border x:Name="Card" CornerRadius="12" Padding="16,10" BorderThickness="1" SnapsToDevicePixels="True">
-    <StackPanel Margin="1">
-      <TextBlock x:Name="Label" TextWrapping="Wrap"/>
-      <TextBlock x:Name="Original" TextWrapping="Wrap" FlowDirection="LeftToRight" Margin="0,6,0,0" Visibility="Collapsed"/>
+        SizeToContent="Height" Width="540" FlowDirection="RightToLeft">
+  <Border x:Name="Card" CornerRadius="24" Padding="18,12" BorderThickness="1"
+          SnapsToDevicePixels="True" Background="#F20A0F1B" BorderBrush="#665D789C">
+    <StackPanel>
+      <Grid Margin="0,0,0,2">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Border Width="27" Height="27" CornerRadius="10" Background="#182B43"
+                BorderBrush="#3D668A" BorderThickness="1" VerticalAlignment="Center">
+          <TextBlock Text="F" FontSize="16" FontWeight="Black" Foreground="#7DEBFF"
+                     HorizontalAlignment="Center" VerticalAlignment="Center"
+                     FlowDirection="LeftToRight"/>
+        </Border>
+        <StackPanel Grid.Column="1" Margin="9,0,0,0" VerticalAlignment="Center">
+          <TextBlock Text="FLAFYO ISLAND" FontSize="10" FontWeight="Black"
+                     Foreground="#A9BBD4" CharacterSpacing="90" FlowDirection="LeftToRight"/>
+          <TextBlock x:Name="IslandCaption" Text="جاهز للترجمة" FontSize="11"
+                     Foreground="#E7F0FF" Margin="0,2,0,0"/>
+        </StackPanel>
+        <Border Grid.Column="2" Background="#123B32" BorderBrush="#286E5D"
+                BorderThickness="1" CornerRadius="10" Padding="8,4" VerticalAlignment="Center">
+          <StackPanel Orientation="Horizontal">
+            <Ellipse Width="6" Height="6" Fill="#45E0A0" Margin="0,0,5,0"/>
+            <TextBlock x:Name="IslandStatus" Text="LIVE" Foreground="#8CF2C5"
+                       FontSize="9" FontWeight="Bold" FlowDirection="LeftToRight"/>
+          </StackPanel>
+        </Border>
+      </Grid>
+      <Border x:Name="DetailsPanel" Background="#111C2B" BorderBrush="#25364D"
+              BorderThickness="1" CornerRadius="14" Padding="12,9" Margin="0,10,0,0"
+              Visibility="Collapsed">
+        <StackPanel>
+          <TextBlock x:Name="Label" TextWrapping="Wrap" FontSize="20"
+                     Foreground="#FFFFFF" FontWeight="SemiBold" TextAlignment="Right"/>
+          <TextBlock x:Name="Original" TextWrapping="Wrap" FlowDirection="LeftToRight"
+                     TextAlignment="Left" FontSize="11" Foreground="#A6B4C9"
+                     Margin="0,7,0,0" Visibility="Collapsed"/>
+        </StackPanel>
+      </Border>
     </StackPanel>
   </Border>
 </Window>
