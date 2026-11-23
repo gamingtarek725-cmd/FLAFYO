@@ -68,6 +68,17 @@ public sealed class OnnxMadladTranslator : ITranslator, IDisposable
             RequireInputs(decoder, "input_ids", "embed_matrix", "encoder_attention_mask");
             RequireOutputs(decoder, "logits");
 
+            for (int layer = 0; layer < Layers; layer++)
+            {
+                foreach (var suffix in new[] { "key", "value" })
+                {
+                    RequireOutputs(initializer, $"present.{layer}.encoder.{suffix}");
+                    RequireInputs(decoder, $"past_key_values.{layer}.encoder.{suffix}");
+                    RequireInputs(decoder, $"past_key_values.{layer}.decoder.{suffix}");
+                    RequireOutputs(decoder, $"present.{layer}.decoder.{suffix}");
+                }
+            }
+
             return new OnnxMadladTranslator(embed, encoder, initializer, decoder, options, tokenizer);
         }
         catch
