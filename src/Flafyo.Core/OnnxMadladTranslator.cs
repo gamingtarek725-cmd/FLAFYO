@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
@@ -6,58 +5,145 @@ using Microsoft.ML.OnnxRuntime.Tensors;
 namespace Flafyo.Core;
 
 /// <summary>
-/// MADLAD-400 3B multilingual T5 translation, using the pinned INT4 ONNX export.
-/// It is intentionally optional: model loading and decoding are substantially heavier than the smaller packs.
+/// MADLAD-400 3B INT4 runtime for the four-graph ReducedRam export:
+/// embedding -> encoder -> cross-attention cache initializer -> autoregressive decoder.
 /// </summary>
 public sealed class OnnxMadladTranslator : ITranslator, IDisposable
 {
-    private static readonly Regex SentenceSplit = new(@"(?<=[.!?…])\s+", RegexOptions.Compiled);
-    private readonly InferenceSession _encoder, _decoder;
+    private const int PadTokenId = 1;
+    private const int EosTokenId = 2;
+    private const int DecoderStartTokenId = 0;
+    private const int LayerCount = 32;
+    private const int HeadCount = 16;
+    private const int HeadDimension = 128;
+    private const int ModelDimension = 1024;
+
+    private static readonly Regex SentenceSplit = new(@"(?<=[.!?…])\\s+", RegexOptions.Compiled);
+
+    private readonly InferenceSession _embed;
+    private readonly InferenceSession _encoder;
+    private readonly InferenceSession _cacheInitializer;
+    private readonly InferenceSession _decoder;
     private readonly SessionOptions _options;
     private readonly MadladTokenizer _tokenizer;
-    private readonly int _pad, _eos, _start, _heads, _headDim;
 
-    private OnnxMadladTranslator(InferenceSession encoder, InferenceSession decoder, SessionOptions options,
-        MadladTokenizer tokenizer, int pad, int eos, int start, int heads, int headDim)
+    private OnnxMadladTranslator(
+        InferenceSession embed,
+        InferenceSession encoder,
+        InferenceSession cacheInitializer,
+        InferenceSession decoder,
+        SessionOptions options,
+        MadladTokenizer tokenizer)
     {
-        _encoder = encoder; _decoder = decoder; _options = options; _tokenizer = tokenizer;
-        _pad = pad; _eos = eos; _start = start; _heads = heads; _headDim = headDim;
+        _embed = embed;
+        _encoder = encoder;
+        _cacheInitializer = cacheInitializer;
+        _decoder = decoder;
+        _options = options;
+        _tokenizer = tokenizer;
     }
 
     public static OnnxMadladTranslator Load(string dir, int threads = 1)
     {
-        int pad = 1, eos = 2, start = 0, heads = 16, dKv = 128;
-        using (var cfg = JsonDocument.Parse(File.ReadAllText(Path.Combine(dir, "config.json"))))
-        {
-            var root = cfg.RootElement;
-            if (root.TryGetProperty("pad_token_id", out var p)) pad = p.GetInt32();
-            if (root.TryGetProperty("eos_token_id", out var e)) eos = e.GetInt32();
-            if (root.TryGetProperty("decoder_start_token_id", out var s)) start = s.GetInt32();
-            if (root.TryGetProperty("num_heads", out var h)) heads = h.GetInt32();
-            if (root.TryGetProperty("d_kv", out var d)) dKv = d.GetInt32();
-        }
+        var modelRoot = Path.Combine(dir, "Madlad");
+        var quantizedRoot = Path.Combine(modelRoot, "Int4Acc4");
+        var embedPath = Path.Combine(modelRoot, "madlad_embed_8bit.onnx");
+        var encoderPath = Path.Combine(quantizedRoot, "madlad_encoder_4bit.onnx");
+        var initializerPath = Path.Combine(quantizedRoot, "madlad_cache_initializer_4bit.onnx");
+        var decoderPath = Path.Combine(quantizedRoot, "madlad_decoder_4bit.onnx");
+        var tokenizerPath = Path.Combine(modelRoot, "spiece.model");
 
-        var tokenizer = MadladTokenizer.Load(Path.Combine(dir, "spiece.model"));
-        _ = tokenizer.LanguageTokenId("ar"); // fail early if the Arabic target token is absent
+        foreach (var path in new[] { embedPath, encoderPath, initializerPath, decoderPath, tokenizerPath })
+            if (!File.Exists(path))
+                throw new FileNotFoundException("A required MADLAD graph or tokenizer file is missing.", path);
+
+        var tokenizer = MadladTokenizer.Load(tokenizerPath);
+        _ = tokenizer.LanguageTokenId("ar");
 
         var options = new SessionOptions
         {
-            IntraOpNumThreads = Math.Clamp(threads, 1, 2),
+            IntraOpNumThreads = Math.Clamp(threads, 1, 4),
             InterOpNumThreads = 1,
+            ExecutionMode = ExecutionMode.ORT_SEQUENTIAL,
             GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_ALL
         };
+
+        InferenceSession? embed = null;
         InferenceSession? encoder = null;
+        InferenceSession? initializer = null;
+        InferenceSession? decoder = null;
         try
         {
-            encoder = new InferenceSession(Path.Combine(dir, "onnx", "encoder_model.onnx"), options);
-            var decoder = new InferenceSession(Path.Combine(dir, "onnx", "decoder_model_merged.onnx"), options);
-            return new OnnxMadladTranslator(encoder, decoder, options, tokenizer, pad, eos, start, heads, dKv);
+            embed = new InferenceSession(embedPath, options);
+            encoder = new InferenceSession(encoderPath, options);
+            initializer = new InferenceSession(initializerPath, options);
+            decoder = new InferenceSession(decoderPath, options);
+            ValidateGraphContract(embed, encoder, initializer, decoder);
+
+            return new OnnxMadladTranslator(embed, encoder, initializer, decoder, options, tokenizer);
         }
         catch
         {
+            decoder?.Dispose();
+            initializer?.Dispose();
             encoder?.Dispose();
+            embed?.Dispose();
             options.Dispose();
             throw;
+        }
+    }
+
+    private static void ValidateGraphContract(
+        InferenceSession embed,
+        InferenceSession encoder,
+        InferenceSession initializer,
+        InferenceSession decoder)
+    {
+        RequireNames(embed.InputMetadata.Keys, new[] { "input_ids" }, "embedding inputs");
+        RequireNames(embed.OutputMetadata.Keys, new[] { "embed_matrix" }, "embedding outputs");
+
+        RequireNames(encoder.InputMetadata.Keys,
+            new[] { "embed_matrix", "input_ids", "attention_mask" }, "encoder inputs");
+        RequireNames(encoder.OutputMetadata.Keys, new[] { "last_hidden_state" }, "encoder outputs");
+
+        RequireNames(initializer.InputMetadata.Keys, new[] { "encoder_hidden_states" }, "cache initializer inputs");
+        var encoderCacheNames = new HashSet<string>(StringComparer.Ordinal);
+        for (int layer = 0; layer < LayerCount; layer++)
+        {
+            encoderCacheNames.Add($"present.{layer}.encoder.key");
+            encoderCacheNames.Add($"present.{layer}.encoder.value");
+        }
+        RequireNames(initializer.OutputMetadata.Keys, encoderCacheNames, "cache initializer outputs");
+
+        var decoderInputs = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "embed_matrix", "encoder_attention_mask", "input_ids"
+        };
+        var decoderOutputs = new HashSet<string>(StringComparer.Ordinal) { "logits" };
+        for (int layer = 0; layer < LayerCount; layer++)
+        {
+            foreach (var kind in new[] { "decoder", "encoder" })
+            {
+                decoderInputs.Add($"past_key_values.{layer}.{kind}.key");
+                decoderInputs.Add($"past_key_values.{layer}.{kind}.value");
+            }
+            decoderOutputs.Add($"present.{layer}.decoder.key");
+            decoderOutputs.Add($"present.{layer}.decoder.value");
+        }
+        RequireNames(decoder.InputMetadata.Keys, decoderInputs, "decoder inputs");
+        RequireNames(decoder.OutputMetadata.Keys, decoderOutputs, "decoder outputs");
+    }
+
+    private static void RequireNames(IEnumerable<string> actual, IEnumerable<string> expected, string label)
+    {
+        var actualSet = new HashSet<string>(actual, StringComparer.Ordinal);
+        var expectedSet = new HashSet<string>(expected, StringComparer.Ordinal);
+        if (!actualSet.SetEquals(expectedSet))
+        {
+            var missing = expectedSet.Except(actualSet).OrderBy(x => x);
+            var unexpected = actualSet.Except(expectedSet).OrderBy(x => x);
+            throw new InvalidDataException(
+                $"Unsupported MADLAD {label}. Missing: [{string.Join(", ", missing)}]. Unexpected: [{string.Join(", ", unexpected)}].");
         }
     }
 
@@ -67,7 +153,8 @@ public sealed class OnnxMadladTranslator : ITranslator, IDisposable
     public string TranslateSync(string text, CancellationToken ct)
     {
         text = text.Trim();
-        if (text.Length == 0) return "";
+        if (text.Length == 0) return string.Empty;
+
         var translated = new List<string>();
         foreach (var part in SentenceSplit.Split(text))
         {
@@ -76,12 +163,14 @@ public sealed class OnnxMadladTranslator : ITranslator, IDisposable
             ct.ThrowIfCancellationRequested();
             translated.Add(TranslateSentence(FixAllCaps(sentence), ct));
         }
+
         return string.Join(" ", translated.Where(x => !string.IsNullOrWhiteSpace(x)));
     }
 
     private static string FixAllCaps(string text)
     {
-        int letters = text.Count(char.IsLetter), upper = text.Count(char.IsUpper);
+        int letters = text.Count(char.IsLetter);
+        int upper = text.Count(char.IsUpper);
         if (letters < 4 || upper < letters * 0.8) return text;
         var lower = text.ToLowerInvariant();
         return char.ToUpperInvariant(lower[0]) + lower[1..];
@@ -89,92 +178,146 @@ public sealed class OnnxMadladTranslator : ITranslator, IDisposable
 
     private string TranslateSentence(string sentence, CancellationToken ct)
     {
-        var source = _tokenizer.Encode(sentence, "ar");
-        if (source.Length > 512) source = source.Take(511).Append(_eos).ToArray();
-        var ids = source.Select(x => (long)x).ToArray();
-        var shape = new[] { 1, ids.Length };
-        var mask = new DenseTensor<long>(Enumerable.Repeat(1L, ids.Length).ToArray(), shape);
+        var sourceIds = _tokenizer.Encode(sentence, "ar");
+        if (sourceIds.Length > 512)
+            sourceIds = sourceIds.Take(511).Append(EosTokenId).ToArray();
 
-        var encoderInputs = new List<NamedOnnxValue>
+        var inputIds = CreateIdsTensor(sourceIds);
+        var encoderMask = new DenseTensor<long>(
+            Enumerable.Repeat(1L, sourceIds.Length).ToArray(),
+            new[] { 1, sourceIds.Length });
+
+        // MADLAD's optimized export stores the shared T5 embedding matrix in its own graph.
+        var sourceEmbeddings = RunEmbedding(inputIds);
+        DenseTensor<float> encoderHidden;
+        using (var encoderResult = _encoder.Run(new[]
         {
-            NamedOnnxValue.CreateFromTensor("input_ids", new DenseTensor<long>(ids, shape))
-        };
-        if (_encoder.InputMetadata.ContainsKey("attention_mask"))
-            encoderInputs.Add(NamedOnnxValue.CreateFromTensor("attention_mask", mask));
-        using var encoderOutput = _encoder.Run(encoderInputs);
-        var hidden = encoderOutput.FirstOrDefault(x => x.Name == "last_hidden_state")?.AsTensor<float>()
-            ?? encoderOutput.First().AsTensor<float>();
+            NamedOnnxValue.CreateFromTensor("input_ids", inputIds),
+            NamedOnnxValue.CreateFromTensor("attention_mask", encoderMask),
+            NamedOnnxValue.CreateFromTensor("embed_matrix", sourceEmbeddings)
+        }))
+        {
+            encoderHidden = CloneTensor(
+                encoderResult.Single(x => x.Name == "last_hidden_state").AsTensor<float>());
+        }
 
-        var past = new Dictionary<string, DenseTensor<float>>(StringComparer.Ordinal);
-        foreach (var name in _decoder.InputMetadata.Keys)
-            if (name.StartsWith("past_key_values", StringComparison.Ordinal))
-                past[name] = new DenseTensor<float>(new float[0], new[] { 1, _heads, 0, _headDim });
+        // Precompute the 64 cross-attention cache tensors once for this source sentence.
+        var encoderCaches = new Dictionary<string, DenseTensor<float>>(StringComparer.Ordinal);
+        using (var cacheResult = _cacheInitializer.Run(new[]
+        {
+            NamedOnnxValue.CreateFromTensor("encoder_hidden_states", encoderHidden)
+        }))
+        {
+            foreach (var output in cacheResult)
+                encoderCaches.Add(output.Name, CloneTensor(output.AsTensor<float>()));
+        }
+
+        var decoderCaches = new Dictionary<string, DenseTensor<float>>(StringComparer.Ordinal);
+        for (int layer = 0; layer < LayerCount; layer++)
+        {
+            decoderCaches.Add($"past_key_values.{layer}.decoder.key", EmptyDecoderCache());
+            decoderCaches.Add($"past_key_values.{layer}.decoder.value", EmptyDecoderCache());
+        }
 
         var generated = new List<int>();
-        long[] current = { _start };
-        bool useCache = false;
-        int maxSteps = Math.Min(2 * source.Length + 24, 192);
+        var currentIds = new[] { DecoderStartTokenId };
+        int maxNewTokens = Math.Clamp(sourceIds.Length * 4 + 24, 48, 256);
 
-        for (int step = 0; step < maxSteps; step++)
+        for (int step = 0; step < maxNewTokens; step++)
         {
             ct.ThrowIfCancellationRequested();
-            var inputs = new List<NamedOnnxValue>();
-            foreach (var name in _decoder.InputMetadata.Keys)
+
+            var currentTensor = CreateIdsTensor(currentIds);
+            var currentEmbeddings = RunEmbedding(currentTensor);
+            var decoderInputs = new List<NamedOnnxValue>
             {
-                if (name is "input_ids" or "decoder_input_ids")
-                    inputs.Add(NamedOnnxValue.CreateFromTensor(name, new DenseTensor<long>(current, new[] { 1, current.Length })));
-                else if (name == "encoder_hidden_states")
-                    inputs.Add(NamedOnnxValue.CreateFromTensor(name, hidden));
-                else if (name == "encoder_attention_mask")
-                    inputs.Add(NamedOnnxValue.CreateFromTensor(name, mask));
-                else if (name == "use_cache_branch")
-                    inputs.Add(NamedOnnxValue.CreateFromTensor(name, new DenseTensor<bool>(new[] { useCache }, new[] { 1 })));
-                else if (past.TryGetValue(name, out var cached))
-                    inputs.Add(NamedOnnxValue.CreateFromTensor(name, cached));
-                else
-                    throw new InvalidOperationException("Unexpected MADLAD decoder input: " + name);
+                NamedOnnxValue.CreateFromTensor("input_ids", currentTensor),
+                NamedOnnxValue.CreateFromTensor("embed_matrix", currentEmbeddings),
+                NamedOnnxValue.CreateFromTensor("encoder_attention_mask", encoderMask)
+            };
+
+            for (int layer = 0; layer < LayerCount; layer++)
+            {
+                foreach (var part in new[] { "key", "value" })
+                {
+                    var decoderName = $"past_key_values.{layer}.decoder.{part}";
+                    var encoderName = $"past_key_values.{layer}.encoder.{part}";
+                    decoderInputs.Add(NamedOnnxValue.CreateFromTensor(decoderName, decoderCaches[decoderName]));
+                    decoderInputs.Add(NamedOnnxValue.CreateFromTensor(encoderName, encoderCaches[$"present.{layer}.encoder.{part}"]));
+                }
             }
 
-            using var result = _decoder.Run(inputs);
-            var logitsValue = result.FirstOrDefault(x => x.Name == "logits") ?? result.First();
-            var logits = logitsValue.AsTensor<float>();
-            int length = logits.Dimensions[1], vocab = logits.Dimensions[2];
-            float[]? copy = null;
-            ReadOnlySpan<float> row;
-            if (logits is DenseTensor<float> dense) row = dense.Buffer.Span.Slice((length - 1) * vocab, vocab);
-            else { copy = logits.ToArray(); row = copy.AsSpan((length - 1) * vocab, vocab); }
-
-            int next = -1;
-            float best = float.NegativeInfinity;
-            for (int token = 0; token < row.Length; token++)
+            int nextToken;
+            var nextDecoderCaches = new Dictionary<string, DenseTensor<float>>(StringComparer.Ordinal);
+            using (var decoderResult = _decoder.Run(decoderInputs))
             {
-                if (token == _pad) continue;
-                if (row[token] > best) { best = row[token]; next = token; }
-            }
-            if (next < 0 || next == _eos) break;
-            generated.Add(next);
-            int count = generated.Count;
-            if (count > 6 && generated[count - 1] == generated[count - 2] &&
-                generated[count - 2] == generated[count - 3] && generated[count - 3] == generated[count - 4]) break;
+                var logits = decoderResult.Single(x => x.Name == "logits").AsTensor<float>();
+                if (logits.Rank != 3 || logits.Dimensions[0] != 1 || logits.Dimensions[1] != 1 ||
+                    logits.Dimensions[2] <= EosTokenId)
+                    throw new InvalidDataException("MADLAD decoder returned an unexpected logits tensor shape.");
 
-            foreach (var output in result)
-            {
-                if (!output.Name.StartsWith("present.", StringComparison.Ordinal)) continue;
-                var inputName = "past_key_values." + output.Name["present.".Length..];
-                if (!past.ContainsKey(inputName)) continue;
-                if (useCache && output.Name.Contains(".encoder.", StringComparison.Ordinal)) continue;
-                past[inputName] = output.AsTensor<float>().ToDenseTensor();
+                var values = logits.ToArray();
+                int vocabSize = logits.Dimensions[2];
+                nextToken = 0;
+                float best = float.NegativeInfinity;
+                for (int token = 0; token < vocabSize; token++)
+                {
+                    if (values[token] > best)
+                    {
+                        best = values[token];
+                        nextToken = token;
+                    }
+                }
+
+                if (nextToken != EosTokenId)
+                {
+                    foreach (var output in decoderResult)
+                    {
+                        if (output.Name.StartsWith("present.", StringComparison.Ordinal))
+                        {
+                            var inputName = "past_key_values." + output.Name["present.".Length..];
+                            nextDecoderCaches.Add(inputName, CloneTensor(output.AsTensor<float>()));
+                        }
+                    }
+                }
             }
-            useCache = true;
-            current = new[] { (long)next };
+
+            if (nextToken == EosTokenId) break;
+            generated.Add(nextToken);
+            if (nextDecoderCaches.Count != LayerCount * 2)
+                throw new InvalidDataException("MADLAD decoder did not return all 64 decoder cache tensors.");
+
+            decoderCaches = nextDecoderCaches;
+            currentIds = new[] { nextToken };
         }
+
         return _tokenizer.Decode(generated);
     }
 
+    private DenseTensor<float> RunEmbedding(DenseTensor<long> inputIds)
+    {
+        using var result = _embed.Run(new[]
+        {
+            NamedOnnxValue.CreateFromTensor("input_ids", inputIds)
+        });
+        return CloneTensor(result.Single(x => x.Name == "embed_matrix").AsTensor<float>());
+    }
+
+    private static DenseTensor<long> CreateIdsTensor(int[] ids) =>
+        new(ids.Select(x => (long)x).ToArray(), new[] { 1, ids.Length });
+
+    private static DenseTensor<float> EmptyDecoderCache() =>
+        new(new float[0], new[] { 1, HeadCount, 0, HeadDimension });
+
+    private static DenseTensor<float> CloneTensor(Tensor<float> tensor) =>
+        new(tensor.ToArray(), tensor.Dimensions.ToArray());
+
     public void Dispose()
     {
-        _encoder.Dispose();
         _decoder.Dispose();
+        _cacheInitializer.Dispose();
+        _encoder.Dispose();
+        _embed.Dispose();
         _options.Dispose();
     }
 }
