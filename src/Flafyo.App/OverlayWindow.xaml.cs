@@ -84,7 +84,7 @@ public partial class OverlayWindow : Window
         if (!_expanded)
         {
             IslandCaption.Text = running ? "FLAFYO جاهز" : "الترجمة متوقفة";
-            IslandStatus.Text = running ? "ON" : "PAUSED";
+            IslandStatus.Text = running ? "ON" : "PAUSED";\n            IslandStatusDot.Fill = MakeBrush(running ? "#45E0A0" : "#F4B860");
         }
     }
 
@@ -96,7 +96,7 @@ public partial class OverlayWindow : Window
         _expanded = false;
         DetailsPanel.Visibility = Visibility.Collapsed;
         IslandCaption.Text = _translationRunning ? "FLAFYO جاهز" : "الترجمة متوقفة";
-        IslandStatus.Text = _translationRunning ? "ON" : "PAUSED";
+        IslandStatus.Text = _translationRunning ? "ON" : "PAUSED";\n        IslandStatusDot.Fill = MakeBrush(_translationRunning ? "#45E0A0" : "#F4B860");
         Card.Padding = new Thickness(14, 9, 14, 9);
         Width = CollapsedWidth;
         BeginAnimation(WidthProperty, null);
@@ -145,7 +145,7 @@ public partial class OverlayWindow : Window
 
         DetailsPanel.Visibility = Visibility.Visible;
         IslandCaption.Text = "ترجمة جديدة";
-        IslandStatus.Text = _translationRunning ? "LIVE" : "PREVIEW";
+        IslandStatus.Text = _translationRunning ? "LIVE" : "PREVIEW";\n        IslandStatusDot.Fill = MakeBrush(_translationRunning ? "#45E0A0" : "#8B5CF6");
         _expanded = true;
         Card.Padding = new Thickness(18, 12, 18, 12);
         BeginAnimation(WidthProperty, null);
