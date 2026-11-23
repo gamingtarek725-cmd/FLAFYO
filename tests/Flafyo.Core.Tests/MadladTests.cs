@@ -102,6 +102,10 @@ public class OnnxMadladIntegrationTests
         if (string.IsNullOrWhiteSpace(Dir))
             throw new InvalidOperationException("FLAFYO_MADLAD_MODEL_DIR must point to the extracted, supported MADLAD model.");
 
+        var tokenProbe = "Press E to interact with the object.";
+        var tokenizer = MadladTokenizer.Load(Path.Combine(Dir, "Madlad", "spiece.model"));
+        _output.WriteLine("MADLAD_CSHARP_SOURCE_IDS=" + string.Join(",", tokenizer.Encode(tokenProbe, "ar")));
+
         var samples = new[]
         {
             "Find the key and open the door.",
