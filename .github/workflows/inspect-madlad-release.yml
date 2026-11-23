@@ -21,7 +21,7 @@ jobs:
           curl --fail --location --retry 3 --retry-delay 5 \
             "https://github.com/niedev/OnnxModelsEnhancer/releases/download/v1.0.0-beta/Madlad.zip" \
             --output "$RUNNER_TEMP/Madlad.zip"
-          stat --printf="Archive bytes: %s\n" "$RUNNER_TEMP/Madlad.zip"
+          stat --printf="Archive bytes: %s\\n" "$RUNNER_TEMP/Madlad.zip"
       - name: Inspect archive paths, sizes, and SHA-256
         shell: bash
         run: |
@@ -47,4 +47,37 @@ jobs:
                       })
               print(json.dumps(rows, indent=2))
               print("TOTAL_INSPECTED_FILES", len(rows))
+          PY
+      - name: Inspect ONNX graph contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check onnx==1.19.0
+          python - <<'PY'
+          import json, zipfile, onnx
+          archive = r"${{ runner.temp }}/Madlad.zip"
+          expected = [
+              "Madlad/Int4Acc4/madlad_embed_8bit.onnx",
+              "Madlad/Int4Acc4/madlad_encoder_4bit.onnx",
+              "Madlad/Int4Acc4/madlad_cache_initializer_4bit.onnx",
+              "Madlad/Int4Acc4/madlad_decoder_4bit.onnx",
+          ]
+          with zipfile.ZipFile(archive) as z:
+              names = set(z.namelist())
+              for name in expected:
+                  if name not in names:
+                      raise SystemExit("Required graph missing: " + name)
+                  model = onnx.load_model_from_string(z.read(name))
+                  def value_info(v):
+                      tensor = v.type.tensor_type
+                      dims = []
+                      for dim in tensor.shape.dim:
+                          dims.append(dim.dim_param if dim.dim_param else dim.dim_value)
+                      return {"name": v.name, "elem_type": tensor.elem_type, "shape": dims}
+                  print(json.dumps({
+                      "graph": name,
+                      "inputs": [value_info(v) for v in model.graph.input],
+                      "outputs": [value_info(v) for v in model.graph.output],
+                      "opsets": [{"domain": x.domain, "version": x.version} for x in model.opset_import],
+                  }, indent=2))
           PY
