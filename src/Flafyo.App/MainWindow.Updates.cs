@@ -150,6 +150,6 @@ public partial class MainWindow
         MainTabs.SelectedIndex = 2;
         SettingsTabs.SelectedIndex = 3;
     }
-    private void DashboardLibrary_Click(object sender, RoutedEventArgs e) => MainTabs.SelectedIndex = 7;
+    private void DashboardLibrary_Click(object sender, RoutedEventArgs e) => MainTabs.SelectedIndex = 3;
     private void DashboardLogs_Click(object sender, RoutedEventArgs e) => OpenLog_Click(sender, e);
 }
