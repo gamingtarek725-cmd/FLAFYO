@@ -12,6 +12,7 @@
           <ColumnDefinition Width="Auto"/>
           <ColumnDefinition Width="*"/>
           <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Border Width="27" Height="27" CornerRadius="10" Background="#182B43"
                 BorderBrush="#3D668A" BorderThickness="1" VerticalAlignment="Center">
@@ -25,7 +26,8 @@
           <TextBlock x:Name="IslandCaption" Text="جاهز للترجمة" FontSize="11"
                      Foreground="#E7F0FF" Margin="0,2,0,0"/>
         </StackPanel>
-        <Border Grid.Column="2" Background="#123B32" BorderBrush="#286E5D"
+        <Border x:Name="IslandToggleSlot" Grid.Column="2" Width="76" Height="30" Margin="0,0,7,0" Background="Transparent" VerticalAlignment="Center"/>
+        <Border Grid.Column="3" Background="#123B32" BorderBrush="#286E5D"
                 BorderThickness="1" CornerRadius="10" Padding="8,4" VerticalAlignment="Center">
           <StackPanel Orientation="Horizontal">
             <Ellipse Width="6" Height="6" Fill="#45E0A0" Margin="0,0,5,0"/>
