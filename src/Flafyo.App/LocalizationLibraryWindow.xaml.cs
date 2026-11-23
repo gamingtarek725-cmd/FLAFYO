@@ -255,7 +255,7 @@ public partial class LocalizationLibraryWindow : UserControl
             !string.IsNullOrWhiteSpace(selected.SourceUrl) &&
             x.SourceUrl.Equals(selected.SourceUrl, StringComparison.OrdinalIgnoreCase));
         if (entriesList.SelectedItem == null && _visible.Count > 0) entriesList.SelectedIndex = 0;
-        if (CountText is not null) CountText.Text = $"{_visible.Count} عنصر";
+        if (CountText is not null) CountText.Text = $"{_visible.Count} لعبة / مصدر";
         if (_visible.Count == 0) ShowEmpty();
     }
 
