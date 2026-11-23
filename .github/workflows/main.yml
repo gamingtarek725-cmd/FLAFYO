@@ -137,20 +137,6 @@ jobs:
           print(f"Extracted MADLAD files to {root}")
           PY
           echo "FLAFYO_MADLAD_MODEL_DIR=$RUNNER_TEMP/madlad-model" >> "$GITHUB_ENV"
-      - name: Compare custom tokenizer IDs with SentencePiece reference
-        shell: bash
-        run: |
-          python -m pip install --disable-pip-version-check sentencepiece==0.2.1
-          python - <<'PY'
-          import os
-          from pathlib import Path
-          import sentencepiece as spm
-          model = Path(os.environ["RUNNER_TEMP"]) / "madlad-model" / "Madlad" / "spiece.model"
-          processor = spm.SentencePieceProcessor(model_file=str(model))
-          text = "<2ar> Press E to interact with the object."
-          print("MADLAD_REFERENCE_IDS=" + ",".join(map(str, processor.encode(text, out_type=int))))
-          print("MADLAD_REFERENCE_PIECES=" + repr(processor.encode(text, out_type=str)))
-          PY
       - name: Real MADLAD Arabic translation test (required)
         run: dotnet test tests/Flafyo.Core.Tests -c Release --filter "FullyQualifiedName~Madlad_model_produces_arabic" --logger "console;verbosity=detailed"
 
