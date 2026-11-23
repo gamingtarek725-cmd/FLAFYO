@@ -76,7 +76,7 @@ public class MadladPackTests
     public void Madlad_pack_is_a_separate_large_optional_model()
     {
         Assert.Equal(PackKind.Madlad, LanguagePack.Madlad.Kind);
-        Assert.True(LanguagePack.Madlad.ApproxBytes > 3_500_000_000);
+        Assert.InRange(LanguagePack.Madlad.ApproxBytes, 1_600_000_000, 1_800_000_000);
         Assert.Contains("madlad", LanguagePack.Madlad.Folder, StringComparison.OrdinalIgnoreCase);
     }
 }
@@ -92,7 +92,8 @@ public class OnnxMadladIntegrationTests
     [Fact]
     public void Madlad_model_produces_arabic_and_reports_reference_quality()
     {
-        if (string.IsNullOrWhiteSpace(Dir)) return;
+        if (string.IsNullOrWhiteSpace(Dir))
+            throw Xunit.Sdk.SkipException.ForSkip("MADLAD INT4 integration test requires FLAFYO_MADLAD_MODEL_DIR; graph-contract CI does not execute inference.");
 
         var samples = new[]
         {
