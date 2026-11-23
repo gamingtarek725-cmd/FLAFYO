@@ -52,7 +52,7 @@ public class MadladTokenizerTests
     {
         var tokenizer = CreateTokenizer();
         Assert.Equal(3, tokenizer.LanguageTokenId("ar"));
-        Assert.Equal(new[] { 3, 4, 5, 2 }, tokenizer.Encode("hello world"));
+        Assert.Equal(new[] { 6, 3, 4, 5, 2 }, tokenizer.Encode("hello world"));
     }
 
     [Fact]
