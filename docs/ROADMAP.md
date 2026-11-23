@@ -62,3 +62,58 @@ FLAFYO is a Windows-first game translation and localization platform. Existing t
 - Never guess archive formats or silently modify original game files.
 - Never present placeholder artwork or unverified localization entries as factual.
 - Every feature needs a working action, a test, and a clear failure state.
+
+## FLAFYO development execution checklist (updated 2026-11-23)
+
+This is the single ordered checklist for future development. A checkbox is marked complete only after the stated acceptance evidence exists. CI success does not substitute for testing on the target PC or inside real games.
+
+### Track A — MADLAD-400 3B INT4 (priority 1)
+- [x] Pin the MADLAD ONNX export revision and record exact file sizes and SHA-256 hashes in `LanguagePack.Madlad`.
+- [x] Add a dedicated integration test that loads the full encoder/decoder pack and translates three English game/UI sentences to Arabic.
+- [x] Add a dedicated CI workflow that downloads the pinned model files and runs the real translation test on CPU.
+- [x] Correct the Arabic Unicode-range assertion in the integration test.
+- [ ] Confirm the CI model download completes with all seven files matching their pinned sizes/hashes.
+- [ ] Confirm ONNX Runtime successfully opens both encoder and merged decoder graphs, including external weight sidecars.
+- [ ] Confirm all three outputs are non-empty Arabic and manually review translation quality.
+- [ ] Measure cold-load time, first-token latency, total sentence latency, peak RAM, and CPU usage.
+- [ ] Test GPU execution on the target RTX 3050 8 GB; retain CPU fallback if provider/runtime compatibility is unavailable.
+- [ ] Verify cancellation, repeated translations, disposal, and no memory growth across a sustained test.
+- [ ] Integrate the model into the in-app pack selector only after the preceding acceptance checks pass; show disk/RAM requirements and a clear low-memory warning.
+- [ ] Verify interrupted downloads resume safely or restart cleanly, hash failures are rejected, and uninstalling a pack does not remove user data.
+
+### Track B — Windows application reliability (priority 2)
+- [ ] Run the full unit/integration test suite and fix all regressions.
+- [ ] Verify every sidebar/dashboard action opens the correct screen and reports failures clearly.
+- [ ] Verify OCR region capture, change detection, bounded queue behavior, and stale-frame rejection.
+- [ ] Verify overlay click-through and game keyboard/mouse/controller input are unaffected.
+- [ ] Test at least three real games with different rendering modes; record OCR, translation, and end-to-end latency.
+- [ ] Verify Arabic shaping, punctuation, line wrapping, mixed RTL/LTR text, and game-specific terminology.
+- [ ] Test language pack install/update/remove, cache, history, profiles, and glossary persistence.
+- [ ] Test clean install, upgrade from the previous release, uninstall, and settings preservation on Windows 10/11.
+- [ ] Verify EXE icon, installer branding, version metadata, signing status, and SHA-256 artifact.
+- [ ] Publish a release only after the Windows build, tests, installer, and manual acceptance checklist pass.
+
+### Track C — Game-file localization (priority 3)
+- [ ] Inventory supported formats and document read-only inspection behavior.
+- [ ] Add real fixture files and extract/edit/rebuild round-trip tests per supported format.
+- [ ] Preserve encoding, IDs, placeholders, archive layout, and original files; always work on copies with backups.
+- [ ] Validate import/export and reject malformed or unsafe paths.
+- [ ] Document unsupported formats instead of implying universal compatibility.
+
+### Track D — Android app (separate deliverable, priority 4)
+- [ ] Connect and inspect the actual Android project; do not treat the Windows WPF project as an APK source.
+- [ ] Confirm native Android architecture, minimum/target SDK, package ID, and supported OS versions.
+- [ ] Implement screen capture/OCR with Android-supported permissions and foreground-service behavior.
+- [ ] Implement a floating overlay that respects user control and Android restrictions.
+- [ ] Integrate downloadable offline translation packs with storage and memory controls.
+- [ ] Build a signed test APK and verify install/upgrade on physical Android devices.
+- [ ] Test game input, capture reliability, battery, thermals, and latency on low-memory devices.
+
+### Track E — Documentation and release (priority 5)
+- [ ] Keep setup, model requirements, known limitations, troubleshooting, privacy, and license notices current.
+- [ ] Include reproducible test evidence and benchmark hardware/software details.
+- [ ] Publish installer/APK checksums and release notes.
+- [ ] Maintain this checklist by changing boxes only when acceptance evidence is available.
+
+### Current gate
+**MADLAD is not yet accepted as working.** The real-model CI run must finish its download and execute the translation test before it can be marked operational. The test currently runs on CPU; GPU acceleration and target-device performance remain separate acceptance items.
