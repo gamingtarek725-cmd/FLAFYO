@@ -39,7 +39,11 @@ class LinkParser(HTMLParser):
         self.active = None
     def handle_starttag(self, tag, attrs):
         if tag.lower() == "a":
-            self.active = {"href": dict(attrs).get("href", ""), "text": ""}
+            self.active = {"href": dict(attrs).get("href", ""), "text": "", "cover": ""}
+        elif tag.lower() == "img" and self.active is not None and not self.active["cover"]:
+            image_attrs = dict(attrs)
+            self.active["cover"] = (image_attrs.get("data-src") or image_attrs.get("data-lazy-src")
+                                    or image_attrs.get("data-original") or image_attrs.get("src") or "")
     def handle_data(self, data):
         if self.active is not None:
             self.active["text"] += data
@@ -112,6 +116,7 @@ def main():
                 "title": title,
                 "sourceUrl": absolute,
                 "sourceName": source_name,
+                "coverUrl": urljoin(listing_url, link.get("cover", "")) if link.get("cover") else "",
                 "platform": ", ".join(platforms),
                 "gameVersion": "",
                 "translationVersion": translation_version,
