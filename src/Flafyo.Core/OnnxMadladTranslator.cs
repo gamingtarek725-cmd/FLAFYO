@@ -292,7 +292,36 @@ public sealed class OnnxMadladTranslator : ITranslator, IDisposable
             currentIds = new[] { nextToken };
         }
 
-        return _tokenizer.Decode(generated);
+        return CleanTranslation(_tokenizer.Decode(generated), sentence);
+    }
+
+    private static string CleanTranslation(string translated, string source)
+    {
+        translated = translated.Trim();
+        if (translated.Length == 0) return translated;
+
+        const string leadingPunctuation = ".,!?;:،؛؟…";
+        int leadingCount = 0;
+        while (leadingCount < translated.Length && leadingPunctuation.Contains(translated[leadingCount]))
+            leadingCount++;
+        if (leadingCount > 0)
+            translated = translated[leadingCount..].TrimStart();
+
+        if (translated.Length == 0) return translated;
+
+        char sourceLast = source.TrimEnd().LastOrDefault();
+        char? expectedEnding = sourceLast switch
+        {
+            '.' => '.',
+            '?' => '؟',
+            '!' => '!',
+            _ => null
+        };
+        const string anyEnding = ".,!?;:،؛؟…";
+        if (expectedEnding.HasValue && !anyEnding.Contains(translated[^1]))
+            translated += expectedEnding.Value;
+
+        return translated;
     }
 
     private DenseTensor<float> RunEmbedding(DenseTensor<long> inputIds)
