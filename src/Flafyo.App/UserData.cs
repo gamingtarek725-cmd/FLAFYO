@@ -156,8 +156,6 @@ public sealed class OverlayStyle
         BackOpacity = o.BackOpacity; Border = o.Border; BorderColor = o.BorderColor; Align = o.Align; Shadow = o.Shadow;
         OverlayMode = o.OverlayMode; AreaX = o.AreaX; AreaY = o.AreaY; AreaW = o.AreaW; AreaH = o.AreaH;
         AutoWidthPx = o.AutoWidthPx; AutoHideSeconds = o.AutoHideSeconds; ShowOriginal = o.ShowOriginal;
-        IslandEnabled = o.IslandEnabled; IslandShowToggleButton = o.IslandShowToggleButton;
-        IslandCollapseSeconds = o.IslandCollapseSeconds;
         HeadingTextColor = o.HeadingTextColor; HeadingScalePercent = o.HeadingScalePercent; HeadingBold = o.HeadingBold; AutoFit = o.AutoFit;
     }
 }
