@@ -113,8 +113,14 @@ public sealed class MadladTokenizer
 
     public int[] Encode(string text, string targetLanguage = "ar")
     {
-        var ids = new List<int> { LanguageTokenId(targetLanguage) };
-        foreach (var piece in _segmenter.Segment(MarianTokenizer.Normalize(text)))
+        var languageToken = "<2" + targetLanguage + ">";
+        _ = LanguageTokenId(targetLanguage); // fail early when the requested target token is absent
+
+        // T5/SentencePiece normalizes the whole prefixed string. This preserves the leading dummy-prefix
+        // piece (▁) before <2xx>; omitting it shifts the source token sequence and degrades translation.
+        var normalized = MarianTokenizer.Normalize(languageToken + " " + text);
+        var ids = new List<int>();
+        foreach (var piece in _segmenter.Segment(normalized))
             ids.Add(_pieceToId.TryGetValue(piece, out var id) ? id : _unk);
         ids.Add(_eos);
         return ids.ToArray();
