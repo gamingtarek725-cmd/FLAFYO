@@ -144,8 +144,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with: { dotnet-version: '8.0.x' }
-      - name: Run tests
-        run: dotnet test tests/Flafyo.Core.Tests -c Release
+      - name: Run tests (excluding the Linux-only MADLAD model integration test)
+        run: dotnet test tests/Flafyo.Core.Tests -c Release --filter "FullyQualifiedName!~Madlad_model_produces_arabic"
       - name: Generate FLAFYO application icon
         shell: pwsh
         run: |
