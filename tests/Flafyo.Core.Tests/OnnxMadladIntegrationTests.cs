@@ -46,7 +46,7 @@ public sealed class OnnxMadladIntegrationTests
             timer.Stop();
             _output.WriteLine($"[{timer.ElapsedMilliseconds} ms] {sample} => {translated}");
             Assert.False(string.IsNullOrWhiteSpace(translated), "MADLAD returned an empty translation.");
-            Assert.Matches(new Regex(@"[\\u0621-\\u064A]"), translated);
+            Assert.Matches(new Regex(@"[\u0621-\u064A]"), translated);
         }
     }
 }
