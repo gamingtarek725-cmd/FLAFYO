@@ -8,8 +8,8 @@
     <SolidColorBrush x:Key="Ink" Color="#F4F5FF"/>
     <SolidColorBrush x:Key="Muted" Color="#9AA4BD"/>
     <SolidColorBrush x:Key="Line" Color="#252B43"/>
-    <SolidColorBrush x:Key="Accent" Color="#8B5CF6"/>
-    <SolidColorBrush x:Key="Accent2" Color="#22D3EE"/>
+    <SolidColorBrush x:Key="Accent" Color="#22D3EE"/>
+    <SolidColorBrush x:Key="Accent2" Color="#A78BFA"/>
     <SolidColorBrush x:Key="Ok" Color="#34D399"/>
     <SolidColorBrush x:Key="Warn" Color="#FBBF24"/>
     <SolidColorBrush x:Key="Surface" Color="#111629"/>
@@ -17,8 +17,8 @@
     <SolidColorBrush x:Key="SurfaceHover" Color="#202A48"/>
 
     <LinearGradientBrush x:Key="CyberGradient" StartPoint="0,0" EndPoint="1,1">
-      <GradientStop Color="#8B5CF6" Offset="0"/>
-      <GradientStop Color="#2563EB" Offset="1"/>
+      <GradientStop Color="#22D3EE" Offset="0"/>
+      <GradientStop Color="#6366F1" Offset="1"/>
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="PageGlow" StartPoint="0,0" EndPoint="1,1">
       <GradientStop Color="#11152B" Offset="0"/>
@@ -63,8 +63,8 @@
     </Style>
 
     <Style TargetType="Button">
-      <Setter Property="Background" Value="#1A2038"/>
-      <Setter Property="BorderBrush" Value="#343D5E"/>
+      <Setter Property="Background" Value="#151F35"/>
+      <Setter Property="BorderBrush" Value="#2B3B5A"/>
       <Setter Property="BorderThickness" Value="1"/>
       <Setter Property="Foreground" Value="{StaticResource Ink}"/>
       <Setter Property="Padding" Value="15,10"/>
