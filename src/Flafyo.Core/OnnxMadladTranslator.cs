@@ -252,12 +252,13 @@ public sealed class OnnxMadladTranslator : ITranslator, IDisposable
             using (var decoderResult = _decoder.Run(decoderInputs))
             {
                 var logits = decoderResult.Single(x => x.Name == "logits").AsTensor<float>();
-                if (logits.Rank != 3 || logits.Dimensions[0] != 1 || logits.Dimensions[1] != 1 ||
-                    logits.Dimensions[2] <= EosTokenId)
+                var logitsShape = logits.Dimensions.ToArray();
+                if (logitsShape.Length != 3 || logitsShape[0] != 1 || logitsShape[1] != 1 ||
+                    logitsShape[2] <= EosTokenId)
                     throw new InvalidDataException("MADLAD decoder returned an unexpected logits tensor shape.");
 
                 var values = logits.ToArray();
-                int vocabSize = logits.Dimensions[2];
+                int vocabSize = logitsShape[2];
                 nextToken = 0;
                 float best = float.NegativeInfinity;
                 for (int token = 0; token < vocabSize; token++)
