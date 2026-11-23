@@ -612,8 +612,7 @@ public partial class MainWindow : Window
 
     private void GameLibrary_Click(object sender, RoutedEventArgs e)
     {
-        var win = new LocalizationLibraryWindow { Owner = this };
-        win.Show();
+        MainTabs.SelectedIndex = 3;
     }
 
     private void GameFiles_Click(object sender, RoutedEventArgs e)
