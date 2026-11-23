@@ -35,6 +35,9 @@ public sealed class MadladTokenizer
         }
 
         if (all.Count < 3) throw new InvalidDataException("SentencePiece vocabulary is incomplete.");
+        if (all[0].Piece != "<unk>" || all[1].Piece != "<s>" || all[2].Piece != "</s>")
+            throw new InvalidDataException("MADLAD SentencePiece special-token IDs do not match the expected 0/1/2 contract.");
+
         var segmentable = all.Where(p => p.Type is 1 or 4).Select(p => (p.Piece, p.Score));
         var result = new MadladTokenizer(new SentencePieceUnigram(segmentable), 0, 1, 2);
         for (int i = 0; i < all.Count; i++)
