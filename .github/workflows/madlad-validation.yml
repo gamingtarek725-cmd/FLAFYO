@@ -1,0 +1,42 @@
+name: MADLAD 3B validation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  madlad-cpu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Download pinned MADLAD-400 3B INT4 pack
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://huggingface.co/tonythethompson/madlad400-3b-mt-onnx/resolve/c165d741425c82365761aae98d0891bd9e7995ed/mixed_fp16_int4"
+          dir="$RUNNER_TEMP/madlad"
+          mkdir -p "$dir/onnx"
+          files=(
+            "config.json"
+            "generation_config.json"
+            "spiece.model"
+            "onnx/encoder_model.onnx"
+            "onnx/encoder_model.onnx.data"
+            "onnx/decoder_model_merged.onnx"
+            "onnx/decoder_model_merged.onnx.data"
+          )
+          for file in "${files[@]}"; do
+            echo "Downloading $file"
+            curl --fail --location --retry 5 --retry-all-errors --continue-at - \
+              "$base/$file" --output "$dir/$file"
+          done
+          echo "FLAFYO_MADLAD_MODEL_DIR=$dir" >> "$GITHUB_ENV"
+          du -sh "$dir"
+      - name: Run real MADLAD English-to-Arabic translation
+        run: dotnet test tests/Flafyo.Core.Tests -c Release --filter "FullyQualifiedName~OnnxMadladIntegrationTests" --logger "console;verbosity=detailed"
