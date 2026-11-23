@@ -612,7 +612,7 @@ public partial class MainWindow : Window
 
     private void GameLibrary_Click(object sender, RoutedEventArgs e)
     {
-        MainTabs.SelectedIndex = 3;
+        MainTabs.SelectedIndex = 7;
     }
 
     private void GameFiles_Click(object sender, RoutedEventArgs e)
