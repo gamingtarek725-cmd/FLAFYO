@@ -25,6 +25,7 @@ public partial class LocalizationLibraryWindow : Window
         public string Notes { get; init; } = "";
         public string SourceUrl { get; init; } = "";
         public string SourceName { get; init; } = "";
+        public string CoverUrl { get; init; } = "";
         public bool IsDirectory { get; init; }
     }
 
@@ -208,6 +209,7 @@ public partial class LocalizationLibraryWindow : Window
             Notes = "اكتُشف هذا الإدخال آليًا. لم يختبر FLAFYO التوافق أو ملف التعريب. راجع صفحة المصدر قبل التثبيت.",
             SourceUrl = x.SourceUrl,
             SourceName = x.SourceName,
+            CoverUrl = IsSafeCoverUrl(x.CoverUrl) ? x.CoverUrl : "",
             IsDirectory = false
         }).ToList();
         _remoteCatalog.Clear();
@@ -254,6 +256,11 @@ public partial class LocalizationLibraryWindow : Window
         if (CountText is not null) CountText.Text = $"{_visible.Count} عنصر";
         if (_visible.Count == 0) ShowEmpty();
     }
+
+    private static bool IsSafeCoverUrl(string? value) =>
+        Uri.TryCreate(value, UriKind.Absolute, out var uri) &&
+        uri.Scheme == Uri.UriSchemeHttps &&
+        string.IsNullOrEmpty(uri.UserInfo);
 
     private static bool ContainsText(string? value, string query) =>
         !string.IsNullOrWhiteSpace(value) && value.Contains(query, StringComparison.OrdinalIgnoreCase);
