@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-22T19:40:48+00:00",
+  "generatedAt": "2026-11-23T07:39:38+00:00",
   "sourceCount": 3,
   "entries": [
     {
@@ -37,17 +37,6 @@
       "publishedAt": ""
     },
     {
-      "title": "Control Resonant",
-      "sourceUrl": "https://muarrab.com/patches/control-resonant/",
-      "sourceName": "Muarrab",
-      "platform": "",
-      "gameVersion": "",
-      "translationVersion": "",
-      "updateType": "listing",
-      "summary": "Control Resonant",
-      "publishedAt": ""
-    },
-    {
       "title": "Grand Theft Auto V",
       "sourceUrl": "https://muarrab.com/patches/grand-theft-auto-v/",
       "sourceName": "Muarrab",
@@ -56,6 +45,17 @@
       "translationVersion": "",
       "updateType": "listing",
       "summary": "Grand Theft Auto V",
+      "publishedAt": ""
+    },
+    {
+      "title": "Grand Theft Auto Vi",
+      "sourceUrl": "https://muarrab.com/patches/grand-theft-auto-vi/",
+      "sourceName": "Muarrab",
+      "platform": "",
+      "gameVersion": "",
+      "translationVersion": "",
+      "updateType": "listing",
+      "summary": "Grand Theft Auto VI",
       "publishedAt": ""
     },
     {
@@ -198,7 +198,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "👁 947 تعريب لعبة Assassins Creed Revelations",
+      "summary": "👁 951 تعريب لعبة Assassins Creed Revelations",
       "publishedAt": ""
     },
     {
@@ -220,7 +220,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "👁 2,311 تعريب لعبة Bully",
+      "summary": "👁 2,320 تعريب لعبة Bully",
       "publishedAt": ""
     },
     {
@@ -231,7 +231,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "👁 1,333 تعريب لعبة Grand Theft Auto V",
+      "summary": "👁 1,350 تعريب لعبة Grand Theft Auto V",
       "publishedAt": ""
     },
     {
@@ -242,7 +242,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "👁 1,030 تعريب لعبة Green Hell",
+      "summary": "👁 1,035 تعريب لعبة Green Hell",
       "publishedAt": ""
     },
     {
@@ -253,7 +253,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "👁 1,062 تعريب لعبة Hitman 3",
+      "summary": "👁 1,064 تعريب لعبة Hitman 3",
       "publishedAt": ""
     },
     {
@@ -275,7 +275,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "👁 1,226 تعريب لعبة Hollow Knight Silksong",
+      "summary": "👁 1,230 تعريب لعبة Hollow Knight Silksong",
       "publishedAt": ""
     },
     {
@@ -330,7 +330,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "👁 1,083 تعريب لعبة Metro Redux",
+      "summary": "👁 1,087 تعريب لعبة Metro Redux",
       "publishedAt": ""
     },
     {
@@ -352,7 +352,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "👁 1,072 تعريب لعبة The Last of Us Part II Remastered",
+      "summary": "👁 1,079 تعريب لعبة The Last of Us Part II Remastered",
       "publishedAt": ""
     },
     {
@@ -374,7 +374,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "👁 961 تعريب لعبة Toy Story 3",
+      "summary": "👁 966 تعريب لعبة Toy Story 3",
       "publishedAt": ""
     },
     {
@@ -396,7 +396,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "👁 1,305 تعريب لعبة Where Winds Meet",
+      "summary": "👁 1,311 تعريب لعبة Where Winds Meet",
       "publishedAt": ""
     },
     {
@@ -418,7 +418,7 @@
       "gameVersion": "",
       "translationVersion": "1.3007",
       "updateType": "update",
-      "summary": "محدّث · v1.3007 First Light007: الضوء الأول310 تحميلأكتوبر 2026PC · 51.47 MB",
+      "summary": "محدّث · v1.3007 First Light007: الضوء الأول318 تحميلأكتوبر 2026PC · 51.47 MB",
       "publishedAt": ""
     },
     {
@@ -440,7 +440,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "6A Way Outطريق للخروج505تحميل",
+      "summary": "6A Way Outطريق للخروج512تحميل",
       "publishedAt": ""
     },
     {
@@ -473,7 +473,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Age of Empires II: Definitive Editionعصر الإمبراطوريات الثاني: الإصدار النهائي88 تحميلنوفمبر 2026PC · 2.45 MB",
+      "summary": "Age of Empires II: Definitive Editionعصر الإمبراطوريات الثاني: الإصدار النهائي91 تحميلنوفمبر 2026PC · 2.45 MB",
       "publishedAt": ""
     },
     {
@@ -484,7 +484,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Alice: Madness Returnsأليس: عودة الجنون170 تحميلأكتوبر 2026PC · 217.86 MB",
+      "summary": "Alice: Madness Returnsأليس: عودة الجنون172 تحميلأكتوبر 2026PC · 217.86 MB",
       "publishedAt": ""
     },
     {
@@ -495,7 +495,7 @@
       "gameVersion": "",
       "translationVersion": "1.6",
       "updateType": "update",
-      "summary": "محدّث · v1.6Aniimoأنيمو174 تحميلأكتوبر 2026PC · 30.33 MB",
+      "summary": "محدّث · v1.6Aniimoأنيمو175 تحميلأكتوبر 2026PC · 30.33 MB",
       "publishedAt": ""
     },
     {
@@ -528,7 +528,7 @@
       "gameVersion": "",
       "translationVersion": "1.4",
       "updateType": "update",
-      "summary": "محدّث · v1.4Attack on Titan 2 - A.O.T.2هجوم العمالقة 2 - A.O.T.2115 تحميلأكتوبر 2026PC · 2.72 MB",
+      "summary": "محدّث · v1.4Attack on Titan 2 - A.O.T.2هجوم العمالقة 2 - A.O.T.2116 تحميلأكتوبر 2026PC · 2.72 MB",
       "publishedAt": ""
     },
     {
@@ -550,7 +550,7 @@
       "gameVersion": "",
       "translationVersion": "2.3",
       "updateType": "update",
-      "summary": "محدّث · v2.3Baldur's Gate 3بالدورز كيت 3237 تحميلأكتوبر 2026PC · 34.77 MB",
+      "summary": "محدّث · v2.3Baldur's Gate 3بالدورز كيت 3238 تحميلأكتوبر 2026PC · 34.77 MB",
       "publishedAt": ""
     },
     {
@@ -561,7 +561,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Barotraumaبارو-تروما25 تحميلنوفمبر 2026PC · 1.70 MB",
+      "summary": "محدّث · v1.1Barotraumaبارو-تروما28 تحميلنوفمبر 2026PC · 1.70 MB",
       "publishedAt": ""
     },
     {
@@ -572,7 +572,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Batman: Arkham Asylum Game of the Year Editionباتمان: مصح أركام - نسخة لعبة العام127 تحميلنوفمبر 2026PC · 5.22 MB",
+      "summary": "Batman: Arkham Asylum Game of the Year Editionباتمان: مصح أركام - نسخة لعبة العام128 تحميلنوفمبر 2026PC · 5.22 MB",
       "publishedAt": ""
     },
     {
@@ -583,7 +583,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Batman: Arkham City - Game of the Year Editionباتمان: أركام سيتي - إصدار لعبة العام179 تحميلنوفمبر 2026PC · 6.07 MB",
+      "summary": "Batman: Arkham City - Game of the Year Editionباتمان: أركام سيتي - إصدار لعبة العام182 تحميلنوفمبر 2026PC · 6.07 MB",
       "publishedAt": ""
     },
     {
@@ -594,7 +594,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Batman: Arkham Knightباتمان: أركام نايت191 تحميلنوفمبر 2026PC · 12.93 MB",
+      "summary": "محدّث · v1.1Batman: Arkham Knightباتمان: أركام نايت203 تحميلنوفمبر 2026PC · 12.93 MB",
       "publishedAt": ""
     },
     {
@@ -605,7 +605,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Batman: Arkham Originsباتمان: أركام أوريجنز99 تحميلنوفمبر 2026PC · 8.15 MB",
+      "summary": "محدّث · v1.1Batman: Arkham Originsباتمان: أركام أوريجنز105 تحميلنوفمبر 2026PC · 8.15 MB",
       "publishedAt": ""
     },
     {
@@ -616,7 +616,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Beyond Two Soulsما وراء الروحين83 تحميلأكتوبر 2026PC · 409.81 MB",
+      "summary": "محدّث · v1.1Beyond Two Soulsما وراء الروحين84 تحميلأكتوبر 2026PC · 409.81 MB",
       "publishedAt": ""
     },
     {
@@ -627,7 +627,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Big Ambitionsطموحات كبيرة113 تحميلأكتوبر 2026PC · 1.48 MB",
+      "summary": "محدّث · v1.1Big Ambitionsطموحات كبيرة114 تحميلأكتوبر 2026PC · 1.48 MB",
       "publishedAt": ""
     },
     {
@@ -638,7 +638,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "BioShock™ 2 Remasteredبايوشوك 2 النسخة المُحسَّنة116 تحميلأكتوبر 2026PC · 667 KB",
+      "summary": "BioShock™ 2 Remasteredبايوشوك 2 النسخة المُحسَّنة117 تحميلأكتوبر 2026PC · 667 KB",
       "publishedAt": ""
     },
     {
@@ -649,7 +649,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "BioShock Infiniteبايوشوك إنفينيت107 تحميلأكتوبر 2026PC · 8.01 MB",
+      "summary": "BioShock Infiniteبايوشوك إنفينيت108 تحميلأكتوبر 2026PC · 8.01 MB",
       "publishedAt": ""
     },
     {
@@ -660,7 +660,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "BioShock™ Remasteredبايوشوك: النسخة المُحسَّنة252 تحميلأكتوبر 2026PC · 497 KB",
+      "summary": "BioShock™ Remasteredبايوشوك: النسخة المُحسَّنة258 تحميلأكتوبر 2026PC · 497 KB",
       "publishedAt": ""
     },
     {
@@ -671,7 +671,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Black Myth: Wukongالأسطورة السوداء: وكونغ377 تحميلأكتوبر 2026PC · 914 KB",
+      "summary": "Black Myth: Wukongالأسطورة السوداء: وكونغ386 تحميلأكتوبر 2026PC · 914 KB",
       "publishedAt": ""
     },
     {
@@ -682,7 +682,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Blasphemous 2بلاسبيموس 254 تحميلنوفمبر 2026PC · 59.26 MB",
+      "summary": "Blasphemous 2بلاسبيموس 256 تحميلنوفمبر 2026PC · 59.26 MB",
       "publishedAt": ""
     },
     {
@@ -693,7 +693,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Borderlands 2بوردرلاندز 275 تحميلنوفمبر 2026PC · 14.78 MB",
+      "summary": "محدّث · v1.1Borderlands 2بوردرلاندز 276 تحميلنوفمبر 2026PC · 14.78 MB",
       "publishedAt": ""
     },
     {
@@ -715,7 +715,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Borderlands 4بوردرلاندز 4211 تحميلأكتوبر 2026PC · 14.38 MB",
+      "summary": "Borderlands 4بوردرلاندز 4215 تحميلأكتوبر 2026PC · 14.38 MB",
       "publishedAt": ""
     },
     {
@@ -770,7 +770,7 @@
       "gameVersion": "",
       "translationVersion": "1.2",
       "updateType": "update",
-      "summary": "محدّث · v1.2Cities: Skylinesالمدن: سكايلاينز85 تحميلأكتوبر 2026PC · 1.69 MB",
+      "summary": "محدّث · v1.2Cities: Skylinesالمدن: سكايلاينز86 تحميلأكتوبر 2026PC · 1.69 MB",
       "publishedAt": ""
     },
     {
@@ -781,7 +781,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Cities: Skylines IIسيتيز: سكاي لاينز 284 تحميلأكتوبر 2026PC · 0.60 MB",
+      "summary": "Cities: Skylines IIسيتيز: سكاي لاينز 286 تحميلأكتوبر 2026PC · 0.60 MB",
       "publishedAt": ""
     },
     {
@@ -792,7 +792,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Clive Barker's Hellraiser - Revivalإحياء جحيم كلايف باركر289 تحميلأكتوبر 2026PC · 1.46 MB",
+      "summary": "Clive Barker's Hellraiser - Revivalإحياء جحيم كلايف باركر291 تحميلأكتوبر 2026PC · 1.46 MB",
       "publishedAt": ""
     },
     {
@@ -803,7 +803,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Command & Conquer Red Alert 2 and Yuri’s Revengeكوماند آند كونكر ريد أليرت 2 انتقام يوري45 تحميلنوفمبر 2026PC · 1.11 MB",
+      "summary": "Command & Conquer Red Alert 2 and Yuri’s Revengeكوماند آند كونكر ريد أليرت 2 انتقام يوري46 تحميلنوفمبر 2026PC · 1.11 MB",
       "publishedAt": ""
     },
     {
@@ -814,7 +814,7 @@
       "gameVersion": "",
       "translationVersion": "1.2",
       "updateType": "update",
-      "summary": "محدّث · v1.2Conan Exiles Enhancedتعزيز كونان المنفيين108 تحميلأكتوبر 2026PC · 5.97 MB",
+      "summary": "محدّث · v1.2Conan Exiles Enhancedتعزيز كونان المنفيين109 تحميلأكتوبر 2026PC · 5.97 MB",
       "publishedAt": ""
     },
     {
@@ -825,7 +825,7 @@
       "gameVersion": "",
       "translationVersion": "1.0.1",
       "updateType": "update",
-      "summary": "محدّث · v1.0.1CONTROL Resonantكنترول: صدى الاضطراب130 تحميلأكتوبر 2026PC · 4.43 MB",
+      "summary": "محدّث · v1.0.1CONTROL Resonantكنترول: صدى الاضطراب133 تحميلأكتوبر 2026PC · 4.43 MB",
       "publishedAt": ""
     },
     {
@@ -836,7 +836,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Coral Islandجزيرة المرجان43 تحميلنوفمبر 2026PC · 5.72 MB",
+      "summary": "Coral Islandجزيرة المرجان44 تحميلنوفمبر 2026PC · 5.72 MB",
       "publishedAt": ""
     },
     {
@@ -902,7 +902,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Cupheadكاب هيد116 تحميلأكتوبر 2026PC · 17.06 MB",
+      "summary": "Cupheadكاب هيد117 تحميلأكتوبر 2026PC · 17.06 MB",
       "publishedAt": ""
     },
     {
@@ -913,7 +913,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "DARK SOULS™ IIIدارك سولز 3184 تحميلأكتوبر 2026PC · 23.67 MB",
+      "summary": "DARK SOULS™ IIIدارك سولز 3193 تحميلأكتوبر 2026PC · 23.67 MB",
       "publishedAt": ""
     },
     {
@@ -935,7 +935,7 @@
       "gameVersion": "",
       "translationVersion": "1.2",
       "updateType": "update",
-      "summary": "محدّث · v1.2DAVE THE DIVERديف ذا دايفر232 تحميلأكتوبر 2026PC · 2.88 MB",
+      "summary": "محدّث · v1.2DAVE THE DIVERديف ذا دايفر234 تحميلأكتوبر 2026PC · 2.88 MB",
       "publishedAt": ""
     },
     {
@@ -946,7 +946,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Days Goneأيام مضت210 تحميلنوفمبر 2026PC · 29.32 MB",
+      "summary": "Days Goneأيام مضت215 تحميلنوفمبر 2026PC · 29.32 MB",
       "publishedAt": ""
     },
     {
@@ -957,7 +957,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Dead Cellsالخلايا الميتة224 تحميلأكتوبر 2026PC · 3.05 MB",
+      "summary": "Dead Cellsالخلايا الميتة225 تحميلأكتوبر 2026PC · 3.05 MB",
       "publishedAt": ""
     },
     {
@@ -968,7 +968,7 @@
       "gameVersion": "",
       "translationVersion": "1.3",
       "updateType": "update",
-      "summary": "محدّث · v1.3Dead Spaceديد سبيس200 تحميلأكتوبر 2026PC · 778 KB",
+      "summary": "محدّث · v1.3Dead Spaceديد سبيس205 تحميلأكتوبر 2026PC · 778 KB",
       "publishedAt": ""
     },
     {
@@ -990,7 +990,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Deep Rock Galactic: Survivorديب روك جالاكتيك: الناجي19 تحميلأكتوبر 2026PC · 2.16 MB",
+      "summary": "Deep Rock Galactic: Survivorديب روك جالاكتيك: الناجي22 تحميلأكتوبر 2026PC · 2.16 MB",
       "publishedAt": ""
     },
     {
@@ -1012,7 +1012,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "8Devil May Cry 5ديفل ماي كراي 5403تحميل",
+      "summary": "8Devil May Cry 5ديفل ماي كراي 5412تحميل",
       "publishedAt": ""
     },
     {
@@ -1023,7 +1023,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Dishonoredديسونورد195 تحميلأكتوبر 2026PC · 24.57 MB",
+      "summary": "Dishonoredديسونورد198 تحميلأكتوبر 2026PC · 24.57 MB",
       "publishedAt": ""
     },
     {
@@ -1078,7 +1078,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "DOOM Eternalالموت الأبدي68 تحميلنوفمبر 2026PC · 2.30 MB",
+      "summary": "DOOM Eternalالموت الأبدي69 تحميلنوفمبر 2026PC · 2.30 MB",
       "publishedAt": ""
     },
     {
@@ -1100,7 +1100,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "DREDGEدريدج97 تحميلأكتوبر 2026PC · 1.17 MB",
+      "summary": "DREDGEدريدج98 تحميلأكتوبر 2026PC · 1.17 MB",
       "publishedAt": ""
     },
     {
@@ -1166,7 +1166,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Fallout: New Vegasفول أوت: فيغاس الجديدة84 تحميلنوفمبر 2026PC · 4.61 MB",
+      "summary": "Fallout: New Vegasفول أوت: فيغاس الجديدة87 تحميلنوفمبر 2026PC · 4.61 MB",
       "publishedAt": ""
     },
     {
@@ -1199,7 +1199,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Far Cry 2فار كراي 2145 تحميلأكتوبر 2026PC · 8.07 MB",
+      "summary": "Far Cry 2فار كراي 2147 تحميلأكتوبر 2026PC · 8.07 MB",
       "publishedAt": ""
     },
     {
@@ -1210,7 +1210,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Far Cry 3فار كراي 3251 تحميلأكتوبر 2026PC · 1.01 MB",
+      "summary": "Far Cry 3فار كراي 3262 تحميلأكتوبر 2026PC · 1.01 MB",
       "publishedAt": ""
     },
     {
@@ -1221,7 +1221,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Far Cry 4فار كراي 4303 تحميلأكتوبر 2026PC · 2.67 MB",
+      "summary": "محدّث · v1.1Far Cry 4فار كراي 4314 تحميلأكتوبر 2026PC · 2.67 MB",
       "publishedAt": ""
     },
     {
@@ -1276,7 +1276,7 @@
       "gameVersion": "",
       "translationVersion": "1.3",
       "updateType": "update",
-      "summary": "محدّث · v1.3Frostpunkفروست بانك216 تحميلأكتوبر 2026PC · 10.76 MB",
+      "summary": "محدّث · v1.3Frostpunkفروست بانك218 تحميلأكتوبر 2026PC · 10.76 MB",
       "publishedAt": ""
     },
     {
@@ -1285,9 +1285,9 @@
       "sourceName": "Ta3reebat",
       "platform": "",
       "gameVersion": "",
-      "translationVersion": "1.1",
-      "updateType": "update",
-      "summary": "محدّث · v1.1Frostpunk 2فروستبانك 2109 تحميلأكتوبر 2026PC · 6.80 MB",
+      "translationVersion": "",
+      "updateType": "listing",
+      "summary": "Frostpunk 2فروستبانك 2112 تحميلأكتوبر 2026PC · 6.80 MB",
       "publishedAt": ""
     },
     {
@@ -1298,7 +1298,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Goat Simulator 3محاكاة الماعز 339 تحميلأكتوبر 2026PC · 4.70 MB",
+      "summary": "Goat Simulator 3محاكاة الماعز 340 تحميلأكتوبر 2026PC · 4.70 MB",
       "publishedAt": ""
     },
     {
@@ -1309,7 +1309,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "God of Warإله الحرب112 تحميلنوفمبر 2026PC · 3.48 MB",
+      "summary": "God of Warإله الحرب118 تحميلنوفمبر 2026PC · 3.48 MB",
       "publishedAt": ""
     },
     {
@@ -1320,7 +1320,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "4Grand Theft Auto IV: The Complete Editionجراند ثفت أوتو 4: النسخة الكاملة637تحميل",
+      "summary": "4Grand Theft Auto IV: The Complete Editionجراند ثفت أوتو 4: النسخة الكاملة700تحميل",
       "publishedAt": ""
     },
     {
@@ -1331,7 +1331,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Grand Theft Auto: San Andreasجراند ثفت أوتو: سان أندرياس219 تحميلأكتوبر 2026PC · 0.59 MB",
+      "summary": "Grand Theft Auto: San Andreasجراند ثفت أوتو: سان أندرياس238 تحميلأكتوبر 2026PC · 0.59 MB",
       "publishedAt": ""
     },
     {
@@ -1342,7 +1342,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "3Grand Theft Auto V Enhancedجراند ثيفت أوتو 5939 تحميل",
+      "summary": "3Grand Theft Auto V Enhancedجراند ثيفت أوتو 5981 تحميل",
       "publishedAt": ""
     },
     {
@@ -1353,7 +1353,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Grand Theft Auto: Vice Cityجراند ثفت أوتو: فايس سيتي225 تحميلأكتوبر 2026PC · 0.44 MB",
+      "summary": "Grand Theft Auto: Vice Cityجراند ثفت أوتو: فايس سيتي238 تحميلأكتوبر 2026PC · 0.44 MB",
       "publishedAt": ""
     },
     {
@@ -1364,7 +1364,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Graveyard Keeperحارس المقبرة52 تحميلنوفمبر 2026PC · 1.36 MB",
+      "summary": "محدّث · v1.1Graveyard Keeperحارس المقبرة53 تحميلنوفمبر 2026PC · 1.36 MB",
       "publishedAt": ""
     },
     {
@@ -1375,7 +1375,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Graveyard Keeper 2حارس المقبرة 286 تحميلسبتمبر 2026PC · 287 KB",
+      "summary": "Graveyard Keeper 2حارس المقبرة 287 تحميلسبتمبر 2026PC · 287 KB",
       "publishedAt": ""
     },
     {
@@ -1386,7 +1386,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Green Hellالجحيم الأخضر64 تحميلأكتوبر 2026PC · 0.82 MB",
+      "summary": "Green Hellالجحيم الأخضر69 تحميلأكتوبر 2026PC · 0.82 MB",
       "publishedAt": ""
     },
     {
@@ -1408,7 +1408,7 @@
       "gameVersion": "",
       "translationVersion": "2.1",
       "updateType": "update",
-      "summary": "محدّث · v2.1Hadesهادس164 تحميلسبتمبر 2026PC · 3.97 MB",
+      "summary": "محدّث · v2.1Hadesهادس167 تحميلسبتمبر 2026PC · 3.97 MB",
       "publishedAt": ""
     },
     {
@@ -1419,7 +1419,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Hades IIهاديس 2151 تحميلأكتوبر 2026PC · 4.03 MB",
+      "summary": "Hades IIهاديس 2160 تحميلأكتوبر 2026PC · 4.03 MB",
       "publishedAt": ""
     },
     {
@@ -1441,7 +1441,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Hearts of Iron IVقلوب من حديد الرابعة39 تحميلنوفمبر 2026PC · 7.19 MB",
+      "summary": "Hearts of Iron IVقلوب من حديد الرابعة45 تحميلنوفمبر 2026PC · 7.19 MB",
       "publishedAt": ""
     },
     {
@@ -1452,7 +1452,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1HITMAN World of Assassinationالقاتل المأجور: عالم الاغتيال200 تحميلأكتوبر 2026PC · 4.09 MB",
+      "summary": "محدّث · v1.1HITMAN World of Assassinationالقاتل المأجور: عالم الاغتيال204 تحميلأكتوبر 2026PC · 4.09 MB",
       "publishedAt": ""
     },
     {
@@ -1463,7 +1463,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Hollow Knightهولو نايت292 تحميلأكتوبر 2026PC · 4.37 MB",
+      "summary": "Hollow Knightهولو نايت301 تحميلأكتوبر 2026PC · 4.37 MB",
       "publishedAt": ""
     },
     {
@@ -1474,7 +1474,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Hollow Knight Silksongهولو نايت سيلك سونغ201 تحميلأكتوبر 2026PC · 9.53 MB",
+      "summary": "محدّث · v1.1Hollow Knight Silksongهولو نايت سيلك سونغ209 تحميلأكتوبر 2026PC · 9.53 MB",
       "publishedAt": ""
     },
     {
@@ -1518,7 +1518,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "inZOIانزوي119 تحميلأكتوبر 2026PC · 6.56 MB",
+      "summary": "inZOIانزوي127 تحميلأكتوبر 2026PC · 6.56 MB",
       "publishedAt": ""
     },
     {
@@ -1529,7 +1529,7 @@
       "gameVersion": "",
       "translationVersion": "1.0.1",
       "updateType": "update",
-      "summary": "محدّث · v1.0.1It Takes Twoات تكس تو323 تحميلأكتوبر 2026PC · 831 KB",
+      "summary": "محدّث · v1.0.1It Takes Twoات تكس تو334 تحميلأكتوبر 2026PC · 831 KB",
       "publishedAt": ""
     },
     {
@@ -1540,7 +1540,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Judgmentجاجمنت165 تحميلأكتوبر 2026PC · 9.01 MB",
+      "summary": "Judgmentجاجمنت167 تحميلأكتوبر 2026PC · 9.01 MB",
       "publishedAt": ""
     },
     {
@@ -1551,7 +1551,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Jurassic World Evolution 3جوراسيك وورلد إيفوليوشن 349 تحميلنوفمبر 2026PC · 3.92 MB",
+      "summary": "Jurassic World Evolution 3جوراسيك وورلد إيفوليوشن 350 تحميلنوفمبر 2026PC · 3.92 MB",
       "publishedAt": ""
     },
     {
@@ -1562,7 +1562,7 @@
       "gameVersion": "",
       "translationVersion": "1.7",
       "updateType": "update",
-      "summary": "محدّث · v1.7Kingdom Come Deliveranceكينغدوم كام: ديليفرانس183 تحميلأكتوبر 2026PC · 27.09 MB",
+      "summary": "محدّث · v1.7Kingdom Come Deliveranceكينغدوم كام: ديليفرانس184 تحميلأكتوبر 2026PC · 27.09 MB",
       "publishedAt": ""
     },
     {
@@ -1573,7 +1573,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Kingdom Come: Deliverance IIمجيء الملكوت: الخلاص II78 تحميلأكتوبر 2026PC · 15.09 MB",
+      "summary": "Kingdom Come: Deliverance IIمجيء الملكوت: الخلاص II80 تحميلأكتوبر 2026PC · 15.09 MB",
       "publishedAt": ""
     },
     {
@@ -1606,7 +1606,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Life is Strange - Episode 1لايف إز سترينج - الحلقة الأولى184 تحميلأكتوبر 2026PC · 1.35 MB",
+      "summary": "محدّث · v1.1Life is Strange - Episode 1لايف إز سترينج - الحلقة الأولى201 تحميلأكتوبر 2026PC · 1.35 MB",
       "publishedAt": ""
     },
     {
@@ -1661,7 +1661,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Little Nightmaresالكوابيس الصغيرة87 تحميلأكتوبر 2026PC · 2.11 MB",
+      "summary": "Little Nightmaresالكوابيس الصغيرة91 تحميلأكتوبر 2026PC · 2.11 MB",
       "publishedAt": ""
     },
     {
@@ -1683,7 +1683,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Mafia Definitive Editionمافيا: الإصدار النهائي239 تحميلأكتوبر 2026PC · 7.31 MB",
+      "summary": "Mafia Definitive Editionمافيا: الإصدار النهائي242 تحميلأكتوبر 2026PC · 7.31 MB",
       "publishedAt": ""
     },
     {
@@ -1694,7 +1694,7 @@
       "gameVersion": "",
       "translationVersion": "1.3",
       "updateType": "update",
-      "summary": "محدّث · v1.3Mafia II: Definitive Editionمافيا II: الإصدار النهائي259 تحميلأكتوبر 2026PC · 1.2 MB",
+      "summary": "محدّث · v1.3Mafia II: Definitive Editionمافيا II: الإصدار النهائي271 تحميلأكتوبر 2026PC · 1.2 MB",
       "publishedAt": ""
     },
     {
@@ -1705,7 +1705,7 @@
       "gameVersion": "",
       "translationVersion": "1.2",
       "updateType": "update",
-      "summary": "محدّث · v1.2Mafia III: Definitive Editionمافيا 3: الطبعة النهائية351 تحميلأكتوبر 2026PC · 3.83 MB",
+      "summary": "محدّث · v1.2Mafia III: Definitive Editionمافيا 3: الطبعة النهائية361 تحميلأكتوبر 2026PC · 3.83 MB",
       "publishedAt": ""
     },
     {
@@ -1716,7 +1716,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Mafia The Old Countryمافيا: البلد القديم+122 تحميلأكتوبر 2026PC · 2.40 MB",
+      "summary": "Mafia The Old Countryمافيا: البلد القديم+123 تحميلأكتوبر 2026PC · 2.40 MB",
       "publishedAt": ""
     },
     {
@@ -1738,7 +1738,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Marvel’s Spider-Man: Miles Moralesالرجل العنكبوت من مارفل: مايلز موراليس117 تحميلنوفمبر 2026PC · 5.39 MB",
+      "summary": "محدّث · v1.1Marvel’s Spider-Man: Miles Moralesالرجل العنكبوت من مارفل: مايلز موراليس126 تحميلنوفمبر 2026PC · 5.39 MB",
       "publishedAt": ""
     },
     {
@@ -1749,7 +1749,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Marvel’s Spider-Man Remasteredالرجل العنكبوت من مارفل: النسخة المُحسَّنة218 تحميلنوفمبر 2026PC · 7.48 MB",
+      "summary": "Marvel’s Spider-Man Remasteredالرجل العنكبوت من مارفل: النسخة المُحسَّنة227 تحميلنوفمبر 2026PC · 7.48 MB",
       "publishedAt": ""
     },
     {
@@ -1793,7 +1793,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "METAL GEAR SOLID Δ: SNAKE EATERميتال جير سوليد Δ: سنيك إيتر71 تحميلأكتوبر 2026PC · 8.23 MB",
+      "summary": "METAL GEAR SOLID Δ: SNAKE EATERميتال جير سوليد Δ: سنيك إيتر72 تحميلأكتوبر 2026PC · 8.23 MB",
       "publishedAt": ""
     },
     {
@@ -1804,7 +1804,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "METAL GEAR SOLID V: THE PHANTOM PAINميتال جير سوليد 5: ذا فانتوم بين129 تحميلأكتوبر 2026PC · 1.76 MB",
+      "summary": "METAL GEAR SOLID V: THE PHANTOM PAINميتال جير سوليد 5: ذا فانتوم بين135 تحميلأكتوبر 2026PC · 1.76 MB",
       "publishedAt": ""
     },
     {
@@ -1815,7 +1815,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Metro Exodusمترو إكسودس117 تحميلأكتوبر 2026PC · 5.28 MB",
+      "summary": "محدّث · v1.1Metro Exodusمترو إكسودس121 تحميلأكتوبر 2026PC · 5.28 MB",
       "publishedAt": ""
     },
     {
@@ -1826,7 +1826,7 @@
       "gameVersion": "",
       "translationVersion": "1.0.4",
       "updateType": "update",
-      "summary": "محدّث · v1.0.4Middle-earth: Shadow of Mordorالأرض الوسطى: ظل موردور200 تحميلأكتوبر 2026PC · 1.70 MB",
+      "summary": "محدّث · v1.0.4Middle-earth: Shadow of Mordorالأرض الوسطى: ظل موردور206 تحميلأكتوبر 2026PC · 1.70 MB",
       "publishedAt": ""
     },
     {
@@ -1837,7 +1837,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "5Moon Sweepersكاسحات القمر558تحميل",
+      "summary": "5Moon Sweepersكاسحات القمر562تحميل",
       "publishedAt": ""
     },
     {
@@ -1848,7 +1848,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Mortal Shell IIمورتال شل II63 تحميلنوفمبر 2026PC · 2.73 MB",
+      "summary": "محدّث · v1.1Mortal Shell IIمورتال شل II64 تحميلنوفمبر 2026PC · 2.73 MB",
       "publishedAt": ""
     },
     {
@@ -1892,7 +1892,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Nioh: Complete Editionنيو: الاصدار الكامل105 تحميلأكتوبر 2026PC · 17.58 MB",
+      "summary": "Nioh: Complete Editionنيو: الاصدار الكامل107 تحميلأكتوبر 2026PC · 17.58 MB",
       "publishedAt": ""
     },
     {
@@ -1903,7 +1903,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "No Man's Skyنو مانز سكاي143 تحميلأكتوبر 2026PC · 7.13 MB",
+      "summary": "No Man's Skyنو مانز سكاي146 تحميلأكتوبر 2026PC · 7.13 MB",
       "publishedAt": ""
     },
     {
@@ -1925,7 +1925,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "OCTOPATH TRAVELERأوكتوباث ترافيلر45 تحميلنوفمبر 2026PC · 32.00 MB",
+      "summary": "OCTOPATH TRAVELERأوكتوباث ترافيلر46 تحميلنوفمبر 2026PC · 32.00 MB",
       "publishedAt": ""
     },
     {
@@ -1936,7 +1936,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "OMORIاموري76 تحميلأكتوبر 2026PC · 50.59 MB",
+      "summary": "OMORIاموري77 تحميلأكتوبر 2026PC · 50.59 MB",
       "publishedAt": ""
     },
     {
@@ -1958,7 +1958,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Ori and the Blind Forestأوري والغابة العمياء97 تحميلأكتوبر 2026PC · 7.15 MB",
+      "summary": "Ori and the Blind Forestأوري والغابة العمياء98 تحميلأكتوبر 2026PC · 7.15 MB",
       "publishedAt": ""
     },
     {
@@ -1978,9 +1978,9 @@
       "sourceName": "Ta3reebat",
       "platform": "",
       "gameVersion": "",
-      "translationVersion": "",
-      "updateType": "listing",
-      "summary": "Outlastأوت لاست213 تحميلأكتوبر 2026PC · 1.84 MB",
+      "translationVersion": "1.1",
+      "updateType": "update",
+      "summary": "Outlast1.0→1.1يعمل الآن على كل نسخ اللعبة وكل المتاجر (Steam وGOG وEpic وغيرها)، بعد أن كانت أداة التثبيت ترفض النسخ غير نسخة Steam23 نوفمبر 2026",
       "publishedAt": ""
     },
     {
@@ -1991,7 +1991,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Outlast 2أوت لاست 2135 تحميلأكتوبر 2026PC · 1.62 MB",
+      "summary": "محدّث · v1.1Outlast 2أوت لاست 2137 تحميلأكتوبر 2026PC · 1.62 MB",
       "publishedAt": ""
     },
     {
@@ -2002,7 +2002,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Oxygen Not Includedأوكسجين نوت إنكلودد40 تحميلأكتوبر 2026PC · 1.50 MB",
+      "summary": "Oxygen Not Includedأوكسجين نوت إنكلودد41 تحميلأكتوبر 2026PC · 1.50 MB",
       "publishedAt": ""
     },
     {
@@ -2035,7 +2035,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Palworldبالوورلد61 تحميلأكتوبر 2026PC · 2.20 MB",
+      "summary": "Palworldبالوورلد62 تحميلأكتوبر 2026PC · 2.20 MB",
       "publishedAt": ""
     },
     {
@@ -2057,7 +2057,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Persona 3 Reloadبيرسونا 3 ريلود191 تحميلأكتوبر 2026PC · 15.58 MB",
+      "summary": "محدّث · v1.1Persona 3 Reloadبيرسونا 3 ريلود192 تحميلأكتوبر 2026PC · 15.58 MB",
       "publishedAt": ""
     },
     {
@@ -2068,7 +2068,7 @@
       "gameVersion": "",
       "translationVersion": "1.2",
       "updateType": "update",
-      "summary": "محدّث · v1.2Persona 5 Royalبيرسونا 5 رويال262 تحميلأكتوبر 2026PC · 49.39 MB",
+      "summary": "محدّث · v1.2Persona 5 Royalبيرسونا 5 رويال264 تحميلأكتوبر 2026PC · 49.39 MB",
       "publishedAt": ""
     },
     {
@@ -2090,7 +2090,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Planet Zooكوكب حديقة الحيوان35 تحميلنوفمبر 2026PC · 4.43 MB",
+      "summary": "Planet Zooكوكب حديقة الحيوان36 تحميلنوفمبر 2026PC · 4.43 MB",
       "publishedAt": ""
     },
     {
@@ -2101,7 +2101,7 @@
       "gameVersion": "",
       "translationVersion": "1.2",
       "updateType": "update",
-      "summary": "محدّث · v1.2Planet Zoo 2كوكب حديقة الحيوان 2252 تحميلأكتوبر 2026PC · 2.87 MB",
+      "summary": "محدّث · v1.2Planet Zoo 2كوكب حديقة الحيوان 2255 تحميلأكتوبر 2026PC · 2.87 MB",
       "publishedAt": ""
     },
     {
@@ -2112,7 +2112,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Potato Pleaseالبطاطا من فضلك155 تحميلنوفمبر 2026PC · 552 KB",
+      "summary": "Potato Pleaseالبطاطا من فضلك157 تحميلنوفمبر 2026PC · 552 KB",
       "publishedAt": ""
     },
     {
@@ -2123,7 +2123,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Preyضحية106 تحميلأكتوبر 2026PC · 1.19 MB",
+      "summary": "Preyضحية109 تحميلأكتوبر 2026PC · 1.19 MB",
       "publishedAt": ""
     },
     {
@@ -2156,7 +2156,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Queen's Domainنطاق الملكة29 تحميلنوفمبر 2026PC · 1.90 MB",
+      "summary": "Queen's Domainنطاق الملكة30 تحميلنوفمبر 2026PC · 1.90 MB",
       "publishedAt": ""
     },
     {
@@ -2178,7 +2178,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Ready or Notمستعد أم لا176 تحميلأكتوبر 2026PC · 8.28 MB",
+      "summary": "محدّث · v1.1Ready or Notمستعد أم لا182 تحميلأكتوبر 2026PC · 8.28 MB",
       "publishedAt": ""
     },
     {
@@ -2189,7 +2189,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Red Dead Redemptionريد ديد ريدمبشن224 تحميلأكتوبر 2026PC · 32.90 MB",
+      "summary": "محدّث · v1.1Red Dead Redemptionريد ديد ريدمبشن237 تحميلأكتوبر 2026PC · 32.90 MB",
       "publishedAt": ""
     },
     {
@@ -2200,7 +2200,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "10Red Dead Redemption 2ريد ديد ريدمبشن 2395تحميل",
+      "summary": "9Red Dead Redemption 2ريد ديد ريدمبشن 2404تحميل",
       "publishedAt": ""
     },
     {
@@ -2211,7 +2211,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Resident Evilريزدنت إيفل102 تحميلأكتوبر 2026PC · 23.68 MB",
+      "summary": "Resident Evilريزدنت إيفل106 تحميلأكتوبر 2026PC · 23.68 MB",
       "publishedAt": ""
     },
     {
@@ -2233,7 +2233,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Resident Evil 4 (2005)ريزيدنت إيفل 4 (2005)194 تحميلأكتوبر 2026PC · 880.90 MB",
+      "summary": "Resident Evil 4 (2005)ريزيدنت إيفل 4 (2005)197 تحميلأكتوبر 2026PC · 880.90 MB",
       "publishedAt": ""
     },
     {
@@ -2244,7 +2244,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Resident Evil 5ريزدنت إيفل 5232 تحميلأكتوبر 2026PC · 14.07 MB",
+      "summary": "Resident Evil 5ريزدنت إيفل 5234 تحميلأكتوبر 2026PC · 14.07 MB",
       "publishedAt": ""
     },
     {
@@ -2255,7 +2255,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Resident Evil 6الشر المقيم 6196 تحميلأكتوبر 2026PC · 1.98 MB",
+      "summary": "محدّث · v1.1Resident Evil 6الشر المقيم 6201 تحميلأكتوبر 2026PC · 1.98 MB",
       "publishedAt": ""
     },
     {
@@ -2266,7 +2266,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Resident Evil Revelationsريزيدنت إيفل ريفيليشنز165 تحميلأكتوبر 2026PC · 18.51 MB",
+      "summary": "محدّث · v1.1Resident Evil Revelationsريزيدنت إيفل ريفيليشنز171 تحميلأكتوبر 2026PC · 18.51 MB",
       "publishedAt": ""
     },
     {
@@ -2354,7 +2354,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Schedule Iالجدول الأول170 تحميلنوفمبر 2026PC · 56.85 MB",
+      "summary": "Schedule Iالجدول الأول177 تحميلنوفمبر 2026PC · 56.85 MB",
       "publishedAt": ""
     },
     {
@@ -2376,7 +2376,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Sekiro™: Shadows Die Twice - GOTY Editionالذئب ذو الذراع الواحدة155 تحميلأكتوبر 2026PC · 7.99 MB",
+      "summary": "Sekiro™: Shadows Die Twice - GOTY Editionالذئب ذو الذراع الواحدة156 تحميلأكتوبر 2026PC · 7.99 MB",
       "publishedAt": ""
     },
     {
@@ -2387,7 +2387,7 @@
       "gameVersion": "",
       "translationVersion": "1.0.2",
       "updateType": "update",
-      "summary": "محدّث · v1.0.2Shift At Midnightنوبة عمل في منتصف الليل161 تحميلنوفمبر 2026PC · 990 KB",
+      "summary": "محدّث · v1.0.2Shift At Midnightنوبة عمل في منتصف الليل163 تحميلنوفمبر 2026PC · 990 KB",
       "publishedAt": ""
     },
     {
@@ -2398,7 +2398,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Sifuسيفو156 تحميلأكتوبر 2026PC · 6.83 MB",
+      "summary": "Sifuسيفو157 تحميلأكتوبر 2026PC · 6.83 MB",
       "publishedAt": ""
     },
     {
@@ -2409,7 +2409,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "SILENT HILL 2سايلنت هيل 294 تحميلأكتوبر 2026PC · 4.70 MB",
+      "summary": "SILENT HILL 2سايلنت هيل 295 تحميلأكتوبر 2026PC · 4.70 MB",
       "publishedAt": ""
     },
     {
@@ -2420,7 +2420,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "SILENT HILL fسايلنت هيل إف73 تحميلأكتوبر 2026PC · 767 KB",
+      "summary": "SILENT HILL fسايلنت هيل إف74 تحميلأكتوبر 2026PC · 767 KB",
       "publishedAt": ""
     },
     {
@@ -2431,7 +2431,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "SILENT HILL: Townfallسايلنت هيل: سقوط البلدة120 تحميلأكتوبر 2026PC · 11.42 MB",
+      "summary": "SILENT HILL: Townfallسايلنت هيل: سقوط البلدة121 تحميلأكتوبر 2026PC · 11.42 MB",
       "publishedAt": ""
     },
     {
@@ -2475,7 +2475,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Sleeping Dogs: Definitive Editionالكلاب النائمة: الطبعة النهائية190 تحميلنوفمبر 2026PC · 2.40 MB",
+      "summary": "محدّث · v1.1Sleeping Dogs: Definitive Editionالكلاب النائمة: الطبعة النهائية202 تحميلنوفمبر 2026PC · 2.40 MB",
       "publishedAt": ""
     },
     {
@@ -2486,7 +2486,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Sons Of The Forestأبناء الغابة391 تحميلأكتوبر 2026PC · 4.07 MB",
+      "summary": "Sons Of The Forestأبناء الغابة398 تحميلأكتوبر 2026PC · 4.07 MB",
       "publishedAt": ""
     },
     {
@@ -2497,7 +2497,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Split Fictionالخيال المنقسم258 تحميلأكتوبر 2026PC · 1.18 MB",
+      "summary": "Split Fictionالخيال المنقسم259 تحميلأكتوبر 2026PC · 1.18 MB",
       "publishedAt": ""
     },
     {
@@ -2508,7 +2508,7 @@
       "gameVersion": "",
       "translationVersion": "2.4",
       "updateType": "update",
-      "summary": "محدّث · v2.4Star Wars Outlawsستار وورز: أوتلوز192 تحميلأكتوبر 2026PC · 7.35 MB",
+      "summary": "محدّث · v2.4Star Wars Outlawsستار وورز: أوتلوز197 تحميلأكتوبر 2026PC · 7.35 MB",
       "publishedAt": ""
     },
     {
@@ -2519,7 +2519,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "7Stardew Valleyستارديو فالي408تحميل",
+      "summary": "7Stardew Valleyستارديو فالي417تحميل",
       "publishedAt": ""
     },
     {
@@ -2541,7 +2541,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "State of Decay 2: Juggernaut Editionستيت أوف ديكاي تو: جاغَرنوت إديشِن75 تحميلنوفمبر 2026PC · 15.93 MB",
+      "summary": "State of Decay 2: Juggernaut Editionستيت أوف ديكاي تو: جاغَرنوت إديشِن76 تحميلنوفمبر 2026PC · 15.93 MB",
       "publishedAt": ""
     },
     {
@@ -2563,7 +2563,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Strayستراي103 تحميلأكتوبر 2026PC · 1.33 MB",
+      "summary": "Strayستراي104 تحميلأكتوبر 2026PC · 1.33 MB",
       "publishedAt": ""
     },
     {
@@ -2596,7 +2596,7 @@
       "gameVersion": "",
       "translationVersion": "1.2",
       "updateType": "update",
-      "summary": "محدّث · v1.2Supermarket Simulatorمحاكاة سوبر ماركت53 تحميلنوفمبر 2026PC · 0.59 MB",
+      "summary": "محدّث · v1.2Supermarket Simulatorمحاكاة سوبر ماركت55 تحميلنوفمبر 2026PC · 0.59 MB",
       "publishedAt": ""
     },
     {
@@ -2607,7 +2607,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Terrariaتيراريا61 تحميلأكتوبر 2026PC · 2.72 MB",
+      "summary": "Terrariaتيراريا62 تحميلأكتوبر 2026PC · 2.72 MB",
       "publishedAt": ""
     },
     {
@@ -2618,7 +2618,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1The Blood of Dawnwalkerدماء سائر الفجر106 تحميلأكتوبر 2026PC · 3.58 MB",
+      "summary": "محدّث · v1.1The Blood of Dawnwalkerدماء سائر الفجر108 تحميلأكتوبر 2026PC · 3.58 MB",
       "publishedAt": ""
     },
     {
@@ -2651,7 +2651,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "The Evil Withinذا إيفل ويذين135 تحميلأكتوبر 2026PC · 43.88 MB",
+      "summary": "The Evil Withinذا إيفل ويذين136 تحميلأكتوبر 2026PC · 43.88 MB",
       "publishedAt": ""
     },
     {
@@ -2673,7 +2673,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "2The Last of Us™ Part Iذا لاست أوف أس™ الجزء الأول1.2K تحميل",
+      "summary": "2The Last of Us™ Part Iذا لاست أوف أس™ الجزء الأول1.3K تحميل",
       "publishedAt": ""
     },
     {
@@ -2684,7 +2684,7 @@
       "gameVersion": "",
       "translationVersion": "1.4",
       "updateType": "update",
-      "summary": "محدّث · v1.4The Last of Us Part IIذا لاست أوف أس: الجزء الثاني243 تحميلأكتوبر 2026PC · 3.46 MB",
+      "summary": "محدّث · v1.4The Last of Us Part IIذا لاست أوف أس: الجزء الثاني255 تحميلأكتوبر 2026PC · 3.46 MB",
       "publishedAt": ""
     },
     {
@@ -2706,7 +2706,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "9The Walking Dead The Telltale Definitive Seriesالموتى السائرون: سلسلة تلتيل النهائية401تحميل",
+      "summary": "10The Walking Dead The Telltale Definitive Seriesالموتى السائرون: سلسلة تلتيل النهائية401تحميل",
       "publishedAt": ""
     },
     {
@@ -2717,7 +2717,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1The Witcher 2: Assassins of Kings Enhanced EditionThe Witcher 2: Assassins of Kings النسخة المحسنة134 تحميلأكتوبر 2026PC · 11.03 MB",
+      "summary": "محدّث · v1.1The Witcher 2: Assassins of Kings Enhanced EditionThe Witcher 2: Assassins of Kings النسخة المحسنة138 تحميلأكتوبر 2026PC · 11.03 MB",
       "publishedAt": ""
     },
     {
@@ -2728,7 +2728,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "The Witcher: Enhanced Edition Director's CutThe Witcher: نسخة محسنة من إخراج المخرج191 تحميلأكتوبر 2026PC · 7.75 MB",
+      "summary": "The Witcher: Enhanced Edition Director's CutThe Witcher: نسخة محسنة من إخراج المخرج195 تحميلأكتوبر 2026PC · 7.75 MB",
       "publishedAt": ""
     },
     {
@@ -2750,7 +2750,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Total War: PHARAOHالحرب الشاملة: فرعون36 تحميلأكتوبر 2026PC · 25.16 MB",
+      "summary": "Total War: PHARAOHالحرب الشاملة: فرعون37 تحميلأكتوبر 2026PC · 25.16 MB",
       "publishedAt": ""
     },
     {
@@ -2772,7 +2772,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Total War: THREE KINGDOMSالحرب الشاملة: ثلاث ممالك36 تحميلأكتوبر 2026PC · 19.43 MB",
+      "summary": "Total War: THREE KINGDOMSالحرب الشاملة: ثلاث ممالك37 تحميلأكتوبر 2026PC · 19.43 MB",
       "publishedAt": ""
     },
     {
@@ -2783,7 +2783,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Trails in the Sky 1st Chapterمسارات في السماء: الفصل الأول30 تحميلأكتوبر 2026PC · 9.67 MB",
+      "summary": "Trails in the Sky 1st Chapterمسارات في السماء: الفصل الأول32 تحميلأكتوبر 2026PC · 9.67 MB",
       "publishedAt": ""
     },
     {
@@ -2816,7 +2816,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "UNCHARTED: Legacy of Thieves Collectionأنشارتد: مجموعة تراث اللصوص149 تحميلنوفمبر 2026PC · 8.24 MB",
+      "summary": "UNCHARTED: Legacy of Thieves Collectionأنشارتد: مجموعة تراث اللصوص158 تحميلنوفمبر 2026PC · 8.24 MB",
       "publishedAt": ""
     },
     {
@@ -2838,7 +2838,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Valor Mortisفالور مورتيس175 تحميلأكتوبر 2026PC · 2.89 MB",
+      "summary": "Valor Mortisفالور مورتيس177 تحميلأكتوبر 2026PC · 2.89 MB",
       "publishedAt": ""
     },
     {
@@ -2871,7 +2871,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Watch_Dogsواتش دوغز189 تحميلنوفمبر 2026PC · 4.07 MB",
+      "summary": "Watch_Dogsواتش دوغز197 تحميلنوفمبر 2026PC · 4.07 MB",
       "publishedAt": ""
     },
     {
@@ -2882,7 +2882,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Well Dwellerساكن البئر184 تحميلأكتوبر 2026PC · 1.26 MB",
+      "summary": "Well Dwellerساكن البئر190 تحميلأكتوبر 2026PC · 1.26 MB",
       "publishedAt": ""
     },
     {
@@ -2904,7 +2904,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Wolfenstein II: The New Colossusوولفنشتاين 2: ذا نيو كولوسوس148 تحميلأكتوبر 2026PC · 5.38 MB",
+      "summary": "Wolfenstein II: The New Colossusوولفنشتاين 2: ذا نيو كولوسوس150 تحميلأكتوبر 2026PC · 5.38 MB",
       "publishedAt": ""
     },
     {
@@ -2959,7 +2959,7 @@
       "gameVersion": "",
       "translationVersion": "1.7",
       "updateType": "update",
-      "summary": "محدّث · v1.7Yakuza 0ياكوزا 0156 تحميلأكتوبر 2026PC · 72.83 MB",
+      "summary": "محدّث · v1.7Yakuza 0ياكوزا 0159 تحميلأكتوبر 2026PC · 72.83 MB",
       "publishedAt": ""
     },
     {
@@ -2970,7 +2970,7 @@
       "gameVersion": "",
       "translationVersion": "1.5",
       "updateType": "update",
-      "summary": "محدّث · v1.5Yakuza 0 Director's Cutياكوزا 0 قطع المخرج178 تحميلأكتوبر 2026PC · 10.68 MB",
+      "summary": "محدّث · v1.5Yakuza 0 Director's Cutياكوزا 0 قطع المخرج180 تحميلأكتوبر 2026PC · 10.68 MB",
       "publishedAt": ""
     },
     {
@@ -2981,7 +2981,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "Yakuza 3 Remasteredياكوزا 3 ريمستر70 تحميلأكتوبر 2026PC · 6.89 MB",
+      "summary": "Yakuza 3 Remasteredياكوزا 3 ريمستر74 تحميلأكتوبر 2026PC · 6.89 MB",
       "publishedAt": ""
     },
     {
@@ -3025,7 +3025,7 @@
       "gameVersion": "",
       "translationVersion": "1.3",
       "updateType": "update",
-      "summary": "محدّث · v1.3Yakuza Kiwamiياكوزا كيوامي144 تحميلأكتوبر 2026PC · 7.16 MB",
+      "summary": "محدّث · v1.3Yakuza Kiwamiياكوزا كيوامي145 تحميلأكتوبر 2026PC · 7.16 MB",
       "publishedAt": ""
     },
     {
@@ -3047,7 +3047,7 @@
       "gameVersion": "",
       "translationVersion": "1.0.2",
       "updateType": "update",
-      "summary": "محدّث · v1.0.2Yakuza: Like a Dragonياكوزا: كالتنين119 تحميلأكتوبر 2026PC · 27.74 MB",
+      "summary": "محدّث · v1.0.2Yakuza: Like a Dragonياكوزا: كالتنين120 تحميلأكتوبر 2026PC · 27.74 MB",
       "publishedAt": ""
     },
     {
@@ -3058,7 +3058,7 @@
       "gameVersion": "",
       "translationVersion": "1.1",
       "updateType": "update",
-      "summary": "محدّث · v1.1Yakuza Kiwami 2ياكوزا كيومي 2118 تحميلأكتوبر 2026PC · 208.48 MB",
+      "summary": "محدّث · v1.1Yakuza Kiwami 2ياكوزا كيومي 2120 تحميلأكتوبر 2026PC · 208.48 MB",
       "publishedAt": ""
     },
     {
@@ -3069,7 +3069,7 @@
       "gameVersion": "",
       "translationVersion": "",
       "updateType": "listing",
-      "summary": "ZED ZONEزِد زُون36 تحميلنوفمبر 2026PC · 83.97 MB",
+      "summary": "ZED ZONEزِد زُون38 تحميلنوفمبر 2026PC · 83.97 MB",
       "publishedAt": ""
     }
   ]
