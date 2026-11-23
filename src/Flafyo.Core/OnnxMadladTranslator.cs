@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
@@ -6,59 +5,94 @@ using Microsoft.ML.OnnxRuntime.Tensors;
 namespace Flafyo.Core;
 
 /// <summary>
-/// MADLAD-400 3B multilingual T5 translation, using the pinned INT4 ONNX export.
-/// It is intentionally optional: model loading and decoding are substantially heavier than the smaller packs.
+/// MADLAD-400 3B translation using the pinned four-session INT4 export.
+/// The embedding matrix is shared by encoder and decoder; encoder KV is initialized separately.
 /// </summary>
 public sealed class OnnxMadladTranslator : ITranslator, IDisposable
 {
-    private static readonly Regex SentenceSplit = new(@"(?<=[.!?…])\s+", RegexOptions.Compiled);
-    private readonly InferenceSession _encoder, _decoder;
+    private const int MaxSourceTokens = 128;
+    private const int Layers = 32;
+    private const int Heads = 16;
+    private const int HeadDim = 128;
+    private static readonly Regex SentenceSplit = new(@"(?<=[.!?…])\\s+", RegexOptions.Compiled);
+
+    private readonly InferenceSession _embed;
+    private readonly InferenceSession _encoder;
+    private readonly InferenceSession _initializer;
+    private readonly InferenceSession _decoder;
     private readonly SessionOptions _options;
     private readonly MadladTokenizer _tokenizer;
-    private readonly int _pad, _eos, _start, _heads, _headDim;
+    private bool _disposed;
 
-    private OnnxMadladTranslator(InferenceSession encoder, InferenceSession decoder, SessionOptions options,
-        MadladTokenizer tokenizer, int pad, int eos, int start, int heads, int headDim)
+    private OnnxMadladTranslator(InferenceSession embed, InferenceSession encoder,
+        InferenceSession initializer, InferenceSession decoder, SessionOptions options,
+        MadladTokenizer tokenizer)
     {
-        _encoder = encoder; _decoder = decoder; _options = options; _tokenizer = tokenizer;
-        _pad = pad; _eos = eos; _start = start; _heads = heads; _headDim = headDim;
+        _embed = embed;
+        _encoder = encoder;
+        _initializer = initializer;
+        _decoder = decoder;
+        _options = options;
+        _tokenizer = tokenizer;
     }
 
     public static OnnxMadladTranslator Load(string dir, int threads = 1)
     {
-        int pad = 1, eos = 2, start = 0, heads = 16, dKv = 128;
-        using (var cfg = JsonDocument.Parse(File.ReadAllText(Path.Combine(dir, "config.json"))))
-        {
-            var root = cfg.RootElement;
-            if (root.TryGetProperty("pad_token_id", out var p)) pad = p.GetInt32();
-            if (root.TryGetProperty("eos_token_id", out var e)) eos = e.GetInt32();
-            if (root.TryGetProperty("decoder_start_token_id", out var s)) start = s.GetInt32();
-            if (root.TryGetProperty("num_heads", out var h)) heads = h.GetInt32();
-            if (root.TryGetProperty("d_kv", out var d)) dKv = d.GetInt32();
-        }
-
         var tokenizer = MadladTokenizer.Load(Path.Combine(dir, "spiece.model"));
-        _ = tokenizer.LanguageTokenId("ar"); // fail early if the Arabic target token is absent
+        _ = tokenizer.LanguageTokenId("ar");
 
         var options = new SessionOptions
         {
             IntraOpNumThreads = Math.Clamp(threads, 1, 2),
             InterOpNumThreads = 1,
-            GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_ALL
+            ExecutionMode = ExecutionMode.ORT_SEQUENTIAL,
+            GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_EXTENDED
         };
+
+        InferenceSession? embed = null;
         InferenceSession? encoder = null;
+        InferenceSession? initializer = null;
+        InferenceSession? decoder = null;
         try
         {
-            encoder = new InferenceSession(Path.Combine(dir, "onnx", "encoder_model.onnx"), options);
-            var decoder = new InferenceSession(Path.Combine(dir, "onnx", "decoder_model_merged.onnx"), options);
-            return new OnnxMadladTranslator(encoder, decoder, options, tokenizer, pad, eos, start, heads, dKv);
+            embed = new InferenceSession(Path.Combine(dir, "madlad_embed_8bit.onnx"), options);
+            encoder = new InferenceSession(Path.Combine(dir, "Int4Acc4", "madlad_encoder_4bit.onnx"), options);
+            initializer = new InferenceSession(Path.Combine(dir, "Int4Acc4", "madlad_cache_initializer_4bit.onnx"), options);
+            decoder = new InferenceSession(Path.Combine(dir, "Int4Acc4", "madlad_decoder_4bit.onnx"), options);
+
+            RequireInputs(embed, "input_ids");
+            RequireOutputs(embed, "embed_matrix");
+            RequireInputs(encoder, "input_ids", "attention_mask", "embed_matrix");
+            RequireOutputs(encoder, "last_hidden_state");
+            RequireInputs(initializer, "encoder_hidden_states");
+            RequireInputs(decoder, "input_ids", "embed_matrix", "encoder_attention_mask");
+            RequireOutputs(decoder, "logits");
+
+            return new OnnxMadladTranslator(embed, encoder, initializer, decoder, options, tokenizer);
         }
         catch
         {
+            decoder?.Dispose();
+            initializer?.Dispose();
             encoder?.Dispose();
+            embed?.Dispose();
             options.Dispose();
             throw;
         }
+    }
+
+    private static void RequireInputs(InferenceSession session, params string[] names)
+    {
+        foreach (var name in names)
+            if (!session.InputMetadata.ContainsKey(name))
+                throw new InvalidDataException($"MADLAD graph is missing required input '{name}'.");
+    }
+
+    private static void RequireOutputs(InferenceSession session, params string[] names)
+    {
+        foreach (var name in names)
+            if (!session.OutputMetadata.ContainsKey(name))
+                throw new InvalidDataException($"MADLAD graph is missing required output '{name}'.");
     }
 
     public Task<string> TranslateAsync(string text, CancellationToken ct) =>
@@ -66,8 +100,10 @@ public sealed class OnnxMadladTranslator : ITranslator, IDisposable
 
     public string TranslateSync(string text, CancellationToken ct)
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
         text = text.Trim();
         if (text.Length == 0) return "";
+
         var translated = new List<string>();
         foreach (var part in SentenceSplit.Split(text))
         {
@@ -89,92 +125,145 @@ public sealed class OnnxMadladTranslator : ITranslator, IDisposable
 
     private string TranslateSentence(string sentence, CancellationToken ct)
     {
-        var source = _tokenizer.Encode(sentence, "ar");
-        if (source.Length > 512) source = source.Take(511).Append(_eos).ToArray();
-        var ids = source.Select(x => (long)x).ToArray();
-        var shape = new[] { 1, ids.Length };
-        var mask = new DenseTensor<long>(Enumerable.Repeat(1L, ids.Length).ToArray(), shape);
+        // The optimized encoder export is calibrated for a fixed 128-token input.
+        var encoded = _tokenizer.Encode(sentence, "ar");
+        if (encoded.Length > MaxSourceTokens)
+            encoded = encoded.Take(MaxSourceTokens - 1).Append(2).ToArray();
 
-        var encoderInputs = new List<NamedOnnxValue>
+        var inputIds = Enumerable.Repeat(1L, MaxSourceTokens).ToArray();
+        var attention = new long[MaxSourceTokens];
+        for (int i = 0; i < encoded.Length; i++)
         {
-            NamedOnnxValue.CreateFromTensor("input_ids", new DenseTensor<long>(ids, shape))
-        };
-        if (_encoder.InputMetadata.ContainsKey("attention_mask"))
-            encoderInputs.Add(NamedOnnxValue.CreateFromTensor("attention_mask", mask));
-        using var encoderOutput = _encoder.Run(encoderInputs);
-        var hidden = encoderOutput.FirstOrDefault(x => x.Name == "last_hidden_state")?.AsTensor<float>()
-            ?? encoderOutput.First().AsTensor<float>();
+            inputIds[i] = encoded[i];
+            attention[i] = 1;
+        }
+        var inputShape = new[] { 1, MaxSourceTokens };
+        var idsTensor = new DenseTensor<long>(inputIds, inputShape);
+        var maskTensor = new DenseTensor<long>(attention, inputShape);
 
-        var past = new Dictionary<string, DenseTensor<float>>(StringComparer.Ordinal);
-        foreach (var name in _decoder.InputMetadata.Keys)
-            if (name.StartsWith("past_key_values", StringComparison.Ordinal))
-                past[name] = new DenseTensor<float>(new float[0], new[] { 1, _heads, 0, _headDim });
+        ct.ThrowIfCancellationRequested();
+        using var encoderEmbedding = _embed.Run(new[]
+        {
+            NamedOnnxValue.CreateFromTensor("input_ids", idsTensor)
+        });
+        var encoderEmbedMatrix = encoderEmbedding.First(x => x.Name == "embed_matrix").AsTensor<float>().ToDenseTensor();
+
+        using var encoderResult = _encoder.Run(new[]
+        {
+            NamedOnnxValue.CreateFromTensor("input_ids", idsTensor),
+            NamedOnnxValue.CreateFromTensor("attention_mask", maskTensor),
+            NamedOnnxValue.CreateFromTensor("embed_matrix", encoderEmbedMatrix)
+        });
+        var hidden = encoderResult.First(x => x.Name == "last_hidden_state").AsTensor<float>().ToDenseTensor();
+
+        ct.ThrowIfCancellationRequested();
+        var initializerOutputs = Enumerable.Range(0, Layers)
+            .SelectMany(i => new[] { $"present.{i}.encoder.key", $"present.{i}.encoder.value" }).ToArray();
+        using var initializerResult = _initializer.Run(
+            new[] { NamedOnnxValue.CreateFromTensor("encoder_hidden_states", hidden) },
+            initializerOutputs);
+
+        var encoderCache = new Dictionary<string, DenseTensor<float>>(StringComparer.Ordinal);
+        foreach (var output in initializerResult)
+        {
+            var inputName = "past_key_values." + output.Name["present.".Length..];
+            encoderCache[inputName] = output.AsTensor<float>().ToDenseTensor();
+        }
+        if (encoderCache.Count != Layers * 2)
+            throw new InvalidDataException("MADLAD cache initializer returned an incomplete encoder cache.");
+
+        var decoderCache = new Dictionary<string, DenseTensor<float>>(StringComparer.Ordinal);
+        for (int i = 0; i < Layers; i++)
+        {
+            decoderCache[$"past_key_values.{i}.decoder.key"] = new DenseTensor<float>(
+                new float[0], new[] { 1, Heads, 0, HeadDim });
+            decoderCache[$"past_key_values.{i}.decoder.value"] = new DenseTensor<float>(
+                new float[0], new[] { 1, Heads, 0, HeadDim });
+        }
 
         var generated = new List<int>();
-        long[] current = { _start };
-        bool useCache = false;
-        int maxSteps = Math.Min(2 * source.Length + 24, 192);
-
+        long nextInput = 0; // MADLAD/T5 decoder start token
+        int maxSteps = 256;
         for (int step = 0; step < maxSteps; step++)
         {
             ct.ThrowIfCancellationRequested();
-            var inputs = new List<NamedOnnxValue>();
-            foreach (var name in _decoder.InputMetadata.Keys)
+            var currentIds = new DenseTensor<long>(new[] { nextInput }, new[] { 1, 1 });
+
+            using var embeddingResult = _embed.Run(new[]
             {
-                if (name is "input_ids" or "decoder_input_ids")
-                    inputs.Add(NamedOnnxValue.CreateFromTensor(name, new DenseTensor<long>(current, new[] { 1, current.Length })));
-                else if (name == "encoder_hidden_states")
-                    inputs.Add(NamedOnnxValue.CreateFromTensor(name, hidden));
-                else if (name == "encoder_attention_mask")
-                    inputs.Add(NamedOnnxValue.CreateFromTensor(name, mask));
-                else if (name == "use_cache_branch")
-                    inputs.Add(NamedOnnxValue.CreateFromTensor(name, new DenseTensor<bool>(new[] { useCache }, new[] { 1 })));
-                else if (past.TryGetValue(name, out var cached))
-                    inputs.Add(NamedOnnxValue.CreateFromTensor(name, cached));
-                else
-                    throw new InvalidOperationException("Unexpected MADLAD decoder input: " + name);
+                NamedOnnxValue.CreateFromTensor("input_ids", currentIds)
+            });
+            var decoderEmbedMatrix = embeddingResult.First(x => x.Name == "embed_matrix").AsTensor<float>().ToDenseTensor();
+
+            var decoderInputs = new List<NamedOnnxValue>
+            {
+                NamedOnnxValue.CreateFromTensor("input_ids", currentIds),
+                NamedOnnxValue.CreateFromTensor("embed_matrix", decoderEmbedMatrix),
+                NamedOnnxValue.CreateFromTensor("encoder_attention_mask", maskTensor)
+            };
+            for (int i = 0; i < Layers; i++)
+            {
+                foreach (var suffix in new[] { "key", "value" })
+                {
+                    var decoderName = $"past_key_values.{i}.decoder.{suffix}";
+                    var encoderName = $"past_key_values.{i}.encoder.{suffix}";
+                    decoderInputs.Add(NamedOnnxValue.CreateFromTensor(decoderName, decoderCache[decoderName]));
+                    decoderInputs.Add(NamedOnnxValue.CreateFromTensor(encoderName, encoderCache[encoderName]));
+                }
             }
 
-            using var result = _decoder.Run(inputs);
-            var logitsValue = result.FirstOrDefault(x => x.Name == "logits") ?? result.First();
-            var logits = logitsValue.AsTensor<float>();
-            int length = logits.Dimensions[1], vocab = logits.Dimensions[2];
-            float[]? copy = null;
-            ReadOnlySpan<float> row;
-            if (logits is DenseTensor<float> dense) row = dense.Buffer.Span.Slice((length - 1) * vocab, vocab);
-            else { copy = logits.ToArray(); row = copy.AsSpan((length - 1) * vocab, vocab); }
-
-            int next = -1;
+            using var decoderResult = _decoder.Run(decoderInputs);
+            var logits = decoderResult.First(x => x.Name == "logits").AsTensor<float>();
+            int vocab = logits.Dimensions[^1];
+            var values = logits.ToArray();
+            int nextToken = -1;
             float best = float.NegativeInfinity;
-            for (int token = 0; token < row.Length; token++)
+            for (int token = 0; token < vocab; token++)
             {
-                if (token == _pad) continue;
-                if (row[token] > best) { best = row[token]; next = token; }
+                if (token == 1) continue; // pad
+                if (values[token] > best)
+                {
+                    best = values[token];
+                    nextToken = token;
+                }
             }
-            if (next < 0 || next == _eos) break;
-            generated.Add(next);
-            int count = generated.Count;
-            if (count > 6 && generated[count - 1] == generated[count - 2] &&
-                generated[count - 2] == generated[count - 3] && generated[count - 3] == generated[count - 4]) break;
 
-            foreach (var output in result)
+            if (nextToken < 0 || nextToken == 2) break; // EOS
+            generated.Add(nextToken);
+            if (generated.Count >= 6)
             {
-                if (!output.Name.StartsWith("present.", StringComparison.Ordinal)) continue;
-                var inputName = "past_key_values." + output.Name["present.".Length..];
-                if (!past.ContainsKey(inputName)) continue;
-                if (useCache && output.Name.Contains(".encoder.", StringComparison.Ordinal)) continue;
-                past[inputName] = output.AsTensor<float>().ToDenseTensor();
+                int n = generated.Count;
+                if (generated[n - 1] == generated[n - 2] &&
+                    generated[n - 2] == generated[n - 3] &&
+                    generated[n - 3] == generated[n - 4])
+                    break;
             }
-            useCache = true;
-            current = new[] { (long)next };
+
+            for (int i = 0; i < Layers; i++)
+            {
+                foreach (var suffix in new[] { "key", "value" })
+                {
+                    var cacheName = $"past_key_values.{i}.decoder.{suffix}";
+                    var outputName = $"present.{i}.decoder.{suffix}";
+                    var cacheOutput = decoderResult.FirstOrDefault(x => x.Name == outputName)
+                        ?? throw new InvalidDataException("MADLAD decoder output is missing: " + outputName);
+                    decoderCache[cacheName] = cacheOutput.AsTensor<float>().ToDenseTensor();
+                }
+            }
+            nextInput = nextToken;
         }
+
         return _tokenizer.Decode(generated);
     }
 
     public void Dispose()
     {
-        _encoder.Dispose();
+        if (_disposed) return;
+        _disposed = true;
         _decoder.Dispose();
+        _initializer.Dispose();
+        _encoder.Dispose();
+        _embed.Dispose();
         _options.Dispose();
     }
 }
