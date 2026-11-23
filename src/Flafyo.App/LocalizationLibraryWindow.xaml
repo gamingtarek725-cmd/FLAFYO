@@ -55,14 +55,20 @@
         </ListBox.ItemContainerStyle>
         <ListBox.ItemTemplate>
           <DataTemplate>
-            <Grid Width="224" Height="190">
-              <Grid.RowDefinitions><RowDefinition Height="122"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-              <Border CornerRadius="12" ClipToBounds="True" Background="#202A48">
+            <Grid Width="224" Height="214">
+              <Grid.RowDefinitions><RowDefinition Height="142"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+              <Border CornerRadius="12" ClipToBounds="True" Background="#10182B">
                 <Grid>
-                  <Grid.Background><LinearGradientBrush StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#29234A" Offset="0"/><GradientStop Color="#101629" Offset="1"/></LinearGradientBrush></Grid.Background>
-                  <TextBlock Text="FLAFYO  /  ARABIC PATCH" Foreground="#C4B5FD" FontSize="9" FontWeight="Bold" Margin="10,9" VerticalAlignment="Top" FlowDirection="LeftToRight"/>
-                  <TextBlock Text="{Binding Title}" Foreground="White" FontSize="17" FontWeight="Bold" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" TextAlignment="Center" VerticalAlignment="Center" Margin="10,20"/>
-                  <Border Background="#D98B5CF6" CornerRadius="8" Padding="7,3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="7"><TextBlock Text="{Binding SourceName}" Foreground="#071321" FontSize="10" FontWeight="Bold"/></Border>
+                  <Image Source="{Binding CoverUrl}" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality"/>
+                  <Border Background="#99070B16"/>
+                  <Border VerticalAlignment="Top" HorizontalAlignment="Left" Margin="9" Background="#CC121B31" CornerRadius="7" Padding="7,4">
+                    <TextBlock Text="{Binding SourceName}" Foreground="#BDEFFB" FontSize="9" FontWeight="Bold"/>
+                  </Border>
+                  <StackPanel VerticalAlignment="Bottom" Margin="12,8">
+                    <TextBlock Text="{Binding Title}" Foreground="White" FontSize="15" FontWeight="Bold" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxHeight="44"/>
+                    <TextBlock Text="{Binding Platform}" Foreground="#8DEBFA" FontSize="10" Margin="0,4,0,0"/>
+                  </StackPanel>
+                  <TextBlock Text="FLAFYO  /  GAME LOCALIZATION" Foreground="#C4B5FD" FontSize="8" FontWeight="Bold" Margin="10,9" VerticalAlignment="Top" HorizontalAlignment="Right" FlowDirection="LeftToRight"/>
                 </Grid>
               </Border>
               <StackPanel Grid.Row="1" Margin="3,7,3,0">
