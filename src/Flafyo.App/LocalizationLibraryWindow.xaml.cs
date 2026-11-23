@@ -8,7 +8,7 @@ using System.Windows.Controls;
 
 namespace Flafyo.Desktop;
 
-public partial class LocalizationLibraryWindow : Window
+public partial class LocalizationLibraryWindow : UserControl
 {
     public sealed class LibraryEntry
     {
@@ -341,6 +341,6 @@ public partial class LocalizationLibraryWindow : Window
             !Uri.TryCreate(item.SourceUrl, UriKind.Absolute, out var uri) ||
             uri.Scheme != Uri.UriSchemeHttps) return;
         try { Process.Start(new ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true }); }
-        catch (Exception ex) { MessageBox.Show(this, "تعذّر فتح صفحة المصدر: " + ex.Message, "FLAFYO", MessageBoxButton.OK, MessageBoxImage.Warning); }
+        catch (Exception ex) { MessageBox.Show("تعذّر فتح صفحة المصدر: " + ex.Message, "FLAFYO", MessageBoxButton.OK, MessageBoxImage.Warning); }
     }
 }
