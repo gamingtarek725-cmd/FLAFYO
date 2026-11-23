@@ -68,8 +68,10 @@ FLAFYO is a Windows-first game translation and localization platform. Existing t
 This is the single ordered checklist for future development. A checkbox is marked complete only after the stated acceptance evidence exists. CI success does not substitute for testing on the target PC or inside real games.
 
 ### Track A — MADLAD-400 3B INT4 (priority 1)
-- [x] Pin the MADLAD ONNX export revision and record exact file sizes and SHA-256 hashes in `LanguagePack.Madlad`.
-- [ ] Add a dedicated integration test after selecting a verified model artifact whose graph layout matches the runtime. A duplicate test class was removed before it could contaminate the main test suite.
+- [ ] Select and pin a verified MADLAD 3B INT4 artifact. The previous `tonythethompson/.../mixed_fp16_int4` URL is invalid for the requested files and its published model card describes INT8 graphs; do not treat the old `LanguagePack.Madlad` manifest as a verified INT4 pack.
+- [ ] Inspect the official `niedev/OnnxModelsEnhancer` v1.0.0-beta `Madlad.zip` archive and pin its exact extracted file paths, sizes, and SHA-256 hashes. The release asset is listed as 1,482,639,037 bytes; archive contents still need direct verification.
+- [ ] Adapt inference to the optimized four-session graph contract: 4-bit encoder, 4-bit decoder, cache initializer, and 8-bit shared embedding graph. The current two-session encoder/merged-decoder implementation is not compatible with this layout.
+- [ ] Add a dedicated integration test after the archive contents and graph metadata are verified. A duplicate test class was removed before it could contaminate the main test suite.
 - [ ] Add a dedicated CI workflow only after verifying the model repository's actual file tree and pinned revision. The initial workflow was removed after its first graph download returned HTTP 404.
 - [ ] Add and validate the Arabic Unicode assertion as part of the final integration test.
 - [ ] Confirm the CI model download completes with all seven files matching their pinned sizes/hashes.
@@ -116,7 +118,7 @@ This is the single ordered checklist for future development. A checkbox is marke
 - [ ] Maintain this checklist by changing boxes only when acceptance evidence is available.
 
 ### Current gate
-**MADLAD is blocked and not accepted as working.** The initial CI attempt downloaded the small config/tokenizer files but returned HTTP 404 for `mixed_fp16_int4/onnx/encoder_model.onnx`; inference never ran. The public model card for the pinned `tonythethompson/madlad400-3b-mt-onnx` repository describes quantized encoder/decoder files named `encoder_model_quantized.onnx` and `decoder_model_quantized.onnx`, not the merged INT4 graph currently expected by `OnnxMadladTranslator`. The pack manifest, model source, and inference graph contract must be reconciled before another runtime integration attempt. CPU/GPU acceleration and target-device performance remain unverified.
+**MADLAD is blocked and not accepted as working.** The initial CI attempt returned HTTP 404 for `mixed_fp16_int4/onnx/encoder_model.onnx`; inference never ran. The pinned `tonythethompson/madlad400-3b-mt-onnx` model card identifies its quantized graphs as INT8, not the requested INT4 package. A more promising INT4 candidate is the `Madlad.zip` asset in `niedev/OnnxModelsEnhancer` release `v1.0.0-beta`. Its upstream documentation describes a custom four-session architecture (encoder, decoder, cache initializer, and shared embedding graph), with 4-bit encoder/decoder/cache components and an 8-bit embedding component. This is incompatible with the current two-session `OnnxMadladTranslator`; the archive contents, exact hashes, graph metadata, and C# implementation must be verified before integration. The upstream project's 64 GB RAM statement applies to generating the optimized model, not a proven inference requirement. CPU/GPU acceleration and target-device performance remain unverified.
 
 
 ### MADLAD investigation notes (2026-11-23)
@@ -124,3 +126,11 @@ This is the single ordered checklist for future development. A checkbox is marke
 - The attempted validation workflow and its duplicate test file were removed to avoid leaving a knowingly broken CI path or duplicate test type in the project.
 - Do not label MADLAD operational, do not ship it as a working pack, and do not publish a new release based on this failed attempt.
 - Next engineering task: identify a verifiable INT4 ONNX artifact with an architecture matching the implemented encoder/merged-decoder/cache interface, then pin actual file paths, sizes, and hashes. If no compatible merged-decoder artifact exists, adapt the runtime to the selected export and add fixture/metadata-based graph contract tests before full model download.
+
+
+### MADLAD source correction (2026-11-23)
+- The old `tonythethompson` manifest is not a valid accepted INT4 source: its published card identifies the ONNX quantization as INT8, and the attempted `mixed_fp16_int4/onnx/encoder_model.onnx` URL returned 404.
+- Upstream candidate: `niedev/OnnxModelsEnhancer` release `v1.0.0-beta`, asset `Madlad.zip` (1,482,639,037 bytes). The upstream README describes the optimized MADLAD INT4 package as approximately 1.7 GB after extraction and documents a custom execution flow.
+- Required graph roles from the upstream inference code: `madlad_embed_8bit.onnx`, reduced-RAM `madlad_encoder_4bit.onnx`, `madlad_cache_initializer_4bit.onnx`, and `madlad_decoder_4bit.onnx`. These names are confirmed in the upstream script's invocation; archive paths and exact hashes still require extraction and verification.
+- The upstream inference path obtains embeddings separately, runs the encoder, initializes encoder KV cache, then runs the decoder with decoder/encoder cache inputs. The current FLAFYO implementation does not implement this contract.
+- No model pack, runtime, test, or UI availability checkbox is marked complete by this investigation. Do not offer MADLAD as installed/working until the real four-session integration test returns reviewed Arabic output.
