@@ -105,6 +105,36 @@ jobs:
                                   require_tensor(outputs, f"present.{layer}.decoder.{part}", 1, ["batch_size", 16, "past_decoder_sequence_length + decoder_sequence_length", 128])
                   print(json.dumps(record, indent=2))
           PY
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Extract verified MADLAD graph files
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, shutil, zipfile
+          from pathlib import Path
+          archive = Path(os.environ["RUNNER_TEMP"]) / "Madlad.zip"
+          root = Path(os.environ["RUNNER_TEMP"]) / "madlad-model"
+          expected = [
+              "Madlad/madlad_embed_8bit.onnx",
+              "Madlad/Int4Acc4/madlad_encoder_4bit.onnx",
+              "Madlad/Int4Acc4/madlad_cache_initializer_4bit.onnx",
+              "Madlad/Int4Acc4/madlad_decoder_4bit.onnx",
+              "Madlad/spiece.model",
+          ]
+          with zipfile.ZipFile(archive) as z:
+              for name in expected:
+                  target = root / name
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  with z.open(name) as source, target.open("wb") as destination:
+                      shutil.copyfileobj(source, destination, length=8 * 1024 * 1024)
+          print(f"Extracted MADLAD files to {root}")
+          PY
+          echo "FLAFYO_MADLAD_MODEL_DIR=$RUNNER_TEMP/madlad-model" >> "$GITHUB_ENV"
+      - name: Real MADLAD Arabic translation test (required)
+        run: dotnet test tests/Flafyo.Core.Tests -c Release --filter "FullyQualifiedName~Madlad_model_produces_arabic" --logger "console;verbosity=detailed"
 
   windows:
     runs-on: windows-latest
