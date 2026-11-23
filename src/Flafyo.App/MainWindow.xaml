@@ -253,8 +253,10 @@
                 </StackPanel>
               </Border>
 
-              <Button Content="قواميس جاهزة حسب نوع اللعبة" Margin="0,16,0,0" Click="Glossary_Click"/>
-              <Button Content="فتح مجلد القاموس والاصطلاحات" Margin="0,8,0,0" Click="OpenFolder_Click"/>
+              <Border Background="#101A2D" BorderBrush="#263956" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,16,0,0">
+                <TextBlock Text="لإدارة قواميس الألعاب، استخدم قسم «قواميس الألعاب» في شريط التنقل الرئيسي."
+                           Style="{StaticResource MutedText}"/>
+              </Border>
             </StackPanel>
           </TabItem>
 
@@ -299,14 +301,18 @@
               <TextBlock Text="شكل الترجمة" Style="{StaticResource H}"/>
               <TextBlock Style="{StaticResource MutedText}" Margin="0,2,0,0"
                          Text="غيّر الخط واللون والحجم ومكان الشريط. كل تغيير بيظهر فورًا في معاينة."/>
-              <Button Content="تغيير شكل الترجمة" Margin="0,10,0,0" Click="Appearance_Click"/>
+              <Border Background="#101A2D" BorderBrush="#263956" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,10,0,0">
+                <TextBlock Text="إعدادات الخط واللون والموضع موجودة في قسم «مظهر الترجمة» بالشريط الجانبي."
+                           Style="{StaticResource MutedText}"/>
+              </Border>
 
               <TextBlock Text="الصوت" Style="{StaticResource L}" Margin="0,18,0,4"/>
               <CheckBox x:Name="SpeakBox" Content="اقرأ الترجمة بصوت عربي" Checked="Speak_Changed" Unchecked="Speak_Changed" Margin="0"/>
               <TextBlock x:Name="SpeakText" Style="{StaticResource MutedText}" Margin="0,4,0,0"/>
 
               <TextBlock Text="السجل والتصحيح" Style="{StaticResource L}" Margin="0,18,0,4"/>
-              <Button Content="السجل وتصحيح الترجمة" Click="History_Click"/>
+              <TextBlock Text="افتح «سجل الترجمة» من شريط التنقل الرئيسي لمراجعة النتائج وتصحيحها."
+                         Style="{StaticResource MutedText}"/>
             </StackPanel>
           </TabItem>
 
