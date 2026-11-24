@@ -347,6 +347,18 @@ public class ScreenPipelineTests
     }
 
     [Fact]
+    public async Task Translations_are_removed_after_a_black_fullscreen_transition()
+    {
+        var (pipeline, grabber, _, _, overlay) = Make();
+        Assert.True(await WaitUntil(() => overlay.Last?.Count == 3));
+
+        // Some exclusive-fullscreen transitions produce a black capture frame instead of OCR lines.
+        grabber.Fill = 0;
+        Assert.True(await WaitUntil(() => overlay.Clears >= 1));
+        await pipeline.DisposeAsync();
+    }
+
+    [Fact]
     public async Task Translations_are_removed_after_all_text_is_gone()
     {
         var (p, g, ocr, _, ov) = Make();
