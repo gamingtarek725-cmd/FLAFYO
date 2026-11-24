@@ -1,0 +1,39 @@
+<Window x:Class="Flafyo.Desktop.IslandStatusWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent" Topmost="True"
+        ShowInTaskbar="False" ShowActivated="False" Focusable="False" ResizeMode="NoResize"
+        SizeToContent="WidthAndHeight" FlowDirection="RightToLeft">
+  <Border x:Name="Card" CornerRadius="20" Padding="15,10" BorderThickness="1"
+          Background="#F20A0F1B" BorderBrush="#665D789C" SnapsToDevicePixels="True">
+    <Grid MinHeight="42">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="78"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+      <Border Width="34" Height="34" CornerRadius="11" Background="#182B43"
+              BorderBrush="#3D668A" BorderThickness="1" VerticalAlignment="Center">
+        <TextBlock Text="F" FontSize="21" FontWeight="Black" Foreground="#7DEBFF"
+                   HorizontalAlignment="Center" VerticalAlignment="Center" FlowDirection="LeftToRight"/>
+      </Border>
+      <StackPanel Grid.Column="1" Margin="10,0,8,0" VerticalAlignment="Center">
+        <TextBlock Text="FLAFYO ISLAND" FontSize="10" FontWeight="Black"
+                   Foreground="#A9BBD4" FlowDirection="LeftToRight"/>
+        <TextBlock x:Name="IslandCaption" Text="الترجمة متوقفة" FontSize="12"
+                   Foreground="#F1F5FF" Margin="0,3,0,0"/>
+      </StackPanel>
+      <Border x:Name="ToggleSlot" Grid.Column="2" Width="78" Height="32"
+              Margin="0,0,7,0" Background="Transparent" VerticalAlignment="Center"/>
+      <Border Grid.Column="3" MinWidth="72" Background="#172D32" BorderBrush="#286E5D"
+              BorderThickness="1" CornerRadius="10" Padding="8,5" VerticalAlignment="Center">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+          <Ellipse x:Name="IslandStatusDot" Width="7" Height="7" Fill="#F4B860" Margin="0,0,5,0"/>
+          <TextBlock x:Name="IslandStatus" Text="OFF" Foreground="#F4B860"
+                     FontSize="9" FontWeight="Bold" FlowDirection="LeftToRight"/>
+        </StackPanel>
+      </Border>
+    </Grid>
+  </Border>
+</Window>
