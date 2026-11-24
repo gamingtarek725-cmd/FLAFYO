@@ -1,4 +1,5 @@
 using System.Text;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using Flafyo.Core;
 using Xunit;
@@ -67,6 +68,21 @@ public class MadladTokenizerTests
     {
         var tokenizer = CreateTokenizer();
         Assert.Equal(new[] { 6, 3, 6, 0, 2 }, tokenizer.Encode("@"));
+    }
+}
+
+public class MadladSentenceSegmentationTests
+{
+    [Fact]
+    public void Sentence_splitter_separates_completed_sentences()
+    {
+        var field = typeof(OnnxMadladTranslator).GetField("SentenceSplit",
+            BindingFlags.NonPublic | BindingFlags.Static);
+        var splitter = Assert.IsType<Regex>(field!.GetValue(null));
+
+        Assert.Equal(
+            new[] { "First sentence.", "Second sentence!", "Third sentence?" },
+            splitter.Split("First sentence. Second sentence! Third sentence?"));
     }
 }
 
