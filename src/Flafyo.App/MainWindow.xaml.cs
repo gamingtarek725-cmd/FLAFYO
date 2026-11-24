@@ -30,6 +30,7 @@ public partial class MainWindow : Window
     private readonly AppSettings _settings = AppSettings.Load();
     private bool _ready;
     private OverlayWindow? _overlay;
+    private IslandStatusWindow? _island;
     private ScreenOverlayWindow? _screenWindow;
     private TranslationPipeline? _pipeline;
     private ScreenPipeline? _screen;
@@ -78,10 +79,6 @@ public partial class MainWindow : Window
         SpeakBox.IsChecked = _settings.Speak;
         AutoProfileBox.IsChecked = _settings.AutoProfile;
         IslandEnabledBox.IsChecked = _settings.Style.IslandEnabled;
-        IslandToggleBox.IsChecked = _settings.Style.IslandShowToggleButton;
-        IslandOriginalBox.IsChecked = _settings.Style.ShowOriginal;
-        IslandCollapseBox.SelectedIndex = _settings.Style.IslandCollapseSeconds < 3.5 ? 0 :
-            _settings.Style.IslandCollapseSeconds > 5.5 ? 2 : 1;
         _masculine = _settings.Masculine;
 
         try { _monitors = Monitors.GetAll(); } catch { }
@@ -98,6 +95,12 @@ public partial class MainWindow : Window
         Height = Math.Min(Height, work.Height - 20);
         LoadAiSettingsIntoUi();
         _ready = true;
+        if (ScreenMode && CaptureBox.SelectedIndex == 0)
+        {
+            CaptureBox.SelectedIndex = 1;
+            _settings.CaptureIndex = 1;
+            _settings.Save();
+        }
         UpdatePackStatus();
         RefreshProfiles();
         RefreshRunning();
@@ -130,11 +133,11 @@ public partial class MainWindow : Window
         DashboardState.Foreground = (System.Windows.Media.Brush)FindResource(running ? "Ok" : "Muted");
         if (_settings.Style.IslandEnabled)
         {
-            var island = EnsureOverlay();
-            island.SetTranslationRunning(running);
-            island.ShowIdle();
+            var island = EnsureIsland();
+            island.SetRunning(running);
+            island.ShowIsland();
         }
-        else _overlay?.SetTranslationRunning(running);
+        else _island?.Hide();
     }
 
     private void SetStatus(string s) => Dispatcher.InvokeAsync(() => StatusText.Text = s);
@@ -201,24 +204,15 @@ public partial class MainWindow : Window
     {
         if (!_ready) return;
         _settings.Style.IslandEnabled = IslandEnabledBox.IsChecked == true;
-        _settings.Style.IslandShowToggleButton = IslandToggleBox.IsChecked == true;
-        _settings.Style.ShowOriginal = IslandOriginalBox.IsChecked == true;
-        _settings.Style.IslandCollapseSeconds = IslandCollapseBox.SelectedIndex switch
-        {
-            0 => 2.5,
-            2 => 7.0,
-            _ => 4.5
-        };
         _settings.Save();
 
-        var island = EnsureOverlay();
-        island.ApplyStyle(_settings.Style);
         if (_settings.Style.IslandEnabled)
         {
-            island.SetTranslationRunning(_pipeline != null || _screen != null);
-            island.ShowIdle();
+            var island = EnsureIsland();
+            island.SetRunning(_pipeline != null || _screen != null);
+            island.ShowIsland();
         }
-        else island.Hide();
+        else _island?.Hide();
     }
 
     private void Speak_Changed(object sender, RoutedEventArgs e)
@@ -351,7 +345,10 @@ public partial class MainWindow : Window
     private void Mode_Changed(object sender, RoutedEventArgs e)
     {
         if (!_ready) return;
-        _settings.ModeIndex = ModeIndexValue; _settings.Save();
+        _settings.ModeIndex = ModeIndexValue;
+        if (ScreenMode && CaptureBox.SelectedIndex != 1)
+            CaptureBox.SelectedIndex = 1; // DXGI is the reliable capture path for fullscreen mode.
+        _settings.Save();
     }
 
     private void Capture_Changed(object sender, SelectionChangedEventArgs e)
@@ -602,10 +599,16 @@ public partial class MainWindow : Window
     private OverlayWindow EnsureOverlay()
     {
         _overlay ??= new OverlayWindow();
-        _overlay.ToggleRequested -= ToggleTranslation;
-        _overlay.ToggleRequested += ToggleTranslation;
         _overlay.ApplyStyle(_settings.Style);
         return _overlay;
+    }
+
+    private IslandStatusWindow EnsureIsland()
+    {
+        _island ??= new IslandStatusWindow();
+        _island.ToggleRequested -= ToggleTranslation;
+        _island.ToggleRequested += ToggleTranslation;
+        return _island;
     }
 
     private ScreenOverlayWindow EnsureScreenWindow() => _screenWindow ??= new ScreenOverlayWindow();
