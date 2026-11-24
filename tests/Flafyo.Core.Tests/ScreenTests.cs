@@ -345,7 +345,7 @@ public class ScreenPipelineTests
         pipeline.ScanNow();
 
         Assert.True(await WaitUntil(() => overlay.Last?.Count == 3, 5000));
-        Assert.Equal(2, translator.Calls);
+        Assert.Equal(4, translator.Calls); // two cached blocks plus the failed block retried
         Assert.Single(overlay.Shown);
         Assert.All(overlay.Last!, block => Assert.False(string.IsNullOrWhiteSpace(block.Arabic)));
     }
