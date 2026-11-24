@@ -57,7 +57,7 @@ public sealed class OnnxNllbTranslator : ITranslator, IDisposable
         {
             enc = new InferenceSession(Path.Combine(dir, "onnx", "encoder_model_quantized.onnx"), opts);
             dec = new InferenceSession(Path.Combine(dir, "onnx", "decoder_model_merged_quantized.onnx"), opts);
-            return new OnnxNllbTranslator(enc, dec, opts, tok, pad, eos, start, targetId, heads, dModel / heads, sourceLang);
+            return new OnnxNllbTranslator(enc!, dec!, opts, tok, pad, eos, start, targetId, heads, dModel / heads, sourceLang);
         }
         catch
         {
