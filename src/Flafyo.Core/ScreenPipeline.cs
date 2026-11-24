@@ -194,6 +194,10 @@ public sealed class ScreenPipeline : IAsyncDisposable
         for (int i = 0; i < frame.Gray.Length; i += 97) if (frame.Gray[i] > max) max = frame.Gray[i];
         if (max < 8)
         {
+            // A black frame (common during fullscreen scene transitions) is an empty scene,
+            // not a valid OCR result. Start the normal grace timer so stale translations clear.
+            if (Interlocked.Read(ref _emptySince) == 0)
+                Interlocked.Exchange(ref _emptySince, Stopwatch.GetTimestamp());
             _log?.Invoke("الصورة سودة: اللعبة غالبًا Fullscreen. غيّر طريقة التصوير لـ «متقدم» أو شغّل اللعبة Borderless.");
             return;
         }
