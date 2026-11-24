@@ -23,6 +23,7 @@ public partial class MainWindow : Window
     [DllImport("user32.dll")] private static extern int GetSystemMetrics(int index);
 
     private object _regionBox = System.Drawing.Rectangle.Empty;   // boxed so reads/writes are atomic across threads
+    private object _islandBoundsBox = System.Drawing.Rectangle.Empty;
     private volatile int _intervalMs = 200;
     private volatile bool _masculine = true;
     private volatile string _lastArabic = "";
@@ -614,8 +615,13 @@ public partial class MainWindow : Window
         _island ??= new IslandStatusWindow();
         _island.ToggleRequested -= ToggleTranslation;
         _island.ToggleRequested += ToggleTranslation;
+        _island.BoundsChanged -= IslandBounds_Changed;
+        _island.BoundsChanged += IslandBounds_Changed;
         return _island;
     }
+
+    private void IslandBounds_Changed(System.Drawing.Rectangle? bounds) =>
+        Volatile.Write(ref _islandBoundsBox, (object)(bounds ?? System.Drawing.Rectangle.Empty));
 
     private ScreenOverlayWindow EnsureScreenWindow() => _screenWindow ??= new ScreenOverlayWindow();
 
@@ -853,6 +859,11 @@ public partial class MainWindow : Window
             Settle = TimeSpan.FromMilliseconds(SpeedBox.SelectedIndex switch { 0 => 350, 2 => 180, _ => 250 }),
             MaxWait = TimeSpan.FromMilliseconds(SpeedBox.SelectedIndex switch { 0 => 1600, 2 => 800, _ => 1100 }),
             ClearDelay = TimeSpan.FromSeconds(6),
+            ExcludedArea = () =>
+            {
+                var bounds = (System.Drawing.Rectangle)Volatile.Read(ref _islandBoundsBox);
+                return bounds.IsEmpty ? null : bounds;
+            },
         };
         var sp = new ScreenPipeline(_grabber!, ocr, resolver, overlay, () => area, options, s => SetStatus(s));
         sp.Updated += blocks =>
