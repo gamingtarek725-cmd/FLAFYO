@@ -155,9 +155,9 @@ public partial class OverlayWindow : Window
         Card.Padding = new Thickness(18, 12, 18, 12);
         BeginAnimation(WidthProperty, null);
         BeginAnimation(LeftProperty, null);
-        PositionForRegion(regionPx, _style);
-
         if (!IsVisible) Show();
+        UpdateLayout();
+        PositionForRegion(regionPx, _style);
         PositionControlWindow();
         _collapseTimer.Stop();
         _collapseTimer.Interval = TimeSpan.FromSeconds(Math.Clamp(_style.IslandCollapseSeconds, 1, 15));
@@ -199,6 +199,8 @@ public partial class OverlayWindow : Window
 
         BeginAnimation(WidthProperty, null);
         Width = _expandedWidth;
+        Label.MaxWidth = Math.Max(260, _expandedWidth - 60);
+        Original.MaxWidth = Label.MaxWidth;
         UpdateLayout();
 
         double widthPx = _expandedWidth * scale;
