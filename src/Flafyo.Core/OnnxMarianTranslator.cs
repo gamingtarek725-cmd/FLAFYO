@@ -50,9 +50,21 @@ public sealed class OnnxMarianTranslator : ITranslator, IDisposable
             InterOpNumThreads = 1,
             GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_ALL
         };
-        var enc = new InferenceSession(Path.Combine(dir, "onnx", "encoder_model_quantized.onnx"), opts);
-        var dec = new InferenceSession(Path.Combine(dir, "onnx", "decoder_model_quantized.onnx"), opts);
-        return new OnnxMarianTranslator(enc, dec, opts, tokenizer, pad, eos, start, langTag);
+        InferenceSession? enc = null;
+        InferenceSession? dec = null;
+        try
+        {
+            enc = new InferenceSession(Path.Combine(dir, "onnx", "encoder_model_quantized.onnx"), opts);
+            dec = new InferenceSession(Path.Combine(dir, "onnx", "decoder_model_quantized.onnx"), opts);
+            return new OnnxMarianTranslator(enc, dec, opts, tokenizer, pad, eos, start, langTag);
+        }
+        catch
+        {
+            dec?.Dispose();
+            enc?.Dispose();
+            opts.Dispose();
+            throw;
+        }
     }
 
     /// <summary>1 = greedy (fastest). 3–4 = beam search: slower but usually more accurate.</summary>
