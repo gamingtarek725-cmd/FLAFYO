@@ -12,7 +12,7 @@ namespace Flafyo.Desktop;
 public partial class OverlayWindow : Window
 {
     [DllImport("user32.dll")] private static extern int GetSystemMetrics(int index);
-    private const int SM_CXSCREEN = 0;
+    private const int SM_CXSCREEN = 0, SM_CYSCREEN = 1;
     private readonly DispatcherTimer _hideTimer = new();
     private OverlayStyle _style = new();
 
@@ -64,12 +64,12 @@ public partial class OverlayWindow : Window
     public static System.Drawing.Rectangle DefaultPreviewRegion()
     {
         int w = GetSystemMetrics(SM_CXSCREEN);
-        int h = (int)SystemParameters.PrimaryScreenHeight;
+        int h = GetSystemMetrics(SM_CYSCREEN);
         return new System.Drawing.Rectangle(w / 2 - 400, h * 3 / 4, 800, 120);
     }
 
     public void ShowPreview(System.Drawing.Rectangle region) =>
-        ShowText("هذه معاينة الترجمة. سيظهر النص العربي هنا فوق اللعبة.", 
+        ShowText("هذه معاينة الترجمة. سيظهر النص العربي هنا فوق اللعبة.",
                  "Translation preview", region, 7);
 
     public void ShowText(string text, string? original, System.Drawing.Rectangle regionPx, int hideAfter = -1)
