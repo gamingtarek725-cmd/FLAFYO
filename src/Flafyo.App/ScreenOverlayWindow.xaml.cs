@@ -37,9 +37,15 @@ public partial class ScreenOverlayWindow : Window
         // Read the scale only after the window is visible on its target display.
         double scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
         if (scale <= 0) scale = 1;
-        double vx = GetSystemMetrics(SM_XVIRTUALSCREEN) / scale, vy = GetSystemMetrics(SM_YVIRTUALSCREEN) / scale;
-        double vw = GetSystemMetrics(SM_CXVIRTUALSCREEN) / scale, vh = GetSystemMetrics(SM_CYVIRTUALSCREEN) / scale;
-        Left = vx; Top = vy; Width = vw; Height = vh;
+        int vxPx = GetSystemMetrics(SM_XVIRTUALSCREEN);
+        int vyPx = GetSystemMetrics(SM_YVIRTUALSCREEN);
+        double vw = GetSystemMetrics(SM_CXVIRTUALSCREEN) / scale;
+        double vh = GetSystemMetrics(SM_CYVIRTUALSCREEN) / scale;
+        Left = vxPx / scale;
+        Top = vyPx / scale;
+        Width = vw;
+        Height = vh;
+        UpdateLayout();
 
         for (int i = 0; i < blocks.Count; i++)
         {
@@ -59,10 +65,13 @@ public partial class ScreenOverlayWindow : Window
 
             card.Visibility = Visibility.Visible;
             card.Measure(new Size(card.Width, double.PositiveInfinity));
-            double x = (area.X + blocks[i].Block.Box.X) / scale - vx;
-            double y = (area.Y + blocks[i].Block.Box.Y) / scale - vy;
-            Canvas.SetLeft(card, Math.Max(0, Math.Min(x, vw - card.Width)));
-            Canvas.SetTop(card, Math.Max(0, Math.Min(y, vh - card.DesiredSize.Height)));
+            // Convert physical desktop pixels through WPF's actual visual transform, not a guessed DPI divisor.
+            var screenPoint = new Point(
+                area.X + blocks[i].Block.Box.X,
+                area.Y + blocks[i].Block.Box.Y);
+            var localPoint = Layer.PointFromScreen(screenPoint);
+            Canvas.SetLeft(card, Math.Max(0, Math.Min(localPoint.X, vw - card.Width)));
+            Canvas.SetTop(card, Math.Max(0, Math.Min(localPoint.Y, vh - card.DesiredSize.Height)));
         }
 
         // Keep existing card objects but hide those no longer present, avoiding needless visual-tree rebuilds.
