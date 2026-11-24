@@ -208,3 +208,31 @@ jobs:
           "FLAFYO_HEAVY_MODEL_DIR=$dir" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Real heavy translation test (required)
         run: dotnet test tests/Flafyo.Core.Tests -c Release --filter "FullyQualifiedName~OnnxNllbHeavyIntegration" --logger "console;verbosity=detailed"
+      - name: Download MADLAD model for the Windows runtime test
+        shell: pwsh
+        run: |
+          $ProgressPreference = 'SilentlyContinue'
+          $archive = Join-Path $env:RUNNER_TEMP "Madlad.zip"
+          Invoke-WebRequest "https://github.com/niedev/OnnxModelsEnhancer/releases/download/v1.0.0-beta/Madlad.zip" -OutFile $archive
+          $root = Join-Path $env:RUNNER_TEMP "madlad-model"
+          $expected = @(
+            "Madlad/madlad_embed_8bit.onnx",
+            "Madlad/Int4Acc4/madlad_encoder_4bit.onnx",
+            "Madlad/Int4Acc4/madlad_cache_initializer_4bit.onnx",
+            "Madlad/Int4Acc4/madlad_decoder_4bit.onnx",
+            "Madlad/spiece.model"
+          )
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $zip = [System.IO.Compression.ZipFile]::OpenRead($archive)
+          try {
+            foreach ($name in $expected) {
+              $entry = $zip.GetEntry($name)
+              if ($null -eq $entry) { throw "Missing MADLAD model file: $name" }
+              $target = Join-Path $root ($name -replace '/', '\\')
+              New-Item -ItemType Directory -Force (Split-Path $target) | Out-Null
+              [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $target, $true)
+            }
+          } finally { $zip.Dispose() }
+          "FLAFYO_MADLAD_MODEL_DIR=$root" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Real MADLAD Arabic translation test on Windows (required)
+        run: dotnet test tests/Flafyo.Core.Tests -c Release --filter "FullyQualifiedName~Madlad_model_produces_arabic" --logger "console;verbosity=detailed"

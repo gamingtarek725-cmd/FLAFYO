@@ -63,14 +63,6 @@ public partial class MainWindow : Window
         SpeedBox.SelectedIndex = Math.Clamp(_settings.SpeedIndex, 0, 2);
         TextSizeBox.SelectedIndex = Math.Clamp(_settings.TextSizeIndex, 0, 2);
         PackBox.SelectedIndex = Math.Clamp(_settings.PackIndex, 0, 2);
-        if (PackBox.Items.Count > 2 && PackBox.Items[2] is ComboBoxItem madladOption)
-            madladOption.IsEnabled = false; // MADLAD export is not compatible with the current ONNX decoder.
-        if (PackBox.SelectedIndex == 2)
-        {
-            PackBox.SelectedIndex = 1;
-            _settings.PackIndex = 1;
-            _settings.Save();
-        }
         ModeIndexValue = Math.Clamp(_settings.ModeIndex, 0, 1);
         CaptureBox.SelectedIndex = Math.Clamp(_settings.CaptureIndex, 0, 1);
         ContinuousBox.IsChecked = _settings.Continuous;
@@ -240,21 +232,17 @@ public partial class MainWindow : Window
         bool madlad = LanguagePack.Madlad.IsInstalled();
         LightText.Text = light ? "✅ الحزمة الخفيفة مثبتة (سريعة)" : "الحزمة الخفيفة (حوالي 145 ميجا): مش مثبتة";
         HeavyText.Text = heavy ? "✅ الحزمة التقيلة مثبتة (حوالي 0.9 جيجا)" : "الحزمة التقيلة NLLB-600M (حوالي 0.9 جيجا): مش مثبتة";
-        MadladText.Text = "MADLAD-400 3B متوقفة مؤقتًا: نسخة ONNX الحالية لا تطابق محرك فك الترميز. لن يبدأ تنزيل غير قابل للتشغيل.";
+        MadladText.Text = madlad
+            ? "✅ MADLAD-400 3B مثبت — جودة أعلى مع استهلاك ذاكرة أكبر"
+            : "MADLAD-400 3B (حوالي 1.5 جيجا تنزيل): غير مثبت";
         LightButton.Visibility = light ? Visibility.Collapsed : Visibility.Visible;
         HeavyButton.Visibility = heavy ? Visibility.Collapsed : Visibility.Visible;
-        MadladButton.Visibility = Visibility.Visible;
-        LightButton.IsEnabled = HeavyButton.IsEnabled = !_downloading;
-        MadladButton.IsEnabled = false;
+        MadladButton.Visibility = madlad ? Visibility.Collapsed : Visibility.Visible;
+        LightButton.IsEnabled = HeavyButton.IsEnabled = MadladButton.IsEnabled = !_downloading;
     }
 
     private async Task DownloadPackAsync(LanguagePack pack, TextBlock text)
     {
-        if (pack.Kind == PackKind.Madlad)
-        {
-            text.Text = "MADLAD متوقف مؤقتًا لحين توافق ملفات ONNX مع محرك التشغيل.";
-            return;
-        }
         if (_downloading) return;
         _downloading = true;
         LightButton.IsEnabled = HeavyButton.IsEnabled = MadladButton.IsEnabled = false;
@@ -738,6 +726,7 @@ public partial class MainWindow : Window
         // Preferred pack → next installed offline pack → temporary online fallback.
         var ordered = PackBox.SelectedIndex switch
         {
+            2 => new[] { LanguagePack.Madlad, LanguagePack.Heavy, LanguagePack.Light },
             1 => new[] { LanguagePack.Heavy, LanguagePack.Light },
             _ => new[] { LanguagePack.Light, LanguagePack.Heavy }
         };
