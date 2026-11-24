@@ -244,7 +244,6 @@ public sealed class ScreenPipeline : IAsyncDisposable
         var area = _area();
         var translated = new List<TranslatedBlock>();
         var translation = Stopwatch.StartNew();
-        long lastPublish = Stopwatch.GetTimestamp();
         foreach (var block in blocks)
         {
             ct.ThrowIfCancellationRequested();
@@ -256,13 +255,6 @@ public sealed class ScreenPipeline : IAsyncDisposable
             }
             catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
             catch (Exception ex) { _log?.Invoke("Translation failed: " + ex.Message); }
-
-            if (translated.Count > 0 && Seconds(lastPublish, Stopwatch.GetTimestamp()) > 1.0)
-            {
-                ct.ThrowIfCancellationRequested();
-                Publish(translated, area);
-                lastPublish = Stopwatch.GetTimestamp();
-            }
         }
         ct.ThrowIfCancellationRequested();
         translation.Stop();
