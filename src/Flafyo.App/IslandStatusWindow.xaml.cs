@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Drawing;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -15,6 +16,7 @@ public partial class IslandStatusWindow : Window
     private readonly IslandControlWindow _controlWindow;
 
     public event Action? ToggleRequested;
+    public event Action<Rectangle?>? BoundsChanged;
 
     public IslandStatusWindow()
     {
@@ -24,8 +26,8 @@ public partial class IslandStatusWindow : Window
         _controlWindow = new IslandControlWindow();
         _controlWindow.Owner = this;
         _controlWindow.ToggleRequested += () => ToggleRequested?.Invoke();
-        SizeChanged += (_, _) => { PositionAtTopCenter(); PositionControlWindow(); };
-        LocationChanged += (_, _) => PositionControlWindow();
+        SizeChanged += (_, _) => { PositionAtTopCenter(); PositionControlWindow(); RaiseBoundsChanged(); };
+        LocationChanged += (_, _) => { PositionControlWindow(); RaiseBoundsChanged(); };
         SetRunning(false);
     }
 
@@ -43,6 +45,7 @@ public partial class IslandStatusWindow : Window
         PositionAtTopCenter();
         if (!IsVisible) Show();
         PositionControlWindow();
+        RaiseBoundsChanged();
     }
 
     private void PositionAtTopCenter()
@@ -67,10 +70,26 @@ public partial class IslandStatusWindow : Window
         catch { }
     }
 
+    private void RaiseBoundsChanged()
+    {
+        if (!IsVisible) { BoundsChanged?.Invoke(null); return; }
+        try
+        {
+            var point = PointToScreen(new Point(0, 0));
+            var dpi = VisualTreeHelper.GetDpi(this);
+            BoundsChanged?.Invoke(new Rectangle(
+                (int)Math.Round(point.X), (int)Math.Round(point.Y),
+                (int)Math.Ceiling(ActualWidth * dpi.DpiScaleX),
+                (int)Math.Ceiling(ActualHeight * dpi.DpiScaleY)));
+        }
+        catch { BoundsChanged?.Invoke(null); }
+    }
+
     public new void Hide()
     {
         _controlWindow.Hide();
         base.Hide();
+        BoundsChanged?.Invoke(null);
     }
 
     protected override void OnClosed(EventArgs e)
