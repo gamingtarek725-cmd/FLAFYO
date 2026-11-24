@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
@@ -23,7 +24,7 @@ public partial class IslandStatusWindow : Window
         _controlWindow = new IslandControlWindow();
         _controlWindow.Owner = this;
         _controlWindow.ToggleRequested += () => ToggleRequested?.Invoke();
-        SizeChanged += (_, _) => PositionControlWindow();
+        SizeChanged += (_, _) => { PositionAtTopCenter(); PositionControlWindow(); };
         LocationChanged += (_, _) => PositionControlWindow();
         SetRunning(false);
     }
