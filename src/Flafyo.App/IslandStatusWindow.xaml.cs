@@ -62,7 +62,7 @@ public partial class IslandStatusWindow : Window
         if (!IsVisible) { _controlWindow.Hide(); return; }
         try
         {
-            var point = ToggleSlot.PointToScreen(new Point(0, 0));
+            var point = ToggleSlot.PointToScreen(new System.Windows.Point(0, 0));
             double scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
             if (scale <= 0) scale = 1;
             _controlWindow.ShowAt(point.X / scale + 3, point.Y / scale + 2);
@@ -75,7 +75,7 @@ public partial class IslandStatusWindow : Window
         if (!IsVisible) { BoundsChanged?.Invoke(null); return; }
         try
         {
-            var point = PointToScreen(new Point(0, 0));
+            var point = PointToScreen(new System.Windows.Point(0, 0));
             var dpi = VisualTreeHelper.GetDpi(this);
             BoundsChanged?.Invoke(new Rectangle(
                 (int)Math.Round(point.X), (int)Math.Round(point.Y),
