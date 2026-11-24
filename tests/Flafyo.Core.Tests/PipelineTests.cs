@@ -160,7 +160,7 @@ public class PipelineTests
     [Fact]
     public void ChangeDetector_detects_small_localized_text_changes_on_a_1080p_screen()
     {
-        var detector = new ChangeDetector();
+        var detector = new ChangeDetector(gridX: 128, gridY: 72, blockDelta: 8, minChangedBlocks: 1);
         const int width = 1920, height = 1080;
         var before = Enumerable.Repeat((byte)24, width * height).ToArray();
         var after = (byte[])before.Clone();
