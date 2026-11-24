@@ -898,6 +898,7 @@ public partial class MainWindow : Window
         (_translator as IDisposable)?.Dispose(); _translator = null;
         _speaker?.Stop();
         _screenWindow?.ClearAll();
+        _overlay?.Hide();
         _loggedBlocks.Clear();
         EngineText.Text = "";
         LastText.Text = "";
@@ -923,6 +924,7 @@ public partial class MainWindow : Window
         _grabber?.Dispose();
         _speaker?.Dispose();
         _overlay?.Close();
+        _island?.Close();
         _screenWindow?.Close();
         base.OnClosed(e);
     }
