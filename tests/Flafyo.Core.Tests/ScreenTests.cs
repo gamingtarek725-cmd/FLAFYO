@@ -91,13 +91,12 @@ public class BlockBuilderTests
 internal sealed class FakeGrabber : IScreenGrabber
 {
     public byte Fill = 50;
-    public bool NoPicture;
     public string? LastError => null;
     private long _id;
     public bool TryGrab(Rectangle area, out Frame frame)
     {
         frame = new Frame(++_id, 1, 64, 32, Enumerable.Repeat(Fill, 64 * 32).ToArray(), Stopwatch.GetTimestamp());
-        return !NoPicture;
+        return true;
     }
     public void Dispose() { }
 }
@@ -342,7 +341,7 @@ public class ScreenPipelineTests
         await Task.Delay(150);
 
         Assert.Equal(3, translator.Calls);
-        Assert.Equal(1, overlay.Shown.Count);
+        Assert.Single(overlay.Shown);
         await pipeline.DisposeAsync();
     }
 
