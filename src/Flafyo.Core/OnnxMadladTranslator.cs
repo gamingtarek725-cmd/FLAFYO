@@ -18,7 +18,7 @@ public sealed class OnnxMadladTranslator : ITranslator, IDisposable
     private const int HeadDimension = 128;
     private const int ModelDimension = 1024;
 
-    private static readonly Regex SentenceSplit = new(@"(?<=[.!?…])\\s+", RegexOptions.Compiled);
+    private static readonly Regex SentenceSplit = new(@"(?<=[.!?…])\s+", RegexOptions.Compiled);
 
     private readonly InferenceSession _embed;
     private readonly InferenceSession _encoder;
