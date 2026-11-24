@@ -137,7 +137,7 @@ public partial class OverlayWindow : Window
         ShowText("هذه معاينة FLAFYO Island. ستظهر الترجمة هنا أثناء اللعب.",
                  "This is a preview of your live game translation.", region, 7);
 
-    /// <summary>Displays a click-through Dynamic Island style translation at the top-center of the primary display.</summary>
+    /// <summary>Displays a click-through translation at the selected position relative to the captured game region.</summary>
     public void ShowText(string text, string? original, System.Drawing.Rectangle regionPx, int hideAfter = -1)
     {
         if (!_style.IslandEnabled) return;
@@ -194,8 +194,8 @@ public partial class OverlayWindow : Window
         int requestedWidthPx = mode == 2 && style.AreaW >= 100
             ? style.AreaW
             : style.AutoWidthPx > 0 ? style.AutoWidthPx : regionPx.Width;
-        double maxWidthDip = Math.Max(300, Math.Min(900, vw / scale - 16));
-        _expandedWidth = Math.Clamp(requestedWidthPx / scale, Math.Min(320, maxWidthDip), maxWidthDip);
+        double maxWidthDip = Math.Max(340, Math.Min(900, vw / scale - 16));
+        _expandedWidth = Math.Clamp(requestedWidthPx / scale, Math.Min(360, maxWidthDip), maxWidthDip);
 
         BeginAnimation(WidthProperty, null);
         Width = _expandedWidth;
