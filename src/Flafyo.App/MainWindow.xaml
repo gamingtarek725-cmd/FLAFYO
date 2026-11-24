@@ -268,7 +268,7 @@
                 <ComboBoxItem Content="متقدم DXGI (لألعاب Fullscreen والصورة السودة)"/>
               </ComboBox>
               <TextBlock Style="{StaticResource MutedText}" Margin="0,4,0,0"
-                         Text="لو لعبتك Fullscreen والترجمة مش بتظهر أو الصورة سودة: جرّب «متقدم»."/>
+                         Text="عند اختيار «الشاشة كاملة» يتم تفعيل DXGI المتقدم تلقائيًا لدعم ألعاب Fullscreen."/>
               <TextBlock Text="الشاشة (لوضع الشاشة كاملة)" Style="{StaticResource L}"/>
               <ComboBox x:Name="MonitorBox" SelectionChanged="Monitor_Changed"/>
               <CheckBox x:Name="ContinuousBox" Content="تحديث مستمر (لو قفلته: الترجمة بتحصل لما تضغط الاختصار بس)" IsChecked="True"
