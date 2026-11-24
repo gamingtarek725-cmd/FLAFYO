@@ -20,7 +20,7 @@ public partial class ScreenOverlayWindow : Window
     {
         InitializeComponent();
         var hwnd = new WindowInteropHelper(this).EnsureHandle();
-        OverlayWindowStyles.Apply(hwnd);     // click-through, never takes focus, hidden from screen capture (so OCR never reads our own cards)
+        OverlayWindowStyles.Apply(hwnd);     // click-through and visible to OBS/display capture; OCR filters Arabic overlay text.
     }
 
     public void ShowBlocks(IReadOnlyList<TranslatedBlock> blocks, System.Drawing.Rectangle area, OverlayStyle style)
