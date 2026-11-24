@@ -56,7 +56,7 @@ public sealed class OnnxMarianTranslator : ITranslator, IDisposable
         {
             enc = new InferenceSession(Path.Combine(dir, "onnx", "encoder_model_quantized.onnx"), opts);
             dec = new InferenceSession(Path.Combine(dir, "onnx", "decoder_model_quantized.onnx"), opts);
-            return new OnnxMarianTranslator(enc, dec, opts, tokenizer, pad, eos, start, langTag);
+            return new OnnxMarianTranslator(enc!, dec!, opts, tokenizer, pad, eos, start, langTag);
         }
         catch
         {
