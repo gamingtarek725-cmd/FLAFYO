@@ -53,7 +53,9 @@ public sealed class ScreenPipeline : IAsyncDisposable
     {
         _grabber = grabber; _ocr = ocr; _resolver = resolver; _overlay = overlay; _area = area; _log = log;
         _opt = options ?? new ScreenPipelineOptions();
-        _detector = new ChangeDetector(_opt.ChangeThreshold);
+        // Whole-screen subtitles can change in a tiny part of a 1080p frame. Keep the default coarse
+        // detector for region mode, but use a denser grid and one changed cell in this pipeline.
+        _detector = new ChangeDetector(_opt.ChangeThreshold, gridX: 128, gridY: 72, blockDelta: 8, minChangedBlocks: 1);
     }
 
     public void Start() => _worker ??= Task.Run(() => Supervise());
