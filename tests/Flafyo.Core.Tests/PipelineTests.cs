@@ -158,6 +158,23 @@ public class PipelineTests
     }
 
     [Fact]
+    public void ChangeDetector_detects_small_localized_text_changes_on_a_1080p_screen()
+    {
+        var detector = new ChangeDetector();
+        const int width = 1920, height = 1080;
+        var before = Enumerable.Repeat((byte)24, width * height).ToArray();
+        var after = (byte[])before.Clone();
+
+        // Simulate a small subtitle glyph appearing in an otherwise unchanged dark scene.
+        for (int y = 780; y < 788; y++)
+            for (int x = 1430; x < 1450; x++)
+                after[y * width + x] = 245;
+
+        Assert.True(detector.HasChanged(new Frame(1, 1, width, height, before, 0)));
+        Assert.True(detector.HasChanged(new Frame(2, 1, width, height, after, 1)));
+    }
+
+    [Fact]
     public void ChangeDetector_detects_changes_only()
     {
         var d = new ChangeDetector();
