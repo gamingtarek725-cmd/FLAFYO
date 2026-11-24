@@ -57,6 +57,19 @@ public class MadladTokenizerTests
     }
 
     [Fact]
+    public void Special_tokens_are_identified_so_the_decoder_can_mask_them()
+    {
+        var tokenizer = CreateTokenizer();
+
+        Assert.True(tokenizer.IsSpecialToken(0)); // unknown
+        Assert.True(tokenizer.IsSpecialToken(1)); // BOS
+        Assert.True(tokenizer.IsSpecialToken(2)); // EOS
+        Assert.True(tokenizer.IsSpecialToken(3)); // target-language tag
+        Assert.False(tokenizer.IsSpecialToken(4)); // normal text piece
+        Assert.True(tokenizer.IsSpecialToken(99)); // unknown IDs fail closed
+    }
+
+    [Fact]
     public void Decode_skips_special_tokens_and_restores_spaces()
     {
         var tokenizer = CreateTokenizer();
