@@ -21,10 +21,20 @@ public partial class ScreenOverlayWindow : Window
         InitializeComponent();
         var hwnd = new WindowInteropHelper(this).EnsureHandle();
         OverlayWindowStyles.Apply(hwnd);     // click-through and visible to OBS/display capture; OCR filters Arabic overlay text.
+        Opacity = 0; // Resolve the real monitor DPI after Show(), before placing cards in physical screen coordinates.
     }
 
     public void ShowBlocks(IReadOnlyList<TranslatedBlock> blocks, System.Drawing.Rectangle area, OverlayStyle style)
     {
+        if (!IsVisible)
+        {
+            Opacity = 0;
+            Show();
+        }
+        UpdateLayout();
+
+        // WPF can report the default 96-DPI scale for a handle that has not been shown yet.
+        // Read the scale only after the window is visible on its target display.
         double scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
         if (scale <= 0) scale = 1;
         double vx = GetSystemMetrics(SM_XVIRTUALSCREEN) / scale, vy = GetSystemMetrics(SM_YVIRTUALSCREEN) / scale;
@@ -59,7 +69,7 @@ public partial class ScreenOverlayWindow : Window
         for (int i = blocks.Count; i < _cards.Count; i++)
             _cards[i].Visibility = Visibility.Collapsed;
 
-        if (!IsVisible) Show();
+        Opacity = 1;
     }
 
     private static void CopyCard(Border target, Border source)
