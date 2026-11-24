@@ -247,6 +247,71 @@ public class ScreenPipelineTests
         await p.DisposeAsync();
     }
 
+    private sealed class SelectiveFailTranslator : ITranslator
+    {
+        public volatile bool FailSecond = true;
+
+        public Task<string> TranslateAsync(string text, CancellationToken ct)
+        {
+            ct.ThrowIfCancellationRequested();
+            if (FailSecond && text.Equals("Open the door", StringComparison.Ordinal))
+                throw new InvalidOperationException("temporary block failure");
+            return Task.FromResult("AR:" + text);
+        }
+    }
+
+    [Fact]
+    public async Task A_real_text_change_is_not_hidden_by_fuzzy_ocr_jitter_detection()
+    {
+        var (pipeline, grabber, ocr, translator, overlay) = Make();
+        Assert.True(await WaitUntil(() => overlay.Last?.Count == 3));
+
+        ocr.Lines = new List<OcrTextLine> { L("Find the golden kcy quickly", 100, 150, 240, 20) };
+        grabber.Fill = 190;
+
+        Assert.True(await WaitUntil(() =>
+            overlay.Last?.Count == 1 &&
+            overlay.Last[0].Block.Text == "Find the golden kcy quickly"));
+        Assert.Equal(4, translator.Calls);
+        await pipeline.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task Failed_block_is_retried_after_a_new_frame_instead_of_being_marked_complete()
+    {
+        var grabber = new FakeGrabber();
+        var ocr = new FakeLayoutOcr
+        {
+            Lines = new List<OcrTextLine>
+            {
+                L("Find the key", 100, 150, 200, 20),
+                L("Open the door", 100, 176, 220, 20),
+            }
+        };
+        var translator = new SelectiveFailTranslator();
+        var overlay = new RecordingScreenOverlay();
+        var pipeline = new ScreenPipeline(grabber, ocr,
+            new TranslationResolver(translator, new TranslationCache()), overlay,
+            () => new Rectangle(0, 0, 1920, 1080),
+            new ScreenPipelineOptions
+            {
+                Interval = TimeSpan.FromMilliseconds(20),
+                Settle = TimeSpan.FromMilliseconds(30),
+                MaxWait = TimeSpan.FromMilliseconds(100),
+                ClearDelay = TimeSpan.FromMilliseconds(250)
+            });
+        pipeline.Start();
+
+        Assert.True(await WaitUntil(() => overlay.Last?.Count == 1));
+        Assert.Equal("AR:Find the key", overlay.Last![0].Arabic);
+
+        translator.FailSecond = false;
+        grabber.Fill = 190;
+        Assert.True(await WaitUntil(() => overlay.Last?.Count == 2));
+        Assert.Contains(overlay.Last!, b => b.Block.Text == "Open the door" && b.Arabic == "AR:Open the door");
+        await pipeline.DisposeAsync();
+    }
+
     [Fact]
     public async Task Small_ocr_box_jitter_does_not_redraw_or_retranslate_the_same_text()
     {
