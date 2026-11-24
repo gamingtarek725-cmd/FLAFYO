@@ -101,6 +101,12 @@ public partial class MainWindow : Window
             _settings.CaptureIndex = 1;
             _settings.Save();
         }
+        if (_settings.Style.IslandEnabled)
+        {
+            var island = EnsureIsland();
+            island.SetRunning(false);
+            island.ShowIsland();
+        }
         UpdatePackStatus();
         RefreshProfiles();
         RefreshRunning();
