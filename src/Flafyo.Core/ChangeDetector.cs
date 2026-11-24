@@ -6,7 +6,9 @@ namespace Flafyo.Core;
 /// </summary>
 public sealed class ChangeDetector
 {
-    private const int GridX = 64, GridY = 32, BlockDelta = 10, MinChangedBlocks = 2;
+    // Fine grid: subtitle and dialog updates can occupy only one small area of a 1080p frame.
+    // A single changed cell is enough; ScreenPipeline's settle/max-wait logic filters transient animation.
+    private const int GridX = 128, GridY = 72, BlockDelta = 8, MinChangedBlocks = 1;
     private readonly double _meanThreshold;
     private readonly Dictionary<int, byte[]> _previous = new();
     private readonly object _gate = new();
