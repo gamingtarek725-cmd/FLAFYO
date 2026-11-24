@@ -14,6 +14,8 @@ public partial class ScreenOverlayWindow : Window
 {
     [DllImport("user32.dll")] private static extern int GetSystemMetrics(int index);
     private const int SM_XVIRTUALSCREEN = 76, SM_YVIRTUALSCREEN = 77, SM_CXVIRTUALSCREEN = 78, SM_CYVIRTUALSCREEN = 79;
+    // Keep the visual containers alive between scans. Clearing and rebuilding the whole Canvas caused visible flashes.
+    private readonly List<Border> _cards = new();
 
     public ScreenOverlayWindow()
     {
@@ -30,17 +32,52 @@ public partial class ScreenOverlayWindow : Window
         double vw = GetSystemMetrics(SM_CXVIRTUALSCREEN) / scale, vh = GetSystemMetrics(SM_CYVIRTUALSCREEN) / scale;
         Left = vx; Top = vy; Width = vw; Height = vh;
 
-        Layer.Children.Clear();
-        foreach (var tb in blocks)
+        for (int i = 0; i < blocks.Count; i++)
         {
-            var card = MakeCard(tb, scale, style, vw);
-            double x = (area.X + tb.Block.Box.X) / scale - vx;
-            double y = (area.Y + tb.Block.Box.Y) / scale - vy;
+            var fresh = MakeCard(blocks[i], scale, style, vw);
+            Border card;
+            if (i < _cards.Count)
+            {
+                card = _cards[i];
+                ApplyCard(card, fresh);
+            }
+            else
+            {
+                card = fresh;
+                _cards.Add(card);
+                Layer.Children.Add(card);
+            }
+
+            card.Measure(new Size(card.Width, double.PositiveInfinity));
+            double x = (area.X + blocks[i].Block.Box.X) / scale - vx;
+            double y = (area.Y + blocks[i].Block.Box.Y) / scale - vy;
             Canvas.SetLeft(card, Math.Max(0, Math.Min(x, vw - card.Width)));
             Canvas.SetTop(card, Math.Max(0, Math.Min(y, vh - card.DesiredSize.Height)));
-            Layer.Children.Add(card);
         }
-        if (!IsVisible) Show();
+
+        // Remove only cards that disappeared; keep surviving visual elements attached to the Canvas.
+        while (_cards.Count > blocks.Count)
+        {
+            var last = _cards[^1];
+            Layer.Children.Remove(last);
+            _cards.RemoveAt(_cards.Count - 1);
+        }
+        if (!IsVisible && blocks.Count > 0) Show();
+    }
+
+    private static void ApplyCard(Border target, Border source)
+    {
+        target.Child = source.Child;
+        target.Width = source.Width;
+        target.Height = source.Height;
+        target.Padding = source.Padding;
+        target.CornerRadius = source.CornerRadius;
+        target.SnapsToDevicePixels = source.SnapsToDevicePixels;
+        target.Effect = source.Effect;
+        target.Background = source.Background;
+        target.BorderBrush = source.BorderBrush;
+        target.BorderThickness = source.BorderThickness;
+        target.FlowDirection = source.FlowDirection;
     }
 
     private static Border MakeCard(TranslatedBlock tb, double scale, OverlayStyle s, double maxWidth)
@@ -91,7 +128,7 @@ public partial class ScreenOverlayWindow : Window
         return card;
     }
 
-    public void ClearAll() { Layer.Children.Clear(); Hide(); }
+    public void ClearAll() { Layer.Children.Clear(); _cards.Clear(); Hide(); }
 
     public void ToggleVisible() { if (IsVisible) Hide(); else if (Layer.Children.Count > 0) Show(); }
 }
