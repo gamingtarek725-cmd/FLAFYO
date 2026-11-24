@@ -14,7 +14,7 @@ public partial class IslandControlWindow : Window
     {
         InitializeComponent();
         var hwnd = new WindowInteropHelper(this).EnsureHandle();
-        OverlayWindowStyles.ApplyInteractive(hwnd);
+        OverlayWindowStyles.ApplyInteractiveCaptureVisible(hwnd);
     }
 
     public void SetRunning(bool running)
