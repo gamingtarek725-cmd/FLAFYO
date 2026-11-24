@@ -39,6 +39,8 @@ public sealed class ScreenPipeline : IAsyncDisposable
     private Task? _worker;
     private int _force;
     private List<ScreenBlock>? _lastBlocks;
+    private string? _retryLayoutKey;
+    private int _translationRetryCount;
     private long _emptySince;
     private Frame? _lastFrame;
     public long DroppedFrames { get; private set; }
@@ -241,8 +243,16 @@ public sealed class ScreenPipeline : IAsyncDisposable
             return;               // nothing really changed → keep what is shown (no flicker)
         }
 
+        var layoutKey = string.Join("|", blocks.Select(b => $"{b.Text}:{b.Box.X}:{b.Box.Y}:{b.Box.Width}:{b.Box.Height}"));
+        if (!string.Equals(layoutKey, _retryLayoutKey, StringComparison.Ordinal))
+        {
+            _retryLayoutKey = layoutKey;
+            _translationRetryCount = 0;
+        }
+
         var area = _area();
         var translated = new List<TranslatedBlock>();
+        var complete = true;
         var translation = Stopwatch.StartNew();
         foreach (var block in blocks)
         {
@@ -252,14 +262,39 @@ public sealed class ScreenPipeline : IAsyncDisposable
                 var (ar, _) = await _resolver.ResolveAsync(block.Text, ct).ConfigureAwait(false);
                 ct.ThrowIfCancellationRequested();
                 if (!string.IsNullOrWhiteSpace(ar)) translated.Add(new TranslatedBlock(block, ar));
+                else
+                {
+                    complete = false;
+                    _log?.Invoke("Translation returned empty text; keeping the previous overlay and retrying.");
+                }
             }
             catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
-            catch (Exception ex) { _log?.Invoke("Translation failed: " + ex.Message); }
+            catch (Exception ex)
+            {
+                complete = false;
+                _log?.Invoke("Translation failed: " + ex.Message);
+            }
         }
         ct.ThrowIfCancellationRequested();
         translation.Stop();
+        if (!complete || translated.Count != blocks.Count)
+        {
+            // Never replace a good overlay with a partial/empty translation batch.
+            // Retry the same captured frame at most twice; later changed frames can retry again.
+            if (_translationRetryCount < 2)
+            {
+                _translationRetryCount++;
+                _log?.Invoke($"Translation batch incomplete ({translated.Count}/{blocks.Count}); retry {_translationRetryCount}/2.");
+                ScanNow();
+            }
+            ReportPerformance(lines.Count, blocks.Count, ocrMs, total, translation);
+            return;
+        }
+
         Publish(translated, area);
         _lastBlocks = blocks;
+        _retryLayoutKey = null;
+        _translationRetryCount = 0;
         ReportPerformance(lines.Count, blocks.Count, ocrMs, total, translation);
     }
 
