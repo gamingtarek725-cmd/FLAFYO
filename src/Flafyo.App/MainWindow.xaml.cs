@@ -785,7 +785,8 @@ public partial class MainWindow : Window
         return (resolver, translator, mode);
     }
 
-    private IScreenGrabber MakeGrabber() => CaptureBox.SelectedIndex == 1 ? new DxgiScreenGrabber() : new GdiScreenGrabber();
+    private IScreenGrabber MakeGrabber() =>
+        ScreenMode || CaptureBox.SelectedIndex == 1 ? new DxgiScreenGrabber() : new GdiScreenGrabber();
 
     // ---- start / stop ----
     private void Start_Click(object sender, RoutedEventArgs e) => StartTranslation();
