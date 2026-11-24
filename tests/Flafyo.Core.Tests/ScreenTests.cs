@@ -315,6 +315,55 @@ public class ScreenPipelineTests
     }
 
     [Fact]
+    public async Task Failed_translation_keeps_previous_overlay_and_retries_complete_batch()
+    {
+        var grabber = new FakeGrabber();
+        var ocr = new FakeLayoutOcr
+        {
+            Lines = new List<OcrTextLine>
+            {
+                L("Active Quests", 100, 100, 260, 32),
+                L("Find the key", 100, 150, 200, 20),
+                L("Open the door", 100, 176, 220, 20),
+            }
+        };
+        var overlay = new RecordingScreenOverlay();
+        var translator = new FailOnceScreenTranslator();
+        await using var pipeline = new ScreenPipeline(grabber, ocr,
+            new TranslationResolver(translator, new TranslationCache()), overlay,
+            () => new Rectangle(0, 0, 1920, 1080),
+            new ScreenPipelineOptions
+            {
+                Continuous = false,
+                Interval = TimeSpan.FromMilliseconds(10),
+                Settle = TimeSpan.Zero,
+                MaxWait = TimeSpan.FromMilliseconds(100),
+                ClearDelay = TimeSpan.FromSeconds(5),
+            });
+
+        pipeline.Start();
+        pipeline.ScanNow();
+
+        Assert.True(await WaitUntil(() => overlay.Last?.Count == 3, 5000));
+        Assert.Equal(2, translator.Calls);
+        Assert.Single(overlay.Shown);
+        Assert.All(overlay.Last!, block => Assert.False(string.IsNullOrWhiteSpace(block.Arabic)));
+    }
+
+    private sealed class FailOnceScreenTranslator : ITranslator
+    {
+        private int _failed;
+        public int Calls;
+        public Task<string> TranslateAsync(string text, CancellationToken ct)
+        {
+            Interlocked.Increment(ref Calls);
+            if (text == "Find the key" && Interlocked.Exchange(ref _failed, 1) == 0)
+                throw new InvalidOperationException("simulated temporary translation failure");
+            return Task.FromResult("AR:" + text);
+        }
+    }
+
+    [Fact]
     public async Task Translations_are_removed_after_all_text_is_gone()
     {
         var (p, g, ocr, _, ov) = Make();
