@@ -4,7 +4,7 @@ namespace Flafyo.Core;
 public sealed class TranslationCache
 {
     private readonly int _capacity;
-    private readonly Dictionary<string, LinkedListNode<(string Key, string Value)>> _map = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, LinkedListNode<(string Key, string Value)>> _map = new(StringComparer.OrdinalIgnoreCase);
     private readonly LinkedList<(string Key, string Value)> _order = new();
     private readonly object _gate = new();
 

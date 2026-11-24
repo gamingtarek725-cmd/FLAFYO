@@ -1,4 +1,5 @@
 using System.Text;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using Flafyo.Core;
 using Xunit;
@@ -56,6 +57,19 @@ public class MadladTokenizerTests
     }
 
     [Fact]
+    public void Special_tokens_are_identified_so_the_decoder_can_mask_them()
+    {
+        var tokenizer = CreateTokenizer();
+
+        Assert.True(tokenizer.IsSpecialToken(0)); // unknown
+        Assert.True(tokenizer.IsSpecialToken(1)); // BOS
+        Assert.True(tokenizer.IsSpecialToken(2)); // EOS
+        Assert.True(tokenizer.IsSpecialToken(3)); // target-language tag
+        Assert.False(tokenizer.IsSpecialToken(4)); // normal text piece
+        Assert.True(tokenizer.IsSpecialToken(99)); // unknown IDs fail closed
+    }
+
+    [Fact]
     public void Decode_skips_special_tokens_and_restores_spaces()
     {
         var tokenizer = CreateTokenizer();
@@ -67,6 +81,21 @@ public class MadladTokenizerTests
     {
         var tokenizer = CreateTokenizer();
         Assert.Equal(new[] { 6, 3, 6, 0, 2 }, tokenizer.Encode("@"));
+    }
+}
+
+public class MadladSentenceSegmentationTests
+{
+    [Fact]
+    public void Sentence_splitter_separates_completed_sentences()
+    {
+        var field = typeof(OnnxMadladTranslator).GetField("SentenceSplit",
+            BindingFlags.NonPublic | BindingFlags.Static);
+        var splitter = Assert.IsType<Regex>(field!.GetValue(null));
+
+        Assert.Equal(
+            new[] { "First sentence.", "Second sentence!", "Third sentence?" },
+            splitter.Split("First sentence. Second sentence! Third sentence?"));
     }
 }
 

@@ -103,6 +103,13 @@ public sealed class MadladTokenizer
         if (pos > data.Length) throw new InvalidDataException("Invalid SentencePiece protobuf length.");
     }
 
+    /// <summary>Returns true for control tokens (padding, unknown, language tags, and sentinels) that must not be generated as text.</summary>
+    public bool IsSpecialToken(int id)
+    {
+        if (!_idToPiece.TryGetValue(id, out var piece)) return true;
+        return piece.Length >= 2 && piece[0] == '<' && piece[^1] == '>';
+    }
+
     public int LanguageTokenId(string languageCode)
     {
         var token = "<2" + languageCode + ">";

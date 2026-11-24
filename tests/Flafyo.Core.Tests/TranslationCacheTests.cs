@@ -51,6 +51,16 @@ public sealed class TranslationCacheTests
     }
 
     [Fact]
+    public void Cache_reuses_translation_when_ocr_changes_only_letter_casing()
+    {
+        var cache = new TranslationCache();
+        cache.Set("PRESS E TO OPEN THE DOOR", "اضغط على E لفتح الباب");
+
+        Assert.True(cache.TryGet("Press E to open the door", out var value));
+        Assert.Equal("اضغط على E لفتح الباب", value);
+    }
+
+    [Fact]
     public void Constructor_rejects_non_positive_capacity()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => new TranslationCache(0));

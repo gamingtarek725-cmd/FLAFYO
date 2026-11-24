@@ -269,6 +269,101 @@ public class ScreenPipelineTests
     }
 
     [Fact]
+    public async Task Screen_overlay_receives_one_complete_batch_not_partial_batches()
+    {
+        var grabber = new FakeGrabber();
+        var ocr = new FakeLayoutOcr
+        {
+            Lines = new List<OcrTextLine>
+            {
+                L("Active Quests", 100, 100, 260, 32),
+                L("Find the key", 100, 150, 200, 20),
+                L("Open the door", 100, 176, 220, 20),
+            }
+        };
+        var overlay = new RecordingScreenOverlay();
+        var translator = new SlowScreenTranslator();
+        await using var pipeline = new ScreenPipeline(grabber, ocr,
+            new TranslationResolver(translator, new TranslationCache()), overlay,
+            () => new Rectangle(0, 0, 1920, 1080),
+            new ScreenPipelineOptions
+            {
+                Continuous = false,
+                Interval = TimeSpan.FromMilliseconds(10),
+                Settle = TimeSpan.Zero,
+                MaxWait = TimeSpan.FromMilliseconds(100),
+                ClearDelay = TimeSpan.FromSeconds(5),
+            });
+
+        pipeline.Start();
+        pipeline.ScanNow();
+        Assert.True(await WaitUntil(() => ocr.Calls > 0));
+        await Task.Delay(1400);
+
+        Assert.Empty(overlay.Shown); // keep the last complete screen until every new block is ready
+        Assert.True(await WaitUntil(() => overlay.Last?.Count == 3, 5000));
+        Assert.Single(overlay.Shown);
+    }
+
+    private sealed class SlowScreenTranslator : ITranslator
+    {
+        public async Task<string> TranslateAsync(string text, CancellationToken ct)
+        {
+            await Task.Delay(650, ct);
+            return "AR:" + text;
+        }
+    }
+
+    [Fact]
+    public async Task Failed_translation_keeps_previous_overlay_and_retries_complete_batch()
+    {
+        var grabber = new FakeGrabber();
+        var ocr = new FakeLayoutOcr
+        {
+            Lines = new List<OcrTextLine>
+            {
+                L("Active Quests", 100, 100, 260, 32),
+                L("Find the key", 100, 150, 200, 20),
+                L("Open the door", 100, 176, 220, 20),
+            }
+        };
+        var overlay = new RecordingScreenOverlay();
+        var translator = new FailOnceScreenTranslator();
+        await using var pipeline = new ScreenPipeline(grabber, ocr,
+            new TranslationResolver(translator, new TranslationCache()), overlay,
+            () => new Rectangle(0, 0, 1920, 1080),
+            new ScreenPipelineOptions
+            {
+                Continuous = false,
+                Interval = TimeSpan.FromMilliseconds(10),
+                Settle = TimeSpan.Zero,
+                MaxWait = TimeSpan.FromMilliseconds(100),
+                ClearDelay = TimeSpan.FromSeconds(5),
+            });
+
+        pipeline.Start();
+        pipeline.ScanNow();
+
+        Assert.True(await WaitUntil(() => overlay.Last?.Count == 3, 5000));
+        Assert.Equal(4, translator.Calls); // two cached blocks plus the failed block retried
+        Assert.Single(overlay.Shown);
+        Assert.All(overlay.Last!, block => Assert.False(string.IsNullOrWhiteSpace(block.Arabic)));
+    }
+
+    private sealed class FailOnceScreenTranslator : ITranslator
+    {
+        private int _failed;
+        public int Calls;
+        public Task<string> TranslateAsync(string text, CancellationToken ct)
+        {
+            Interlocked.Increment(ref Calls);
+            if (text == "Find the key" && Interlocked.Exchange(ref _failed, 1) == 0)
+                throw new InvalidOperationException("simulated temporary translation failure");
+            return Task.FromResult("AR:" + text);
+        }
+    }
+
+    [Fact]
     public async Task Translations_are_removed_after_all_text_is_gone()
     {
         var (p, g, ocr, _, ov) = Make();
