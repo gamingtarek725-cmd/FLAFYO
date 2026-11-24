@@ -259,16 +259,23 @@ public sealed class OnnxMadladTranslator : ITranslator, IDisposable
 
                 var values = logits.ToArray();
                 int vocabSize = logitsShape[2];
-                nextToken = 0;
+                nextToken = -1;
                 float best = float.NegativeInfinity;
                 for (int token = 0; token < vocabSize; token++)
                 {
-                    if (values[token] > best)
+                    // Only EOS is a valid control token during generation. Do not emit PAD,
+                    // unknown, language tags, or T5 sentinel tokens into the translated sentence.
+                    if (token != EosTokenId && _tokenizer.IsSpecialToken(token)) continue;
+                    var score = values[token];
+                    if (float.IsNaN(score) || float.IsNegativeInfinity(score)) continue;
+                    if (score > best)
                     {
-                        best = values[token];
+                        best = score;
                         nextToken = token;
                     }
                 }
+                if (nextToken < 0)
+                    throw new InvalidDataException("MADLAD decoder produced no valid next token.");
 
                 if (nextToken != EosTokenId)
                 {
