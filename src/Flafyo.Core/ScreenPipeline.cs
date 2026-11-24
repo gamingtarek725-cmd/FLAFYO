@@ -242,9 +242,8 @@ public sealed class ScreenPipeline : IAsyncDisposable
         }
 
         var area = _area();
-        var translated = new List<TranslatedBlock>();
+        var translated = new List<TranslatedBlock>(blocks.Count);
         var translation = Stopwatch.StartNew();
-        long lastPublish = Stopwatch.GetTimestamp();
         foreach (var block in blocks)
         {
             ct.ThrowIfCancellationRequested();
@@ -256,18 +255,21 @@ public sealed class ScreenPipeline : IAsyncDisposable
             }
             catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
             catch (Exception ex) { _log?.Invoke("Translation failed: " + ex.Message); }
-
-            if (translated.Count > 0 && Seconds(lastPublish, Stopwatch.GetTimestamp()) > 1.0)
-            {
-                ct.ThrowIfCancellationRequested();
-                Publish(translated, area);
-                lastPublish = Stopwatch.GetTimestamp();
-            }
         }
         ct.ThrowIfCancellationRequested();
         translation.Stop();
-        Publish(translated, area);
-        _lastBlocks = blocks;
+
+        // Publish atomically only when every detected block has a usable translation.
+        // A partial/empty batch must never replace the last complete on-screen result.
+        if (translated.Count == blocks.Count)
+        {
+            Publish(translated, area);
+            _lastBlocks = blocks;
+        }
+        else
+        {
+            _log?.Invoke($"Translation batch incomplete ({translated.Count}/{blocks.Count}); keeping the last complete overlay.");
+        }
         ReportPerformance(lines.Count, blocks.Count, ocrMs, total, translation);
     }
 
