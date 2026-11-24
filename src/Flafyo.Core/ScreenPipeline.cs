@@ -17,6 +17,8 @@ public sealed class ScreenPipelineOptions
     public bool Continuous { get; init; } = true;
     public double ChangeThreshold { get; init; } = 2.0;
     public int MaxBlocks { get; init; } = 40;
+    /// <summary>Optional screen-space rectangle to mask before OCR (for capture-visible UI overlays).</summary>
+    public Func<Rectangle?>? ExcludedArea { get; init; }
 }
 
 /// <summary>
@@ -106,7 +108,12 @@ public sealed class ScreenPipeline : IAsyncDisposable
             Frame? got = null;
             if (_opt.Continuous || forced || pending != null)
             {
-                if (_grabber.TryGrab(_area(), out var fr)) { got = fr; _lastFrame = fr; }
+                var captureArea = _area();
+                if (_grabber.TryGrab(captureArea, out var fr))
+                {
+                    got = MaskExcludedArea(fr, captureArea, _opt.ExcludedArea?.Invoke());
+                    _lastFrame = got;
+                }
                 else if (_grabber.LastError != null) _log?.Invoke("Capture: " + _grabber.LastError);
             }
             long now = Stopwatch.GetTimestamp();
@@ -153,6 +160,22 @@ public sealed class ScreenPipeline : IAsyncDisposable
 
             await Task.Delay(_opt.Interval, ct).ConfigureAwait(false);
         }
+    }
+
+
+    private static Frame MaskExcludedArea(Frame frame, Rectangle capturedArea, Rectangle? excluded)
+    {
+        if (excluded is not Rectangle exclusion) return frame;
+        var clipped = Rectangle.Intersect(capturedArea, exclusion);
+        if (clipped.Width <= 0 || clipped.Height <= 0) return frame;
+
+        int x = clipped.X - capturedArea.X;
+        int y = clipped.Y - capturedArea.Y;
+        var gray = frame.Gray.ToArray();
+        for (int row = 0; row < clipped.Height; row++)
+            Array.Clear(gray, (y + row) * frame.Width + x, clipped.Width);
+
+        return frame with { Gray = gray };
     }
 
     private void OfferLatest(LatestQueue<FrameWork> latest, Frame frame)

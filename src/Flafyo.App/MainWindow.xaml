@@ -268,7 +268,7 @@
                 <ComboBoxItem Content="متقدم DXGI (لألعاب Fullscreen والصورة السودة)"/>
               </ComboBox>
               <TextBlock Style="{StaticResource MutedText}" Margin="0,4,0,0"
-                         Text="لو لعبتك Fullscreen والترجمة مش بتظهر أو الصورة سودة: جرّب «متقدم»."/>
+                         Text="عند اختيار «الشاشة كاملة» يتم تفعيل DXGI المتقدم تلقائيًا لدعم ألعاب Fullscreen."/>
               <TextBlock Text="الشاشة (لوضع الشاشة كاملة)" Style="{StaticResource L}"/>
               <ComboBox x:Name="MonitorBox" SelectionChanged="Monitor_Changed"/>
               <CheckBox x:Name="ContinuousBox" Content="تحديث مستمر (لو قفلته: الترجمة بتحصل لما تضغط الاختصار بس)" IsChecked="True"
@@ -318,23 +318,13 @@
 
           <TabItem Header="FLAFYO Island">
             <StackPanel Margin="14">
-              <TextBlock Text="تخصيص الجزيرة العائمة" Style="{StaticResource H}"/>
-              <TextBlock Text="تحكم في ظهور الجزيرة وطريقة تفاعلها أثناء اللعب، من غير ما تحتاج تفتح النافذة الرئيسية."
+              <TextBlock Text="FLAFYO Island" Style="{StaticResource H}"/>
+              <TextBlock Text="مؤشر عائم يوضح حالة الترجمة فقط، مع زر واحد لتشغيلها أو إيقافها."
                          Style="{StaticResource MutedText}" Margin="0,3,0,12" TextWrapping="Wrap"/>
               <CheckBox x:Name="IslandEnabledBox" Content="إظهار FLAFYO Island فوق اللعبة"
                         Checked="IslandSettings_Changed" Unchecked="IslandSettings_Changed"/>
-              <CheckBox x:Name="IslandToggleBox" Content="إظهار زر تشغيل / إيقاف الترجمة داخل الجزيرة"
-                        Margin="0,10,0,0" Checked="IslandSettings_Changed" Unchecked="IslandSettings_Changed"/>
-              <CheckBox x:Name="IslandOriginalBox" Content="إظهار النص الإنجليزي الأصلي أسفل الترجمة"
-                        Margin="0,10,0,0" Checked="IslandSettings_Changed" Unchecked="IslandSettings_Changed"/>
-              <TextBlock Text="وقت انكماش الجزيرة بعد ظهور الترجمة" Style="{StaticResource L}" Margin="0,16,0,4"/>
-              <ComboBox x:Name="IslandCollapseBox" SelectedIndex="1" SelectionChanged="IslandSettings_Changed">
-                <ComboBoxItem Content="سريع — 2.5 ثانية"/>
-                <ComboBoxItem Content="متوازن — 4.5 ثانية"/>
-                <ComboBoxItem Content="مريح — 7 ثوانٍ"/>
-              </ComboBox>
               <Border Background="#101A2D" BorderBrush="#263956" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,16,0,0">
-                <TextBlock Text="زر التحكم نافذته صغيرة ومستقلة؛ بقية الجزيرة تظل شفافة للنقرات حتى لا تعطل تحكم اللعبة. الزر لا يسحب تركيز اللعبة."
+                <TextBlock Text="الجزيرة لا تعرض نصوص الترجمة ولا تحتوي على إعدادات أو أدوات إضافية. زر التشغيل والإيقاف يظل متاحًا أثناء اللعب."
                            Style="{StaticResource MutedText}" TextWrapping="Wrap"/>
               </Border>
             </StackPanel>
