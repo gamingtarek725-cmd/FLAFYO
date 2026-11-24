@@ -11,6 +11,19 @@ public class BlockBuilderTests
     private static OcrTextLine L(string t, int x, int y, int w, int h) => new(t, new Rectangle(x, y, w, h));
 
     [Fact]
+    public void The_visible_flafyo_overlay_brand_is_not_treated_as_game_text()
+    {
+        var blocks = BlockBuilder.Build(new[]
+        {
+            L("FLAFYO ISLAND", 700, 10, 180, 20),
+            L("Find the key", 100, 180, 200, 20),
+        });
+
+        Assert.Single(blocks);
+        Assert.Equal("Find the key", blocks[0].Text);
+    }
+
+    [Fact]
     public void A_wrapped_sentence_becomes_one_block()
     {
         var blocks = BlockBuilder.Build(new[]
