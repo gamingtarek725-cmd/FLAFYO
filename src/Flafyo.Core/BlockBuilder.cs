@@ -26,7 +26,7 @@ public static class BlockBuilder
         foreach (var l in lines)
         {
             var t = TextNormalizer.Normalize(l.Text);
-            if (!TextQuality.LooksLikeText(t) || HasArabic(t) || l.Box.Height < o.MinLineHeight) continue;
+            if (!TextQuality.LooksLikeText(t) || HasArabic(t) || IsOverlayBrandText(t) || l.Box.Height < o.MinLineHeight) continue;
             kept.Add((t, l.Box));
         }
         if (kept.Count == 0) return new List<ScreenBlock>();
@@ -84,6 +84,11 @@ public static class BlockBuilder
         if (SentenceRules.EndsSentence(prev)) return false;
         return next.Length > 0 && char.IsLetter(next[0]) && char.IsLower(next[0]);
     }
+
+    // The overlay is now intentionally visible to OBS/display capture. Ignore its own English brand label
+    // so whole-screen OCR does not translate FLAFYO's UI back onto itself.
+    private static bool IsOverlayBrandText(string s) =>
+        s.Contains("FLAFYO", StringComparison.OrdinalIgnoreCase);
 
     private static bool HasArabic(string s) => s.Count(c => c >= '\u0600' && c <= '\u06FF') > s.Length * 0.3;
 
