@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Flafyo.Desktop"
         Title="FLAFYO GAME TRANSLATOR" Icon="Assets/flafyo.ico"
-        Width="1440" Height="920" MinWidth="1120" MinHeight="720"
+        Width="1440" Height="900" MinWidth="1000" MinHeight="650"
         Background="{StaticResource Page}" FlowDirection="RightToLeft"
         FontFamily="Segoe UI, Tahoma" FontSize="13" WindowStartupLocation="CenterScreen">
   <Window.Resources>
@@ -11,17 +11,17 @@
       <Setter Property="HorizontalContentAlignment" Value="Right"/>
       <Setter Property="Padding" Value="16,13"/>
       <Setter Property="Margin" Value="0,4"/>
-      <Setter Property="Background" Value="#121C31"/>
-      <Setter Property="BorderBrush" Value="#243654"/>
+      <Setter Property="Background" Value="#20232D"/>
+      <Setter Property="BorderBrush" Value="#303542"/>
       <Setter Property="FontSize" Value="13"/>
     </Style>
     <Style x:Key="HeroTitle" TargetType="TextBlock">
-      <Setter Property="Foreground" Value="#F7F8FF"/>
+      <Setter Property="Foreground" Value="#F3F5F8"/>
       <Setter Property="FontSize" Value="30"/>
       <Setter Property="FontWeight" Value="Bold"/>
     </Style>
     <Style x:Key="SectionTitle" TargetType="TextBlock">
-      <Setter Property="Foreground" Value="#F7F8FF"/>
+      <Setter Property="Foreground" Value="#F3F5F8"/>
       <Setter Property="FontSize" Value="19"/>
       <Setter Property="FontWeight" Value="Bold"/>
       <Setter Property="Margin" Value="0,0,0,8"/>
@@ -32,19 +32,19 @@
     <Grid.RowDefinitions><RowDefinition Height="76"/><RowDefinition Height="*"/></Grid.RowDefinitions>
 
     <!-- Permanent navigation: each destination appears once. -->
-    <Border Grid.Column="0" Grid.RowSpan="2" Background="#090E1B" BorderBrush="#202B45" BorderThickness="0,0,1,0" Padding="18,20">
+    <Border Grid.Column="0" Grid.RowSpan="2" Background="#101116" BorderBrush="#303542" BorderThickness="0,0,1,0" Padding="18,20">
       <DockPanel LastChildFill="True">
         <StackPanel DockPanel.Dock="Top">
-          <Border Background="#141F36" BorderBrush="#293B5B" BorderThickness="1" CornerRadius="18" Padding="14" Margin="0,0,0,28">
+          <Border Background="#191B23" BorderBrush="#303542" BorderThickness="1" CornerRadius="18" Padding="14" Margin="0,0,0,28">
             <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight">
               <Image Source="Assets/flafyo-brand.png" Width="46" Height="46" Stretch="Uniform" Margin="0,0,12,0"/>
               <StackPanel VerticalAlignment="Center">
-                <TextBlock Text="FLAFYO" FontSize="23" FontWeight="Bold" Foreground="#A78BFA"/>
-                <TextBlock Text="GAME TRANSLATOR" FontSize="9" Foreground="#91A2C4" FontWeight="Bold"/>
+                <TextBlock Text="FLAFYO" FontSize="23" FontWeight="Bold" Foreground="#795CFF"/>
+                <TextBlock Text="GAME TRANSLATOR" FontSize="9" Foreground="#9AA3B2" FontWeight="Bold"/>
               </StackPanel>
             </StackPanel>
           </Border>
-          <TextBlock Text="مساحة العمل" Foreground="#7182A5" FontSize="10" FontWeight="Bold" Margin="4,0,0,9"/>
+          <TextBlock Text="مساحة العمل" Foreground="#687282" FontSize="10" FontWeight="Bold" Margin="4,0,0,9"/>
           <Button Style="{StaticResource NavButton}" Content="⌂   الرئيسية" Click="DashboardHome_Click"/>
           <Button Style="{StaticResource NavButton}" Content="◉   الترجمة الفورية" Click="NavigateLive_Click"/>
           <Button Style="{StaticResource NavButton}" Content="▤   تعريب ملفات الألعاب" Click="DashboardFiles_Click"/>
@@ -52,16 +52,16 @@
           <Button Style="{StaticResource NavButton}" Content="文   حزم اللغات" Click="DashboardLanguages_Click"/>
           <Button Style="{StaticResource NavButton}" Content="⌘   ملفات تعريف الألعاب" Click="DashboardGameSettings_Click"/>
           <Separator Margin="0,17"/>
-          <TextBlock Text="الأدوات" Foreground="#7182A5" FontSize="10" FontWeight="Bold" Margin="4,0,0,9"/>
+          <TextBlock Text="الأدوات" Foreground="#687282" FontSize="10" FontWeight="Bold" Margin="4,0,0,9"/>
           <Button Style="{StaticResource NavButton}" Content="✦   مظهر الترجمة" Click="Appearance_Click"/>
           <Button Style="{StaticResource NavButton}" Content="◷   سجل الترجمة" Click="History_Click"/>
           <Button Style="{StaticResource NavButton}" Content="⌕   قواميس الألعاب" Click="Glossary_Click"/>
           <Button Style="{StaticResource NavButton}" Content="⚙   التشخيص والسجلات" Click="DashboardLogs_Click"/>
         </StackPanel>
-        <Border DockPanel.Dock="Bottom" Background="#101A2D" BorderBrush="#263956" BorderThickness="1" CornerRadius="14" Padding="13" Margin="0,18,0,0">
+        <Border DockPanel.Dock="Bottom" Background="#191B23" BorderBrush="#303542" BorderThickness="1" CornerRadius="14" Padding="13" Margin="0,18,0,0">
           <StackPanel>
             <TextBlock Text="حالة التطبيق" Foreground="#8293B5" FontSize="10"/>
-            <TextBlock x:Name="StateText" Text="● جاهز" Foreground="#34D399" FontWeight="Bold" Margin="0,7,0,2"/>
+            <TextBlock x:Name="StateText" Text="● جاهز" Foreground="#43C98B" FontWeight="Bold" Margin="0,7,0,2"/>
             <TextBlock Text="المعالجة المحلية · Windows" Foreground="#8293B5" FontSize="10"/>
           </StackPanel>
         </Border>
@@ -69,11 +69,11 @@
     </Border>
 
     <!-- Top command bar -->
-    <Border Grid.Column="1" Grid.Row="0" Background="#0D1425" BorderBrush="#202B45" BorderThickness="0,0,0,1" Padding="24,10">
+    <Border Grid.Column="1" Grid.Row="0" Background="#191B23" BorderBrush="#303542" BorderThickness="0,0,0,1" Padding="24,10">
       <Grid>
         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
         <StackPanel VerticalAlignment="Center">
-          <TextBlock Text="مترجم الألعاب" FontSize="19" FontWeight="Bold" Foreground="#F7F8FF"/>
+          <TextBlock Text="مترجم الألعاب" FontSize="19" FontWeight="Bold" Foreground="#F3F5F8"/>
           <TextBlock Text="ترجمة الألعاب وتعريبها — مساحة عمل موحّدة" Foreground="#8E9DB9" FontSize="11" Margin="0,3,0,0"/>
         </StackPanel>
         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
@@ -95,18 +95,18 @@
         <TabItem Header="الرئيسية">
           <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="28">
-              <Border CornerRadius="22" Padding="30" Margin="0,0,0,18" BorderBrush="#38436D" BorderThickness="1">
+              <Border CornerRadius="22" Padding="30" Margin="0,0,0,18" BorderBrush="#303542" BorderThickness="1">
                 <Border.Background>
                   <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="#25204A" Offset="0"/>
-                    <GradientStop Color="#14243A" Offset="0.58"/>
-                    <GradientStop Color="#101829" Offset="1"/>
+                    <GradientStop Color="#20232D" Offset="0"/>
+                    <GradientStop Color="#191B23" Offset="0.58"/>
+                    <GradientStop Color="#101116" Offset="1"/>
                   </LinearGradientBrush>
                 </Border.Background>
                 <Grid>
                   <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                   <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="FLAFYO  /  GAME TRANSLATOR" Foreground="#7CE8F6" FontSize="10" FontWeight="Bold" FlowDirection="LeftToRight"/>
+                    <TextBlock Text="FLAFYO  /  GAME TRANSLATOR" Foreground="#00D4FF" FontSize="10" FontWeight="Bold" FlowDirection="LeftToRight"/>
                     <TextBlock Text="خلّي عالم اللعبة بلغتك." Style="{StaticResource HeroTitle}" Margin="0,10,0,5"/>
                     <TextBlock Text="ترجمة فورية فوق اللعبة، تعريب ملفات، ومكتبة تعريبات في مكان واحد." Foreground="#C0CBE0" FontSize="14" TextWrapping="Wrap" MaxWidth="650"/>
                     <Button Content="ابدأ الترجمة الفورية  ←" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Right" Margin="0,22,0,0" Click="NavigateLive_Click"/>
@@ -119,27 +119,27 @@
 
               <TextBlock Text="نظرة عامة" Style="{StaticResource SectionTitle}"/>
               <UniformGrid Columns="3" Margin="0,0,0,18">
-                <Border Background="#111B30" BorderBrush="#263956" BorderThickness="1" CornerRadius="15" Padding="17" Margin="0,0,10,0">
-                  <StackPanel><TextBlock Text="محرك الترجمة" Foreground="#8EA0C2"/><TextBlock x:Name="DashboardEngineStatus" Text="OCR · Offline · Overlay" Foreground="#F7F8FF" FontSize="14" FontWeight="SemiBold" Margin="0,9,0,0"/><TextBlock Text="حالة المحرك" Foreground="#7182A5" FontSize="10" Margin="0,4,0,0"/></StackPanel>
+                <Border Background="#191B23" BorderBrush="#303542" BorderThickness="1" CornerRadius="15" Padding="17" Margin="0,0,10,0">
+                  <StackPanel><TextBlock Text="محرك الترجمة" Foreground="#9AA3B2"/><TextBlock x:Name="DashboardEngineStatus" Text="OCR · Offline · Overlay" Foreground="#F3F5F8" FontSize="14" FontWeight="SemiBold" Margin="0,9,0,0"/><TextBlock Text="حالة المحرك" Foreground="#687282" FontSize="10" Margin="0,4,0,0"/></StackPanel>
                 </Border>
-                <Border Background="#111B30" BorderBrush="#263956" BorderThickness="1" CornerRadius="15" Padding="17" Margin="5,0">
-                  <StackPanel><TextBlock Text="حالة الجلسة" Foreground="#8EA0C2"/><TextBlock x:Name="DashboardState" Text="جاهز" Foreground="#34D399" FontSize="17" FontWeight="Bold" Margin="0,9,0,0"/><TextBlock Text="ابدأ أو أوقف الترجمة من صفحة الترجمة" Foreground="#7182A5" FontSize="10" Margin="0,4,0,0"/></StackPanel>
+                <Border Background="#191B23" BorderBrush="#303542" BorderThickness="1" CornerRadius="15" Padding="17" Margin="5,0">
+                  <StackPanel><TextBlock Text="حالة الجلسة" Foreground="#9AA3B2"/><TextBlock x:Name="DashboardState" Text="جاهز" Foreground="#43C98B" FontSize="17" FontWeight="Bold" Margin="0,9,0,0"/><TextBlock Text="ابدأ أو أوقف الترجمة من صفحة الترجمة" Foreground="#687282" FontSize="10" Margin="0,4,0,0"/></StackPanel>
                 </Border>
-                <Border Background="#111B30" BorderBrush="#263956" BorderThickness="1" CornerRadius="15" Padding="17" Margin="10,0,0,0">
-                  <StackPanel><TextBlock Text="اختصار سريع" Foreground="#8EA0C2"/><TextBlock Text="CTRL  +  ALT  +  T" Foreground="#7CE8F6" FontSize="16" FontWeight="Bold" Margin="0,9,0,0" FlowDirection="LeftToRight"/><TextBlock Text="تشغيل / إيقاف أثناء اللعب" Foreground="#7182A5" FontSize="10" Margin="0,4,0,0"/></StackPanel>
+                <Border Background="#191B23" BorderBrush="#303542" BorderThickness="1" CornerRadius="15" Padding="17" Margin="10,0,0,0">
+                  <StackPanel><TextBlock Text="اختصار سريع" Foreground="#9AA3B2"/><TextBlock Text="CTRL  +  ALT  +  T" Foreground="#00D4FF" FontSize="16" FontWeight="Bold" Margin="0,9,0,0" FlowDirection="LeftToRight"/><TextBlock Text="تشغيل / إيقاف أثناء اللعب" Foreground="#687282" FontSize="10" Margin="0,4,0,0"/></StackPanel>
                 </Border>
               </UniformGrid>
 
               <TextBlock Text="أدوات FLAFYO" Style="{StaticResource SectionTitle}"/>
               <UniformGrid Columns="3">
-                <Border Background="#111B30" BorderBrush="#263956" BorderThickness="1" CornerRadius="15" Padding="17" Margin="0,0,8,0">
-                  <StackPanel><TextBlock Text="01  /  LIVE OCR" Foreground="#7CE8F6" FontSize="10" FontWeight="Bold" FlowDirection="LeftToRight"/><TextBlock Text="التقاط النصوص وترجمتها فوق اللعبة" Foreground="#F7F8FF" FontWeight="SemiBold" Margin="0,9,0,0" TextWrapping="Wrap"/></StackPanel>
+                <Border Background="#191B23" BorderBrush="#303542" BorderThickness="1" CornerRadius="15" Padding="17" Margin="0,0,8,0">
+                  <StackPanel><TextBlock Text="01  /  LIVE OCR" Foreground="#00D4FF" FontSize="10" FontWeight="Bold" FlowDirection="LeftToRight"/><TextBlock Text="التقاط النصوص وترجمتها فوق اللعبة" Foreground="#F3F5F8" FontWeight="SemiBold" Margin="0,9,0,0" TextWrapping="Wrap"/></StackPanel>
                 </Border>
-                <Border Background="#111B30" BorderBrush="#263956" BorderThickness="1" CornerRadius="15" Padding="17" Margin="4,0">
-                  <StackPanel><TextBlock Text="02  /  OFFLINE" Foreground="#A78BFA" FontSize="10" FontWeight="Bold" FlowDirection="LeftToRight"/><TextBlock Text="حزم ترجمة محلية تعمل دون اتصال" Foreground="#F7F8FF" FontWeight="SemiBold" Margin="0,9,0,0" TextWrapping="Wrap"/></StackPanel>
+                <Border Background="#191B23" BorderBrush="#303542" BorderThickness="1" CornerRadius="15" Padding="17" Margin="4,0">
+                  <StackPanel><TextBlock Text="02  /  OFFLINE" Foreground="#795CFF" FontSize="10" FontWeight="Bold" FlowDirection="LeftToRight"/><TextBlock Text="حزم ترجمة محلية تعمل دون اتصال" Foreground="#F3F5F8" FontWeight="SemiBold" Margin="0,9,0,0" TextWrapping="Wrap"/></StackPanel>
                 </Border>
-                <Border Background="#111B30" BorderBrush="#263956" BorderThickness="1" CornerRadius="15" Padding="17" Margin="8,0,0,0">
-                  <StackPanel><TextBlock Text="03  /  GAME LIBRARY" Foreground="#7CE8F6" FontSize="10" FontWeight="Bold" FlowDirection="LeftToRight"/><TextBlock Text="مكتبة تعريبات مع صور الألعاب ومعلومات المصدر" Foreground="#F7F8FF" FontWeight="SemiBold" Margin="0,9,0,0" TextWrapping="Wrap"/></StackPanel>
+                <Border Background="#191B23" BorderBrush="#303542" BorderThickness="1" CornerRadius="15" Padding="17" Margin="8,0,0,0">
+                  <StackPanel><TextBlock Text="03  /  GAME LIBRARY" Foreground="#00D4FF" FontSize="10" FontWeight="Bold" FlowDirection="LeftToRight"/><TextBlock Text="مكتبة تعريبات مع صور الألعاب ومعلومات المصدر" Foreground="#F3F5F8" FontWeight="SemiBold" Margin="0,9,0,0" TextWrapping="Wrap"/></StackPanel>
                 </Border>
               </UniformGrid>
             </StackPanel>
@@ -151,8 +151,8 @@
           <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="28" MaxWidth="920" HorizontalAlignment="Right">
               <TextBlock Text="الترجمة الفورية" Style="{StaticResource HeroTitle}"/>
-              <TextBlock Text="حدد مصدر النص وطريقة التقاطه، ثم شغّل الترجمة. لن تتوقف اللعبة أثناء المعالجة." Foreground="#9AAAC7" FontSize="13" Margin="0,8,0,22" TextWrapping="Wrap"/>
-              <Border Background="#111A30" BorderBrush="#293B5A" BorderThickness="1" CornerRadius="18" Padding="22" Margin="0,0,0,16">
+              <TextBlock Text="حدد مصدر النص وطريقة التقاطه، ثم شغّل الترجمة. لن تتوقف اللعبة أثناء المعالجة." Foreground="#9AA3B2" FontSize="13" Margin="0,8,0,22" TextWrapping="Wrap"/>
+              <Border Background="#191B23" BorderBrush="#303542" BorderThickness="1" CornerRadius="18" Padding="22" Margin="0,0,0,16">
                 <StackPanel>
                   <TextBlock Text="طريقة الالتقاط" Style="{StaticResource SectionTitle}"/>
                   <StackPanel x:Name="ModeRadios" Margin="0,10,0,0">
@@ -164,13 +164,13 @@
                     </RadioButton>
                   </StackPanel>
                   <Button x:Name="SelectButton" Content="تحديد منطقة النص" Margin="0,18,0,0" Click="Select_Click" HorizontalAlignment="Right"/>
-                  <TextBlock x:Name="RegionText" Text="لم يتم اختيار منطقة بعد" Foreground="#91A2C4" Margin="0,8,0,0"/>
+                  <TextBlock x:Name="RegionText" Text="لم يتم اختيار منطقة بعد" Foreground="#9AA3B2" Margin="0,8,0,0"/>
                 </StackPanel>
               </Border>
-              <Border Background="#111A30" BorderBrush="#293B5A" BorderThickness="1" CornerRadius="18" Padding="22">
+              <Border Background="#191B23" BorderBrush="#303542" BorderThickness="1" CornerRadius="18" Padding="22">
                 <StackPanel>
                   <TextBlock Text="حالة جلسة الترجمة" Style="{StaticResource SectionTitle}"/>
-                  <TextBlock x:Name="StatusText" Text="جاهز. حدد مكان النص ثم ابدأ الترجمة." Foreground="#F7F8FF" FontSize="15" TextWrapping="Wrap"/>
+                  <TextBlock x:Name="StatusText" Text="جاهز. حدد مكان النص ثم ابدأ الترجمة." Foreground="#F3F5F8" FontSize="15" TextWrapping="Wrap"/>
                   <TextBlock x:Name="EngineText" Style="{StaticResource WarnText}" Margin="0,8,0,0"/>
                   <TextBlock x:Name="LatencyText" Style="{StaticResource MutedText}" Margin="0,5,0,0"/>
                   <TextBlock x:Name="LastText" Style="{StaticResource MutedText}" Margin="0,5,0,0"/>
@@ -179,7 +179,7 @@
                     <Button x:Name="StartButton" Content="ابدأ الترجمة" Style="{StaticResource PrimaryButton}" Click="Start_Click"/>
                     <Button x:Name="StopButton" Grid.Column="1" Content="إيقاف" Margin="10,0,0,0" IsEnabled="False" Click="Stop_Click"/>
                   </Grid>
-                  <TextBlock Text="اختصار التشغيل والإيقاف: Ctrl + Alt + T" Foreground="#91A2C4" Margin="0,12,0,0" FlowDirection="RightToLeft"/>
+                  <TextBlock Text="اختصار التشغيل والإيقاف: Ctrl + Alt + T" Foreground="#9AA3B2" Margin="0,12,0,0" FlowDirection="RightToLeft"/>
                 </StackPanel>
               </Border>
             </StackPanel>
@@ -191,7 +191,7 @@
           <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="28">
               <TextBlock Text="مركز الإعدادات" Style="{StaticResource HeroTitle}" Margin="0,0,0,8"/>
-              <TextBlock Text="كل إعداد في قسم واضح. لا توجد قوائم مكررة أو حقول متداخلة." Foreground="#9AAAC7" Margin="0,0,0,18"/>
+              <TextBlock Text="كل إعداد في قسم واضح. لا توجد قوائم مكررة أو حقول متداخلة." Foreground="#9AA3B2" Margin="0,0,0,18"/>
               <TabControl x:Name="SettingsTabs" Padding="0" Margin="0,0,0,12">
 
           <TabItem Header="محرك الترجمة">
@@ -253,7 +253,7 @@
                 </StackPanel>
               </Border>
 
-              <Border Background="#101A2D" BorderBrush="#263956" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,16,0,0">
+              <Border Background="#191B23" BorderBrush="#303542" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,16,0,0">
                 <TextBlock Text="لإدارة قواميس الألعاب، استخدم قسم «قواميس الألعاب» في شريط التنقل الرئيسي."
                            Style="{StaticResource MutedText}"/>
               </Border>
@@ -301,7 +301,7 @@
               <TextBlock Text="شكل الترجمة" Style="{StaticResource H}"/>
               <TextBlock Style="{StaticResource MutedText}" Margin="0,2,0,0"
                          Text="غيّر الخط واللون والحجم ومكان الشريط. كل تغيير بيظهر فورًا في معاينة."/>
-              <Border Background="#101A2D" BorderBrush="#263956" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,10,0,0">
+              <Border Background="#191B23" BorderBrush="#303542" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,10,0,0">
                 <TextBlock Text="إعدادات الخط واللون والموضع موجودة في قسم «مظهر الترجمة» بالشريط الجانبي."
                            Style="{StaticResource MutedText}"/>
               </Border>
@@ -333,7 +333,7 @@
                 <ComboBoxItem Content="متوازن — 4.5 ثانية"/>
                 <ComboBoxItem Content="مريح — 7 ثوانٍ"/>
               </ComboBox>
-              <Border Background="#101A2D" BorderBrush="#263956" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,16,0,0">
+              <Border Background="#191B23" BorderBrush="#303542" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,16,0,0">
                 <TextBlock Text="زر التحكم نافذته صغيرة ومستقلة؛ بقية الجزيرة تظل شفافة للنقرات حتى لا تعطل تحكم اللعبة. الزر لا يسحب تركيز اللعبة."
                            Style="{StaticResource MutedText}" TextWrapping="Wrap"/>
               </Border>
