@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -98,6 +99,7 @@ public partial class MainWindow : Window
         Height = Math.Min(Height, work.Height - 20);
         LoadAiSettingsIntoUi();
         _ready = true;
+        ApplyModeControls();
         UpdatePackStatus();
         RefreshProfiles();
         RefreshRunning();
@@ -351,7 +353,24 @@ public partial class MainWindow : Window
     private void Mode_Changed(object sender, RoutedEventArgs e)
     {
         if (!_ready) return;
+        ApplyModeControls();
         _settings.ModeIndex = ModeIndexValue; _settings.Save();
+    }
+
+    private void ApplyModeControls()
+    {
+        bool wholeScreen = ScreenMode;
+        ContinuousBox.IsEnabled = !wholeScreen;
+        ContinuousBox.Content = wholeScreen
+            ? "تحديث مستمر (مطلوب لترجمة صفحات اللعبة تلقائيًا)"
+            : "تحديث مستمر (لو قفلته: الترجمة بتحصل لما تضغط الاختصار بس)";
+
+        if (wholeScreen && ContinuousBox.IsChecked != true)
+        {
+            ContinuousBox.IsChecked = true;
+            _settings.Continuous = true;
+            _settings.Save();
+        }
     }
 
     private void Capture_Changed(object sender, SelectionChangedEventArgs e)
@@ -835,9 +854,15 @@ public partial class MainWindow : Window
             ? _monitors[Math.Min(MonitorBox.SelectedIndex, _monitors.Count - 1)].Bounds
             : new System.Drawing.Rectangle(0, 0, GetSystemMetrics(0), GetSystemMetrics(1));
         var overlay = new WpfScreenOverlay(EnsureScreenWindow(), () => _settings.Style);
+        // Whole-screen mode must keep watching for the next dialogue/menu/page without a hotkey.
+        ContinuousBox.IsChecked = true;
+        ContinuousBox.IsEnabled = false;
+        _settings.Continuous = true;
+        _settings.Save();
+
         var options = new ScreenPipelineOptions
         {
-            Continuous = ContinuousBox.IsChecked == true,
+            Continuous = true,
             // Fullscreen scenes often contain idle character animation. Scan at a bounded cadence
             // instead of waiting for a perfectly static frame that may never arrive.
             Interval = TimeSpan.FromMilliseconds(SpeedBox.SelectedIndex switch { 0 => 550, 2 => 250, _ => 350 }),
@@ -898,6 +923,22 @@ public partial class MainWindow : Window
         UpdatePackStatus();
     }
 
+    private bool _closeAfterStop;
+
+    protected override async void OnClosing(CancelEventArgs e)
+    {
+        if (!_closeAfterStop)
+        {
+            e.Cancel = true;
+            _closeAfterStop = true;
+            try { await StopAsync(); }
+            catch (Exception ex) { AppLog.Write(ex); }
+            Close();
+            return;
+        }
+        base.OnClosing(e);
+    }
+
     protected override void OnClosed(EventArgs e)
     {
         _watcher.Stop();
@@ -912,6 +953,12 @@ public partial class MainWindow : Window
         }
         _capture?.Dispose();
         _grabber?.Dispose();
+        foreach (var info in _restoreInfos.Values.ToArray())
+        {
+            try { WindowTools.Restore(info); }
+            catch (Exception ex) { AppLog.Write(ex); }
+        }
+        _restoreInfos.Clear();
         _speaker?.Dispose();
         _overlay?.Close();
         _screenWindow?.Close();

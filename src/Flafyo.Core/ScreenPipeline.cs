@@ -53,7 +53,9 @@ public sealed class ScreenPipeline : IAsyncDisposable
     {
         _grabber = grabber; _ocr = ocr; _resolver = resolver; _overlay = overlay; _area = area; _log = log;
         _opt = options ?? new ScreenPipelineOptions();
-        _detector = new ChangeDetector(_opt.ChangeThreshold);
+        // Whole-screen subtitles can change in a tiny part of a 1080p frame. Keep the default coarse
+        // detector for region mode, but use a denser grid and one changed cell in this pipeline.
+        _detector = new ChangeDetector(_opt.ChangeThreshold, gridX: 128, gridY: 72, blockDelta: 8, minChangedBlocks: 1);
     }
 
     public void Start() => _worker ??= Task.Run(() => Supervise());
@@ -192,6 +194,10 @@ public sealed class ScreenPipeline : IAsyncDisposable
         for (int i = 0; i < frame.Gray.Length; i += 97) if (frame.Gray[i] > max) max = frame.Gray[i];
         if (max < 8)
         {
+            // A black frame (common during fullscreen scene transitions) is an empty scene,
+            // not a valid OCR result. Start the normal grace timer so stale translations clear.
+            if (Interlocked.Read(ref _emptySince) == 0)
+                Interlocked.Exchange(ref _emptySince, Stopwatch.GetTimestamp());
             _log?.Invoke("الصورة سودة: اللعبة غالبًا Fullscreen. غيّر طريقة التصوير لـ «متقدم» أو شغّل اللعبة Borderless.");
             return;
         }
@@ -221,6 +227,7 @@ public sealed class ScreenPipeline : IAsyncDisposable
         var area = _area();
         var translated = new List<TranslatedBlock>();
         var translation = Stopwatch.StartNew();
+        bool allTranslated = true;
         long lastPublish = Stopwatch.GetTimestamp();
         foreach (var block in blocks)
         {
@@ -229,10 +236,17 @@ public sealed class ScreenPipeline : IAsyncDisposable
             {
                 var (ar, _) = await _resolver.ResolveAsync(block.Text, ct).ConfigureAwait(false);
                 ct.ThrowIfCancellationRequested();
-                if (!string.IsNullOrWhiteSpace(ar)) translated.Add(new TranslatedBlock(block, ar));
+                if (!string.IsNullOrWhiteSpace(ar))
+                    translated.Add(new TranslatedBlock(block, ar));
+                else
+                    allTranslated = false;
             }
             catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
-            catch (Exception ex) { _log?.Invoke("Translation failed: " + ex.Message); }
+            catch (Exception ex)
+            {
+                allTranslated = false;
+                _log?.Invoke("Translation failed: " + ex.Message);
+            }
 
             if (translated.Count > 0 && Seconds(lastPublish, Stopwatch.GetTimestamp()) > 1.0)
             {
@@ -243,8 +257,18 @@ public sealed class ScreenPipeline : IAsyncDisposable
         }
         ct.ThrowIfCancellationRequested();
         translation.Stop();
-        Publish(translated, area);
-        _lastBlocks = blocks;
+
+        // Publish only translations completed for this frame. A failed block must not keep stale
+        // text from the previous page on screen, nor mark the current page as fully processed.
+        if (translated.Count > 0) Publish(translated, area);
+        else
+        {
+            try { _overlay.Clear(); } catch (Exception ex) { _log?.Invoke("Overlay clear failed: " + ex.Message); }
+            try { Updated?.Invoke(Array.Empty<TranslatedBlock>()); } catch { }
+        }
+
+        // If one block failed, a later changed frame retries this layout; successful blocks are cached.
+        _lastBlocks = allTranslated ? blocks : null;
         ReportPerformance(lines.Count, blocks.Count, ocrMs, total, translation);
     }
 
@@ -260,9 +284,23 @@ public sealed class ScreenPipeline : IAsyncDisposable
         if (b == null || a.Count != b.Count) return false;
         for (int i = 0; i < a.Count; i++)
         {
-            if (!TextQuality.IsJitterOf(a[i].Text, b[i].Text)) return false;
-            // OCR boxes can drift a few pixels between frames because of animation, scaling, and antialiasing.
-            if (Math.Abs(a[i].Box.X - b[i].Box.X) > 18 || Math.Abs(a[i].Box.Y - b[i].Box.Y) > 18) return false;
+            var current = a[i];
+            var previous = b[i];
+
+            // Fuzzy OCR similarity is useful for noise filtering, but unsafe for scene identity:
+            // a one-character quest/dialog change can be a genuinely new line and must be translated.
+            var currentText = TextNormalizer.Normalize(current.Text);
+            var previousText = TextNormalizer.Normalize(previous.Text);
+            if (!string.Equals(currentText, previousText, StringComparison.OrdinalIgnoreCase)) return false;
+            if (current.Kind != previous.Kind) return false;
+
+            // Position and dimensions may drift slightly because of animation/antialiasing.
+            if (Math.Abs(current.Box.X - previous.Box.X) > 18 ||
+                Math.Abs(current.Box.Y - previous.Box.Y) > 18 ||
+                Math.Abs(current.Box.Width - previous.Box.Width) > 24 ||
+                Math.Abs(current.Box.Height - previous.Box.Height) > 10 ||
+                Math.Abs(current.LineHeight - previous.LineHeight) > 4)
+                return false;
         }
         return true;
     }

@@ -14,33 +14,85 @@ public partial class ScreenOverlayWindow : Window
 {
     [DllImport("user32.dll")] private static extern int GetSystemMetrics(int index);
     private const int SM_XVIRTUALSCREEN = 76, SM_YVIRTUALSCREEN = 77, SM_CXVIRTUALSCREEN = 78, SM_CYVIRTUALSCREEN = 79;
+    private readonly List<Border> _cards = new();
 
     public ScreenOverlayWindow()
     {
         InitializeComponent();
         var hwnd = new WindowInteropHelper(this).EnsureHandle();
-        OverlayWindowStyles.Apply(hwnd);     // click-through, never takes focus, hidden from screen capture (so OCR never reads our own cards)
+        OverlayWindowStyles.Apply(hwnd);     // click-through and visible to OBS/display capture; OCR filters Arabic overlay text.
+        Opacity = 0; // Resolve the real monitor DPI after Show(), before placing cards in physical screen coordinates.
     }
 
     public void ShowBlocks(IReadOnlyList<TranslatedBlock> blocks, System.Drawing.Rectangle area, OverlayStyle style)
     {
+        if (!IsVisible)
+        {
+            Opacity = 0;
+            Show();
+        }
+        UpdateLayout();
+
+        // WPF can report the default 96-DPI scale for a handle that has not been shown yet.
+        // Read the scale only after the window is visible on its target display.
         double scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
         if (scale <= 0) scale = 1;
-        double vx = GetSystemMetrics(SM_XVIRTUALSCREEN) / scale, vy = GetSystemMetrics(SM_YVIRTUALSCREEN) / scale;
-        double vw = GetSystemMetrics(SM_CXVIRTUALSCREEN) / scale, vh = GetSystemMetrics(SM_CYVIRTUALSCREEN) / scale;
-        Left = vx; Top = vy; Width = vw; Height = vh;
+        int vxPx = GetSystemMetrics(SM_XVIRTUALSCREEN);
+        int vyPx = GetSystemMetrics(SM_YVIRTUALSCREEN);
+        double vw = GetSystemMetrics(SM_CXVIRTUALSCREEN) / scale;
+        double vh = GetSystemMetrics(SM_CYVIRTUALSCREEN) / scale;
+        Left = vxPx / scale;
+        Top = vyPx / scale;
+        Width = vw;
+        Height = vh;
+        UpdateLayout();
 
-        Layer.Children.Clear();
-        foreach (var tb in blocks)
+        for (int i = 0; i < blocks.Count; i++)
         {
-            var card = MakeCard(tb, scale, style, vw);
-            double x = (area.X + tb.Block.Box.X) / scale - vx;
-            double y = (area.Y + tb.Block.Box.Y) / scale - vy;
-            Canvas.SetLeft(card, Math.Max(0, Math.Min(x, vw - card.Width)));
-            Canvas.SetTop(card, Math.Max(0, Math.Min(y, vh - card.DesiredSize.Height)));
-            Layer.Children.Add(card);
+            var fresh = MakeCard(blocks[i], scale, style, vw);
+            Border card;
+            if (i >= _cards.Count)
+            {
+                card = fresh;
+                _cards.Add(card);
+                Layer.Children.Add(card);
+            }
+            else
+            {
+                card = _cards[i];
+                CopyCard(card, fresh);
+            }
+
+            card.Visibility = Visibility.Visible;
+            card.Measure(new Size(card.Width, double.PositiveInfinity));
+            // Convert physical desktop pixels through WPF's actual visual transform, not a guessed DPI divisor.
+            var screenPoint = new Point(
+                area.X + blocks[i].Block.Box.X,
+                area.Y + blocks[i].Block.Box.Y);
+            var localPoint = Layer.PointFromScreen(screenPoint);
+            Canvas.SetLeft(card, Math.Max(0, Math.Min(localPoint.X, vw - card.Width)));
+            Canvas.SetTop(card, Math.Max(0, Math.Min(localPoint.Y, vh - card.DesiredSize.Height)));
         }
-        if (!IsVisible) Show();
+
+        // Keep existing card objects but hide those no longer present, avoiding needless visual-tree rebuilds.
+        for (int i = blocks.Count; i < _cards.Count; i++)
+            _cards[i].Visibility = Visibility.Collapsed;
+
+        Opacity = 1;
+    }
+
+    private static void CopyCard(Border target, Border source)
+    {
+        target.Child = source.Child;
+        target.Width = source.Width;
+        target.Padding = source.Padding;
+        target.CornerRadius = source.CornerRadius;
+        target.SnapsToDevicePixels = source.SnapsToDevicePixels;
+        target.Effect = source.Effect;
+        target.FlowDirection = source.FlowDirection;
+        target.Background = source.Background;
+        target.BorderBrush = source.BorderBrush;
+        target.BorderThickness = source.BorderThickness;
     }
 
     private static Border MakeCard(TranslatedBlock tb, double scale, OverlayStyle s, double maxWidth)
@@ -91,7 +143,12 @@ public partial class ScreenOverlayWindow : Window
         return card;
     }
 
-    public void ClearAll() { Layer.Children.Clear(); Hide(); }
+    public void ClearAll()
+    {
+        Layer.Children.Clear();
+        _cards.Clear();
+        Hide();
+    }
 
     public void ToggleVisible() { if (IsVisible) Hide(); else if (Layer.Children.Count > 0) Show(); }
 }

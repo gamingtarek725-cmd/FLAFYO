@@ -14,6 +14,8 @@ public partial class OverlayWindow : Window
 {
     [DllImport("user32.dll")] private static extern int GetSystemMetrics(int index);
     private const int SM_CXSCREEN = 0, SM_CYSCREEN = 1;
+    private const int SM_XVIRTUALSCREEN = 76, SM_YVIRTUALSCREEN = 77;
+    private const int SM_CXVIRTUALSCREEN = 78, SM_CYVIRTUALSCREEN = 79;
     private readonly DispatcherTimer _hideTimer = new();
     private readonly DispatcherTimer _collapseTimer = new();
     private OverlayStyle _style = new();
@@ -21,7 +23,7 @@ public partial class OverlayWindow : Window
     private bool _expanded;
     private bool _translationRunning;
     public event Action? ToggleRequested;
-    private const double ExpandedWidth = 540;
+    private double _expandedWidth = 540;
     private const double CollapsedWidth = 292;
     private const double TopInset = 18;
 
@@ -135,7 +137,7 @@ public partial class OverlayWindow : Window
         ShowText("هذه معاينة FLAFYO Island. ستظهر الترجمة هنا أثناء اللعب.",
                  "This is a preview of your live game translation.", region, 7);
 
-    /// <summary>Displays a click-through Dynamic Island style translation at the top-center of the primary display.</summary>
+    /// <summary>Displays a click-through translation at the selected position relative to the captured game region.</summary>
     public void ShowText(string text, string? original, System.Drawing.Rectangle regionPx, int hideAfter = -1)
     {
         if (!_style.IslandEnabled) return;
@@ -153,11 +155,9 @@ public partial class OverlayWindow : Window
         Card.Padding = new Thickness(18, 12, 18, 12);
         BeginAnimation(WidthProperty, null);
         BeginAnimation(LeftProperty, null);
-        Width = ExpandedWidth;
-        UpdateLayout();
-        PositionAtTopCenter(ExpandedWidth);
-
         if (!IsVisible) Show();
+        UpdateLayout();
+        PositionForRegion(regionPx, _style);
         PositionControlWindow();
         _collapseTimer.Stop();
         _collapseTimer.Interval = TimeSpan.FromSeconds(Math.Clamp(_style.IslandCollapseSeconds, 1, 15));
@@ -180,6 +180,57 @@ public partial class OverlayWindow : Window
         return Math.Max(8, (screenWidth - width) / 2);
     }
 
+    private void PositionForRegion(System.Drawing.Rectangle regionPx, OverlayStyle style)
+    {
+        double scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
+        if (scale <= 0) scale = 1;
+
+        int vx = GetSystemMetrics(SM_XVIRTUALSCREEN);
+        int vy = GetSystemMetrics(SM_YVIRTUALSCREEN);
+        int vw = Math.Max(1, GetSystemMetrics(SM_CXVIRTUALSCREEN));
+        int vh = Math.Max(1, GetSystemMetrics(SM_CYVIRTUALSCREEN));
+
+        int mode = Math.Clamp(style.OverlayMode, 0, 2);
+        int requestedWidthPx = mode == 2 && style.AreaW >= 100
+            ? style.AreaW
+            : style.AutoWidthPx > 0 ? style.AutoWidthPx : regionPx.Width;
+        double maxWidthDip = Math.Max(340, Math.Min(900, vw / scale - 16));
+        _expandedWidth = Math.Clamp(requestedWidthPx / scale, Math.Min(360, maxWidthDip), maxWidthDip);
+
+        BeginAnimation(WidthProperty, null);
+        Width = _expandedWidth;
+        Label.MaxWidth = Math.Max(260, _expandedWidth - 60);
+        Original.MaxWidth = Label.MaxWidth;
+        UpdateLayout();
+
+        double widthPx = _expandedWidth * scale;
+        double heightPx = Math.Max(80, ActualHeight * scale);
+        double x;
+        double y;
+
+        if (mode == 2 && style.AreaW >= 100 && style.AreaH >= 40)
+        {
+            // Fixed position uses the user's selected rectangle in physical screen pixels.
+            x = style.AreaX;
+            y = style.AreaY;
+        }
+        else
+        {
+            x = regionPx.Left + regionPx.Width / 2.0 - widthPx / 2.0;
+            bool placeAbove = mode != 1;
+            y = placeAbove ? regionPx.Top - heightPx - 12 : regionPx.Bottom + 12;
+
+            // Keep the card visible when the selected region is close to a screen edge.
+            if (placeAbove && y < vy + 8) y = regionPx.Bottom + 12;
+            else if (!placeAbove && y + heightPx > vy + vh - 8) y = regionPx.Top - heightPx - 12;
+        }
+
+        x = Math.Clamp(x, vx + 8, Math.Max(vx + 8, vx + vw - widthPx - 8));
+        y = Math.Clamp(y, vy + 8, Math.Max(vy + 8, vy + vh - heightPx - 8));
+        Left = x / scale;
+        Top = y / scale;
+    }
+
     private void PositionAtTopCenter(double width)
     {
         Left = CenteredLeft(width);
@@ -197,8 +248,9 @@ public partial class OverlayWindow : Window
         Card.Padding = new Thickness(14, 9, 14, 9);
         var duration = TimeSpan.FromMilliseconds(260);
         var easing = new CubicEase { EasingMode = EasingMode.EaseOut };
+        double collapsedLeft = Left + Math.Max(0, (Width - CollapsedWidth) / 2);
         BeginAnimation(WidthProperty, new DoubleAnimation(Width, CollapsedWidth, duration) { EasingFunction = easing });
-        BeginAnimation(LeftProperty, new DoubleAnimation(Left, CenteredLeft(CollapsedWidth), duration) { EasingFunction = easing });
+        BeginAnimation(LeftProperty, new DoubleAnimation(Left, collapsedLeft, duration) { EasingFunction = easing });
         PositionControlWindow();
     }
 

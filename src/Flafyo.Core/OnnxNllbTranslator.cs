@@ -51,9 +51,21 @@ public sealed class OnnxNllbTranslator : ITranslator, IDisposable
             InterOpNumThreads = 1,
             GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_ALL
         };
-        var enc = new InferenceSession(Path.Combine(dir, "onnx", "encoder_model_quantized.onnx"), opts);
-        var dec = new InferenceSession(Path.Combine(dir, "onnx", "decoder_model_merged_quantized.onnx"), opts);
-        return new OnnxNllbTranslator(enc, dec, opts, tok, pad, eos, start, targetId, heads, dModel / heads, sourceLang);
+        InferenceSession? enc = null;
+        InferenceSession? dec = null;
+        try
+        {
+            enc = new InferenceSession(Path.Combine(dir, "onnx", "encoder_model_quantized.onnx"), opts);
+            dec = new InferenceSession(Path.Combine(dir, "onnx", "decoder_model_merged_quantized.onnx"), opts);
+            return new OnnxNllbTranslator(enc!, dec!, opts, tok, pad, eos, start, targetId, heads, dModel / heads, sourceLang);
+        }
+        catch
+        {
+            dec?.Dispose();
+            enc?.Dispose();
+            opts.Dispose();
+            throw;
+        }
     }
 
     public int[] DebugEncode(string text) => _tok.Encode(text, _sourceLang);
