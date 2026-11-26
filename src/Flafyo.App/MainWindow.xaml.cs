@@ -47,11 +47,43 @@ public partial class MainWindow : Window
     private bool _downloading;
     private IntPtr _hwnd;
 
+    private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e) => ApplyResponsiveLayout();
+
+    private void ApplyResponsiveLayout()
+    {
+        if (!IsInitialized) return;
+
+        // Keep the sidebar usable while giving the content area more room on compact windows.
+        SidebarColumn.Width = new GridLength(ActualWidth < 1120 ? 210 : 252);
+
+        // Each dashboard card gets roughly 300 DIPs. The number of columns follows
+        // the actual content width, not the monitor's nominal pixel resolution.
+        var contentWidth = MainScrollViewer.ActualWidth;
+        var columns = Math.Clamp((int)Math.Floor(contentWidth / 300d), 1, 3);
+        OverviewCardsGrid.Columns = columns;
+        ToolsCardsGrid.Columns = columns;
+    }
+
     public MainWindow()
     {
         InitializeComponent();
         MainTabs.SelectedIndex = 0; // Always open on the dashboard.
-        Loaded += (_, _) => { MainTabs.SelectedIndex = 0; MainScrollViewer.ScrollToTop(); };
+        Loaded += (_, _) =>
+        {
+            // Respect the usable desktop area so the window opens fully on smaller displays.
+            var workArea = SystemParameters.WorkArea;
+            if (WindowState != WindowState.Maximized)
+            {
+                Width = Math.Min(Width, Math.Max(MinWidth, workArea.Width - 32));
+                Height = Math.Min(Height, Math.Max(MinHeight, workArea.Height - 32));
+                Left = workArea.Left + (workArea.Width - Width) / 2;
+                Top = workArea.Top + (workArea.Height - Height) / 2;
+            }
+
+            MainTabs.SelectedIndex = 0;
+            MainScrollViewer.ScrollToTop();
+            ApplyResponsiveLayout();
+        };
         UpdateStatusText.Text = $"الإصدار {typeof(MainWindow).Assembly.GetName().Version?.ToString(3) ?? "غير معروف"}";
         UserData.EnsureTemplates();
         if (_settings.Width >= 20 && _settings.Height >= 10)
