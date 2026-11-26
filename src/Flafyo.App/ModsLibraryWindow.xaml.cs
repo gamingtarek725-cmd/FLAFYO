@@ -270,7 +270,7 @@ public partial class ModsLibraryWindow : UserControl
             uri.Scheme != Uri.UriSchemeHttps || !uri.IsDefaultPort ||
             !string.IsNullOrEmpty(uri.UserInfo)) return false;
         var allowed = new[] {
-            "curseforge.com", "minecraft.net", "moddingway.com", "fifa-infinity.com", "steamcommunity.com"
+            "curseforge.com", "minecraft.net", "moddingway.com", "fifa-infinity.com", "steamcommunity.com", "farming-simulator.com", "stardewvalleywiki.com"
         };
         return allowed.Any(host => uri.Host.Equals(host, StringComparison.OrdinalIgnoreCase) ||
                                    uri.Host.EndsWith("." + host, StringComparison.OrdinalIgnoreCase));
