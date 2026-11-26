@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-26T16:00:00Z",
+  "generatedAt": "2026-11-26T16:15:00Z",
   "entries": [
     {
       "title": "Minecraft Marketplace",
@@ -83,6 +83,34 @@
       "installMethod": "افتح الورشة من حساب Steam، واختر خرائط أو مباني أو أصولًا، ثم اقرأ المتطلبات والتوافق قبل الاشتراك في المحتوى.",
       "safetyNotes": "بعض العناصر تحتاج DLC أو إضافات أخرى. راجع التقييمات وتاريخ التحديث، ولا تثبّت عناصر غير متوافقة مع نسختك.",
       "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/255710/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Euro Truck Simulator 2 — شاحنات وطلاءات وإضافات",
+      "game": "Euro Truck Simulator 2",
+      "platform": "PC / Windows",
+      "category": "شاحنات · طلاءات · ملحقات المقصورة",
+      "sourceName": "Steam Workshop · Euro Truck Simulator 2",
+      "sourceUrl": "https://steamcommunity.com/app/227300/workshop/",
+      "version": "تحقق من إصدار اللعبة ومتطلبات كل إضافة",
+      "summary": "ورشة Steam الرسمية لإضافات Euro Truck Simulator 2، وتشمل تخصيص الشاحنات والطلاءات وملحقات المقصورة والمقطورات.",
+      "installMethod": "افتح الورشة من Steam، وراجع وصف الإضافة وإصدار اللعبة المطلوب قبل الاشتراك فيها.",
+      "safetyNotes": "تأكد من توافق الإضافة مع إصدار اللعبة ومع بقية الإضافات، وراجع متطلبات المحتوى الإضافي المدفوع إن وجدت.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/227300/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Planet Zoo — مخططات وحدائق ومباني",
+      "game": "Planet Zoo",
+      "platform": "PC / Windows",
+      "category": "حدائق · مخططات · مباني · مناظر طبيعية",
+      "sourceName": "Steam Workshop · Planet Zoo",
+      "sourceUrl": "https://steamcommunity.com/app/703080/workshop/",
+      "version": "تحقق من DLC المطلوب وتوافق إصدار اللعبة",
+      "summary": "ورشة Steam الرسمية لمشاركة مخططات حدائق الحيوان والمباني والموائل والمناظر الطبيعية.",
+      "installMethod": "افتح صفحة الورشة عبر Steam، واختر المخططات أو المباني أو عناصر الديكور، ثم راجع قائمة DLC المطلوبة قبل الاشتراك.",
+      "safetyNotes": "بعض العناصر تتطلب حزم DLC محددة. راجع المتطلبات والتوافق قبل إضافتها إلى لعبتك.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/703080/library_600x900_2x.jpg",
       "entryType": "directory"
     }
   ]
