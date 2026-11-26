@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-26T18:10:00+02:00",
+  "generatedAt": "2026-11-26T18:30:00+02:00",
   "entries": [
     {
       "title": "Minecraft Marketplace",
@@ -436,6 +436,62 @@
       "installMethod": "افتح ورشة Steam، وراجع وصف العنصر ومتطلباته وتاريخ تحديثه قبل الاشتراك.",
       "safetyNotes": "المكتبة تعرض المصدر الأصلي فقط ولا تستضيف الملفات. تحقق من توافق المحتوى قبل استخدامه.",
       "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/2688950/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Car Mechanic Simulator 2021 — ورشة المحتوى المجتمعي",
+      "game": "Car Mechanic Simulator 2021",
+      "platform": "PC / Windows",
+      "category": "سيارات مخصصة · طلاءات · خرائط · لوحات",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/1190000/workshop/",
+      "version": "تحقق من توافق كل عنصر مع إصدار اللعبة وDLC",
+      "summary": "ورشة Steam الرسمية تعرض سيارات مخصصة وخرائط ولوحات وترجمات وطلاءات ومحتوى إضافيًا للعبة.",
+      "installMethod": "افتح الورشة عبر Steam، واختر المحتوى المناسب، ثم راجع المتطلبات وDLC وإصدار اللعبة قبل الاشتراك.",
+      "safetyNotes": "المكتبة تعرض المصدر الأصلي ولا تستضيف الملفات. بعض العناصر تتطلب DLC؛ تحقق من الوصف والتوافق قبل الاستخدام.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/1190000/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Automation — The Car Company Tycoon Game",
+      "game": "Automation - The Car Company Tycoon Game",
+      "platform": "PC / Windows",
+      "category": "تصميم سيارات · هياكل · قطع ومكونات",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/293760/workshop/",
+      "version": "تحقق من توافق العنصر مع إصدار اللعبة",
+      "summary": "ورشة المجتمع الرسمية لتصميم السيارات، وتضم هياكل سيارات وقطعًا وتجهيزات داخلية وخارجية قابلة للاستخدام في التصاميم.",
+      "installMethod": "افتح الورشة عبر Steam، وراجع وصف العنصر والتوافق قبل الاشتراك فيه.",
+      "safetyNotes": "المكتبة تعرض المصدر الأصلي فقط. راجع متطلبات كل عنصر وتوافقه مع إصدار اللعبة.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/293760/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Train Simulator Classic — سيناريوهات المجتمع",
+      "game": "Train Simulator Classic",
+      "platform": "PC / Windows",
+      "category": "سيناريوهات · مسارات · تجارب قيادة",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/24010/workshop/",
+      "version": "قد تتطلب السيناريوهات إضافات ومسارات مدفوعة",
+      "summary": "ورشة Steam الرسمية لمشاركة سيناريوهات قيادة القطارات التي يصممها المجتمع، مع توضيح الإضافات المطلوبة لكل سيناريو.",
+      "installMethod": "افتح صفحة السيناريو واقرأ قائمة المسارات والقطارات والإضافات المطلوبة قبل الاشتراك.",
+      "safetyNotes": "قد لا يعمل السيناريو دون DLC أو أصول محددة. المكتبة تعرض المصدر الأصلي ولا تستضيف الملفات.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/24010/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "PC Building Simulator — معرض خلفيات الأجهزة",
+      "game": "PC Building Simulator",
+      "platform": "PC / Windows",
+      "category": "خلفيات · تخصيص شكل الأجهزة",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/621060/workshop/",
+      "version": "تحقق من توافق المحتوى مع إصدار اللعبة",
+      "summary": "ورشة المجتمع الرسمية لمشاركة خلفيات مخصصة تُستخدم على الشاشات داخل أجهزة الكمبيوتر الافتراضية في اللعبة.",
+      "installMethod": "افتح الورشة عبر Steam، واختر الخلفيات المناسبة، ثم اشترك فيها من صفحة العنصر.",
+      "safetyNotes": "هذا القسم مخصص للخلفيات والتخصيص البصري. راجع محتوى كل عنصر قبل استخدامه.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/621060/library_600x900_2x.jpg",
       "entryType": "directory"
     }
   ]
