@@ -23,6 +23,7 @@ public partial class ModsLibraryWindow : UserControl
         public string InstallMethod { get; init; } = "";
         public string SafetyNotes { get; init; } = "";
         public string CoverUrl { get; init; } = "";
+        public long? DownloadCount { get; init; }
     }
 
     private readonly ObservableCollection<ModEntry> _visible = new();
@@ -30,6 +31,7 @@ public partial class ModsLibraryWindow : UserControl
     private bool _refreshing;
     private string _platformFilter = "all";
     private string _gameFilter = "all";
+    private string _sortFilter = "default";
 
     public ModsLibraryWindow()
     {
@@ -119,8 +121,22 @@ public partial class ModsLibraryWindow : UserControl
             Summary = x.Summary,
             InstallMethod = x.InstallMethod,
             SafetyNotes = x.SafetyNotes,
-            CoverUrl = IsSafeCoverUrl(x.CoverUrl) ? x.CoverUrl : ""
+            CoverUrl = IsSafeCoverUrl(x.CoverUrl) ? x.CoverUrl : "",
+            DownloadCount = x.DownloadCount is >= 0 ? x.DownloadCount : null
         }).ToList();
+
+        if (GameFilter != null)
+        {
+            var selectedGame = _gameFilter;
+            GameFilter.Items.Clear();
+            GameFilter.Items.Add(new ComboBoxItem { Content = "كل الألعاب", Tag = "all" });
+            foreach (var game in entries.Select(e => e.Game).Where(g => !string.IsNullOrWhiteSpace(g))
+                         .Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(g => g, StringComparer.CurrentCultureIgnoreCase))
+                GameFilter.Items.Add(new ComboBoxItem { Content = game, Tag = game });
+            var selectedOption = GameFilter.Items.OfType<ComboBoxItem>()
+                .FirstOrDefault(item => string.Equals(item.Tag?.ToString(), selectedGame, StringComparison.OrdinalIgnoreCase));
+            GameFilter.SelectedItem = selectedOption ?? GameFilter.Items[0];
+        }
         _remoteCatalog.Clear();
         _remoteCatalog.AddRange(entries);
         RefreshList();
@@ -140,7 +156,9 @@ public partial class ModsLibraryWindow : UserControl
              ContainsText(x.Title, query) || ContainsText(x.Game, query) ||
              ContainsText(x.Category, query) || ContainsText(x.SourceName, query) ||
              ContainsText(x.Summary, query) || ContainsText(x.Platform, query)))
-            .OrderBy(x => x.Platform, StringComparer.CurrentCultureIgnoreCase)
+            .OrderBy(x => _sortFilter == "popular" ? (x.DownloadCount.HasValue ? 0 : 1) : 0)
+            .ThenByDescending(x => _sortFilter == "popular" ? x.DownloadCount ?? -1 : -1)
+            .ThenBy(x => x.Platform, StringComparer.CurrentCultureIgnoreCase)
             .ThenBy(x => x.Title, StringComparer.CurrentCultureIgnoreCase);
 
         var selected = EntriesList.SelectedItem as ModEntry;
@@ -151,6 +169,8 @@ public partial class ModsLibraryWindow : UserControl
                 x.SourceUrl.Equals(selected.SourceUrl, StringComparison.OrdinalIgnoreCase));
         if (EntriesList.SelectedItem == null && _visible.Count > 0) EntriesList.SelectedIndex = 0;
         if (CountText is not null) CountText.Text = $"{_visible.Count} مصدر";
+        if (_sortFilter == "popular" && !_visible.Any(x => x.DownloadCount.HasValue))
+            UpdateStatus.Text = "لا تتوفر إحصائيات تحميل موثقة لهذه النتائج بعد؛ لم يتم اختلاق ترتيب.";
         if (_visible.Count == 0) ShowEmpty();
     }
 
@@ -198,6 +218,13 @@ public partial class ModsLibraryWindow : UserControl
         RefreshList();
     }
 
+    private void SortFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (SortFilter?.SelectedItem is ComboBoxItem item)
+            _sortFilter = item.Tag?.ToString() ?? "default";
+        RefreshList();
+    }
+
     private void Platform_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not Button selected) return;
@@ -227,7 +254,8 @@ public partial class ModsLibraryWindow : UserControl
         {
             "اللعبة: " + (string.IsNullOrWhiteSpace(item.Game) ? "غير محددة" : item.Game),
             "المنصة: " + (string.IsNullOrWhiteSpace(item.Platform) ? "غير محددة" : item.Platform),
-            "الإصدار: " + (string.IsNullOrWhiteSpace(item.Version) ? "راجع صفحة المصدر" : item.Version)
+            "الإصدار: " + (string.IsNullOrWhiteSpace(item.Version) ? "راجع صفحة المصدر" : item.Version),
+            "عدد التحميلات: " + (item.DownloadCount.HasValue ? item.DownloadCount.Value.ToString("N0") : "غير متاح من المصدر")
         });
         DetailInfo.Text = item.Summary;
         InstallSteps.Text = item.InstallMethod;
