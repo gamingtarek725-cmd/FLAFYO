@@ -856,7 +856,7 @@ public partial class MainWindow : Window
 
     private void StartRegion(WindowsOcrEngine ocr, TranslationResolver resolver)
     {
-        var sink = new WpfOverlaySink(EnsureOverlay(), () => Region);
+        var sink = new WpfRegionOverlaySink(EnsureScreenWindow(), () => Region, () => _settings.Style);
 
         // wait a little before translating so half-typed lines are not translated on their own
         var options = new PipelineOptions
