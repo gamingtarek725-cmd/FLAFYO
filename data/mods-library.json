@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-26T19:00:00+02:00",
+  "generatedAt": "2026-11-26T16:20:30.349Z",
   "entries": [
     {
       "title": "Minecraft Marketplace",
@@ -576,6 +576,76 @@
       "installMethod": "افتح ورشة Steam، واختر مرحلة، ثم راجع وصفها وإصدار اللعبة المطلوب.",
       "safetyNotes": "المكتبة تعرض صفحة المصدر ولا تستضيف ملفات المراحل.",
       "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/367450/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "NIMBY Rails — ورشة المجتمع",
+      "game": "NIMBY Rails",
+      "platform": "PC / Windows",
+      "category": "شبكات قطارات · محطات · خرائط · واجهات",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/1134710/workshop/",
+      "version": "تحقق من توافق المود مع إصدار اللعبة",
+      "summary": "ورشة Steam الرسمية لمودات NIMBY Rails، وتشمل القطارات والعربات والمحطات والخرائط وأنماط الخرائط والترجمات وعناصر التحكم.",
+      "installMethod": "افتح صفحة الورشة عبر Steam، واختر الفئة المناسبة، ثم راجع وصف العنصر ومتطلباته وتاريخ تحديثه قبل الاشتراك.",
+      "safetyNotes": "المكتبة تعرض المصدر الأصلي فقط ولا تستضيف الملفات. تحقق من التوافق قبل الاشتراك في المحتوى.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/1134710/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Production Line — ورشة المودات",
+      "game": "Production Line",
+      "platform": "PC / Windows",
+      "category": "مصانع سيارات · تحسين الإنتاج · ألوان وشعارات",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/591370/workshop/",
+      "version": "تحقق من توافق المود مع إصدار اللعبة",
+      "summary": "ورشة Steam الرسمية لمودات Production Line، وتضم تحسينات الإنتاج ومكونات المصنع والخرائط والألوان والشعارات وتعديلات تجربة اللعب.",
+      "installMethod": "افتح صفحة الورشة عبر Steam، ثم راجع وصف المود ومتطلباته. تدعم اللعبة لوحة إدارة للمودات من القائمة الرئيسية.",
+      "safetyNotes": "المكتبة تربط بالمصدر الأصلي ولا تستضيف الملفات. راجع وصف كل مود قبل تثبيته.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/591370/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Mashinky — ورشة المجتمع",
+      "game": "Mashinky",
+      "platform": "PC / Windows",
+      "category": "قطارات · خرائط · مبانٍ · محطات",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/598960/workshop/",
+      "version": "تحقق من توافق المود مع إصدار اللعبة",
+      "summary": "ورشة المجتمع الرسمية لتخصيص Mashinky، وتشمل مركبات السكك الحديدية والخرائط والمباني والمحطات وعناصر البيئة.",
+      "installMethod": "افتح ورشة Steam، واختر المحتوى المطلوب، ثم تحقق من متطلبات العنصر وتوافقه قبل الاشتراك.",
+      "safetyNotes": "قد تتطلب بعض العناصر إصدارًا أو محتوى إضافيًا. استخدم صفحة المصدر الرسمية وتحقق من التفاصيل.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/598960/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Transport Fever — ورشة المجتمع",
+      "game": "Transport Fever",
+      "platform": "PC / Windows",
+      "category": "مركبات نقل · محطات · أصول · سيناريوهات",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/446800/workshop/",
+      "version": "تحقق من توافق المود مع إصدار اللعبة",
+      "summary": "ورشة Steam الرسمية لمشاركة وتثبيت تعديلات Transport Fever، مثل المركبات ومحطات النقل والأصول والسيناريوهات.",
+      "installMethod": "افتح الورشة من Steam، ثم راجع وصف المود وإصداره ومتطلباته قبل الاشتراك.",
+      "safetyNotes": "قد تحتاج بعض العناصر إلى محتوى إضافي أو DLC. المكتبة تعرض رابط المصدر الأصلي فقط.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/446800/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Factory Town — ورشة المجتمع",
+      "game": "Factory Town",
+      "platform": "PC / Windows",
+      "category": "خرائط · سيناريوهات · عناصر · وصفات",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/860890/workshop/",
+      "version": "تحقق من توافق المحتوى مع إصدار اللعبة",
+      "summary": "ورشة المجتمع الرسمية لمشاركة الخرائط والبيئات والسيناريوهات والحفظات وقواعد اللعب المخصصة.",
+      "installMethod": "افتح ورشة Steam، وحدد نوع المحتوى المناسب، ثم اقرأ وصف العنصر وإصدار اللعبة المطلوب قبل الاشتراك.",
+      "safetyNotes": "المكتبة تعرض المصدر الأصلي ولا تستضيف الملفات. تحقق من توافق الخرائط والسيناريوهات قبل استخدامها.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/860890/library_600x900_2x.jpg",
       "entryType": "directory"
     }
   ]
