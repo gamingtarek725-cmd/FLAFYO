@@ -99,7 +99,7 @@ public partial class ModsLibraryWindow : UserControl
              (_platformFilter == "pc" && HasPlatform(x, "PC", "Windows")) ||
              (_platformFilter == "android" && HasPlatform(x, "Android")) ||
              (_platformFilter == "ios" && HasPlatform(x, "iOS", "iPhone", "iPad")) ||
-             (_platformFilter == "multi" && (HasPlatform(x, "متعدد") || HasPlatform(x, "Multi")))) &&
+             (_platformFilter == "multi" && IsMultiPlatform(x))) &&
             (string.IsNullOrWhiteSpace(query) ||
              ContainsText(x.Title, query) || ContainsText(x.Game, query) ||
              ContainsText(x.Category, query) || ContainsText(x.SourceName, query) ||
@@ -142,6 +142,16 @@ public partial class ModsLibraryWindow : UserControl
 
     private static bool HasPlatform(ModEntry entry, params string[] platforms) =>
         platforms.Any(platform => entry.Platform.Contains(platform, StringComparison.OrdinalIgnoreCase));
+
+    private static bool IsMultiPlatform(ModEntry entry)
+    {
+        var value = entry.Platform;
+        var hasPc = value.Contains("PC", StringComparison.OrdinalIgnoreCase) ||
+                    value.Contains("Windows", StringComparison.OrdinalIgnoreCase);
+        var hasAndroid = value.Contains("Android", StringComparison.OrdinalIgnoreCase);
+        var hasIos = value.Contains("iOS", StringComparison.OrdinalIgnoreCase);
+        return (hasPc && (hasAndroid || hasIos)) || (hasAndroid && hasIos);
+    }
 
     private void SearchBox_TextChanged(object sender, TextChangedEventArgs e) => RefreshList();
 
