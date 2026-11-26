@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-26T16:20:30.349Z",
+  "generatedAt": "2026-11-26T19:20:09.262Z",
   "entries": [
     {
       "title": "Minecraft Marketplace",
@@ -646,6 +646,62 @@
       "installMethod": "افتح ورشة Steam، وحدد نوع المحتوى المناسب، ثم اقرأ وصف العنصر وإصدار اللعبة المطلوب قبل الاشتراك.",
       "safetyNotes": "المكتبة تعرض المصدر الأصلي ولا تستضيف الملفات. تحقق من توافق الخرائط والسيناريوهات قبل استخدامها.",
       "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/860890/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Timberborn — ورشة الخرائط والمودات",
+      "game": "Timberborn",
+      "platform": "PC / Windows",
+      "category": "خرائط · مبانٍ · نباتات · تحسينات جودة الحياة",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/1062090/workshop/",
+      "version": "تأكد من توافق المود مع تحديث اللعبة الحالي",
+      "summary": "ورشة Steam الرسمية للعبة Timberborn، وتضم خرائط من صنع اللاعبين ومودات للمباني والنباتات وتحسينات جودة الحياة والمظهر والترجمات.",
+      "installMethod": "افتح الورشة عبر Steam، واختر خرائط أو عناصر بناء أو تحسينات واجهة، ثم راجع توافقها مع إصدار اللعبة قبل الاشتراك.",
+      "safetyNotes": "تختلف المودات في توافقها مع تحديثات اللعبة. المكتبة تعرض المصدر الأصلي فقط ولا تستضيف الملفات.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/1062090/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Software Inc. — ورشة المحتوى والتخصيص",
+      "game": "Software Inc.",
+      "platform": "PC / Windows",
+      "category": "أثاث مكاتب · أنواع برامج · واجهات · تحسينات",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/362620/workshop/",
+      "version": "راجع توافق العنصر مع إصدار اللعبة والنسخة التجريبية",
+      "summary": "ورشة Steam الرسمية لمحتوى Software Inc.، وتشمل الأثاث وأنواع البرامج والشركات الافتراضية وتحسينات الواجهة ومحتوى البيانات.",
+      "installMethod": "افتح صفحة الورشة، ثم اختر عناصر الأثاث أو واجهة المستخدم أو محتوى البيانات، واقرأ متطلبات الإصدار قبل الاشتراك.",
+      "safetyNotes": "قد تتطلب بعض المودات إصدارًا تجريبيًا محددًا أو مودات أساسية. راجع المتطلبات قبل التثبيت.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/362620/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Infinifactory — ألغاز المجتمع",
+      "game": "Infinifactory",
+      "platform": "PC / Windows",
+      "category": "ألغاز هندسية · مراحل من صنع اللاعبين",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/300570/workshop/",
+      "version": "مراحل المجتمع للعبة Infinifactory",
+      "summary": "ورشة Steam الرسمية لمشاركة الألغاز الهندسية التي يصممها اللاعبون، مع محرر مراحل داخل اللعبة وإمكانية الاشتراك في مراحل جديدة.",
+      "installMethod": "افتح الورشة عبر Steam، واستعرض قسم Puzzles، ثم اشترك في المرحلة التي تريد تجربتها.",
+      "safetyNotes": "المحتوى عبارة عن مراحل ألغاز يشاركها المجتمع. تحقق من وصف المرحلة قبل الاشتراك.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/300570/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Opus Magnum — ألغاز المجتمع",
+      "game": "Opus Magnum",
+      "platform": "PC / Windows",
+      "category": "ألغاز منطقية · تصميم آلات · مراحل",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/558990/workshop/",
+      "version": "قد تتطلب بعض المجموعات محتوى De Re Metallica الإضافي",
+      "summary": "ورشة Steam الرسمية لمشاركة ألغاز تصميم الآلات والحلول التي يصنعها اللاعبون، مع محرر مدمج ومجموعات ألغاز مجتمعية.",
+      "installMethod": "افتح الورشة عبر Steam، واستعرض الألغاز أو المجموعات، ثم راجع ما إذا كانت تتطلب محتوى إضافيًا قبل الاشتراك.",
+      "safetyNotes": "بعض المجموعات تتطلب DLC محددًا. راجع صفحة كل لغز ومتطلباته قبل إضافته.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/558990/library_600x900_2x.jpg",
       "entryType": "directory"
     }
   ]
