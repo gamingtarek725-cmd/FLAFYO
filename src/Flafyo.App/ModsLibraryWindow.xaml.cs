@@ -1,0 +1,285 @@
+using System;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+
+namespace Flafyo.Desktop;
+
+public partial class ModsLibraryWindow : UserControl
+{
+    public sealed class ModEntry
+    {
+        public string Title { get; init; } = "";
+        public string Game { get; init; } = "";
+        public string Platform { get; init; } = "";
+        public string Category { get; init; } = "";
+        public string SourceName { get; init; } = "";
+        public string SourceUrl { get; init; } = "";
+        public string Version { get; init; } = "";
+        public string Summary { get; init; } = "";
+        public string InstallMethod { get; init; } = "";
+        public string SafetyNotes { get; init; } = "";
+        public string CoverUrl { get; init; } = "";
+        public long? DownloadCount { get; init; }
+    }
+
+    private readonly ObservableCollection<ModEntry> _visible = new();
+    private readonly System.Collections.Generic.List<ModEntry> _remoteCatalog = new();
+    private bool _refreshing;
+    private string _platformFilter = "all";
+    private string _gameFilter = "all";
+    private string _sortFilter = "default";
+
+    public ModsLibraryWindow()
+    {
+        InitializeComponent();
+        EntriesList.ItemsSource = _visible;
+        ApplyCatalog(ModsCatalogService.LoadCache());
+        RefreshList();
+        Loaded += async (_, _) => await RefreshCatalogAsync();
+    }
+
+    private async void RefreshLibrary_Click(object sender, RoutedEventArgs e) => await RefreshCatalogAsync();
+
+    private void BrowseGames_Click(object sender, RoutedEventArgs e)
+    {
+        var games = _remoteCatalog
+            .GroupBy(x => x.Game, StringComparer.OrdinalIgnoreCase)
+            .Where(g => !string.IsNullOrWhiteSpace(g.Key))
+            .Select(g => new GameCard(g.Key, g.Count(), g.Select(x => x.CoverUrl).FirstOrDefault(url => !string.IsNullOrWhiteSpace(url)) ?? ""))
+            .OrderBy(g => g.Name, StringComparer.CurrentCultureIgnoreCase)
+            .ToList();
+
+        var dialog = new GamesBrowserDialog(games, gameName =>
+        {
+            _gameFilter = gameName;
+            if (GameFilter != null)
+            {
+                var option = GameFilter.Items.OfType<ComboBoxItem>()
+                    .FirstOrDefault(item => string.Equals(item.Tag?.ToString(), gameName, StringComparison.OrdinalIgnoreCase));
+                if (option == null)
+                {
+                    option = new ComboBoxItem { Content = gameName, Tag = gameName };
+                    GameFilter.Items.Add(option);
+                }
+                GameFilter.SelectedItem = option;
+            }
+
+            var gameMods = _remoteCatalog
+                .Where(x => string.Equals(x.Game, gameName, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            new GameModsDialog(gameName, gameMods) { Owner = Window.GetWindow(this) }.ShowDialog();
+        }) { Owner = Window.GetWindow(this) };
+        dialog.ShowDialog();
+    }
+
+    public sealed record GameCard(string Name, int ModCount, string CoverUrl);
+
+    private async Task RefreshCatalogAsync()
+    {
+        if (_refreshing) return;
+        _refreshing = true;
+        RefreshButton.IsEnabled = false;
+        UpdateStatus.Text = "جارٍ تحديث فهرس مصادر المودات...";
+        try
+        {
+            var catalog = await ModsCatalogService.FetchAsync();
+            ApplyCatalog(catalog);
+            UpdateStatus.Text = DateTimeOffset.TryParse(catalog.GeneratedAt, out var stamp)
+                ? "آخر تحديث للمكتبة: " + stamp.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                : "تم تحديث المكتبة بنجاح.";
+        }
+        catch
+        {
+            UpdateStatus.Text = _remoteCatalog.Count > 0
+                ? "تعذر الاتصال الآن؛ يتم عرض آخر نسخة محفوظة."
+                : "تعذر تحميل الفهرس. تحقق من الإنترنت ثم اضغط تحديث المكتبة.";
+        }
+        finally
+        {
+            _refreshing = false;
+            RefreshButton.IsEnabled = true;
+            RefreshList();
+        }
+    }
+
+    private void ApplyCatalog(ModsCatalogService.Catalog? catalog)
+    {
+        if (catalog == null) return;
+        var entries = catalog.Entries.Select(x => new ModEntry
+        {
+            Title = x.Title,
+            Game = x.Game,
+            Platform = x.Platform,
+            Category = x.Category,
+            SourceName = x.SourceName,
+            SourceUrl = x.SourceUrl,
+            Version = x.Version,
+            Summary = x.Summary,
+            InstallMethod = x.InstallMethod,
+            SafetyNotes = x.SafetyNotes,
+            CoverUrl = IsSafeCoverUrl(x.CoverUrl) ? x.CoverUrl : "",
+            DownloadCount = x.DownloadCount is >= 0 ? x.DownloadCount : null
+        }).ToList();
+
+        if (GameFilter != null)
+        {
+            var selectedGame = _gameFilter;
+            GameFilter.Items.Clear();
+            GameFilter.Items.Add(new ComboBoxItem { Content = "كل الألعاب", Tag = "all" });
+            foreach (var game in entries.Select(e => e.Game).Where(g => !string.IsNullOrWhiteSpace(g))
+                         .Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(g => g, StringComparer.CurrentCultureIgnoreCase))
+                GameFilter.Items.Add(new ComboBoxItem { Content = game, Tag = game });
+            var selectedOption = GameFilter.Items.OfType<ComboBoxItem>()
+                .FirstOrDefault(item => string.Equals(item.Tag?.ToString(), selectedGame, StringComparison.OrdinalIgnoreCase));
+            GameFilter.SelectedItem = selectedOption ?? GameFilter.Items[0];
+        }
+        _remoteCatalog.Clear();
+        _remoteCatalog.AddRange(entries);
+        RefreshList();
+    }
+
+    private void RefreshList()
+    {
+        var query = SearchBox?.Text?.Trim() ?? "";
+        var filtered = _remoteCatalog.Where(x =>
+            (_platformFilter == "all" ||
+             (_platformFilter == "pc" && HasPlatform(x, "PC", "Windows")) ||
+             (_platformFilter == "android" && HasPlatform(x, "Android")) ||
+             (_platformFilter == "ios" && HasPlatform(x, "iOS", "iPhone", "iPad")) ||
+             (_platformFilter == "multi" && IsMultiPlatform(x))) &&
+            (_gameFilter == "all" || ContainsText(x.Game, _gameFilter)) &&
+            (string.IsNullOrWhiteSpace(query) ||
+             ContainsText(x.Title, query) || ContainsText(x.Game, query) ||
+             ContainsText(x.Category, query) || ContainsText(x.SourceName, query) ||
+             ContainsText(x.Summary, query) || ContainsText(x.Platform, query)))
+            .OrderBy(x => _sortFilter == "popular" ? (x.DownloadCount.HasValue ? 0 : 1) : 0)
+            .ThenByDescending(x => _sortFilter == "popular" ? x.DownloadCount ?? -1 : -1)
+            .ThenBy(x => x.Platform, StringComparer.CurrentCultureIgnoreCase)
+            .ThenBy(x => x.Title, StringComparer.CurrentCultureIgnoreCase);
+
+        var selected = EntriesList.SelectedItem as ModEntry;
+        _visible.Clear();
+        foreach (var item in filtered) _visible.Add(item);
+        if (selected != null)
+            EntriesList.SelectedItem = _visible.FirstOrDefault(x =>
+                x.SourceUrl.Equals(selected.SourceUrl, StringComparison.OrdinalIgnoreCase));
+        if (EntriesList.SelectedItem == null && _visible.Count > 0) EntriesList.SelectedIndex = 0;
+        if (CountText is not null) CountText.Text = $"{_visible.Count} مصدر";
+        if (_sortFilter == "popular" && !_visible.Any(x => x.DownloadCount.HasValue))
+            UpdateStatus.Text = "لا تتوفر إحصائيات تحميل موثقة لهذه النتائج بعد؛ لم يتم اختلاق ترتيب.";
+        if (_visible.Count == 0) ShowEmpty();
+    }
+
+    private void ShowEmpty()
+    {
+        DetailTitle.Text = "لا توجد نتائج";
+        DetailSubtitle.Text = "جرّب تغيير المنصة أو كلمات البحث.";
+        DetailMetadata.Text = "";
+        DetailInfo.Text = "";
+        InstallSteps.Text = "";
+        SafetyNotes.Text = "";
+        SourceAddress.Text = "";
+        OpenSourceButton.IsEnabled = false;
+    }
+
+    private static bool IsSafeCoverUrl(string? value) =>
+        Uri.TryCreate(value, UriKind.Absolute, out var uri) &&
+        uri.Scheme == Uri.UriSchemeHttps && uri.IsDefaultPort &&
+        string.IsNullOrEmpty(uri.UserInfo) &&
+        (uri.Host.Equals("cdn.akamai.steamstatic.com", StringComparison.OrdinalIgnoreCase) ||
+         uri.Host.Equals("images.gamebanana.com", StringComparison.OrdinalIgnoreCase));
+
+    private static bool ContainsText(string? value, string query) =>
+        !string.IsNullOrWhiteSpace(value) && value.Contains(query, StringComparison.OrdinalIgnoreCase);
+
+    private static bool HasPlatform(ModEntry entry, params string[] platforms) =>
+        platforms.Any(platform => entry.Platform.Contains(platform, StringComparison.OrdinalIgnoreCase));
+
+    private static bool IsMultiPlatform(ModEntry entry)
+    {
+        var value = entry.Platform;
+        var hasPc = value.Contains("PC", StringComparison.OrdinalIgnoreCase) ||
+                    value.Contains("Windows", StringComparison.OrdinalIgnoreCase);
+        var hasAndroid = value.Contains("Android", StringComparison.OrdinalIgnoreCase);
+        var hasIos = value.Contains("iOS", StringComparison.OrdinalIgnoreCase);
+        return (hasPc && (hasAndroid || hasIos)) || (hasAndroid && hasIos);
+    }
+
+    private void SearchBox_TextChanged(object sender, TextChangedEventArgs e) => RefreshList();
+
+    private void GameFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (GameFilter?.SelectedItem is ComboBoxItem item)
+            _gameFilter = item.Tag?.ToString() ?? "all";
+        RefreshList();
+    }
+
+    private void SortFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (SortFilter?.SelectedItem is ComboBoxItem item)
+            _sortFilter = item.Tag?.ToString() ?? "default";
+        RefreshList();
+    }
+
+    private void Platform_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button selected) return;
+        _platformFilter = selected.Tag?.ToString() ?? "all";
+        foreach (var button in PlatformFilters.Children.OfType<Button>())
+        {
+            bool active = ReferenceEquals(button, selected);
+            button.Background = new System.Windows.Media.SolidColorBrush(active
+                ? System.Windows.Media.Color.FromRgb(32, 191, 208)
+                : System.Windows.Media.Color.FromRgb(23, 35, 58));
+            button.Foreground = new System.Windows.Media.SolidColorBrush(active
+                ? System.Windows.Media.Color.FromRgb(7, 19, 33)
+                : System.Windows.Media.Color.FromRgb(220, 230, 245));
+            button.BorderBrush = new System.Windows.Media.SolidColorBrush(active
+                ? System.Windows.Media.Color.FromRgb(32, 191, 208)
+                : System.Windows.Media.Color.FromRgb(43, 59, 90));
+        }
+        RefreshList();
+    }
+
+    private void EntriesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (EntriesList.SelectedItem is not ModEntry item) return;
+        DetailTitle.Text = item.Title;
+        DetailSubtitle.Text = item.SourceName + " · " + item.Category;
+        DetailMetadata.Text = string.Join(Environment.NewLine, new[]
+        {
+            "اللعبة: " + (string.IsNullOrWhiteSpace(item.Game) ? "غير محددة" : item.Game),
+            "المنصة: " + (string.IsNullOrWhiteSpace(item.Platform) ? "غير محددة" : item.Platform),
+            "الإصدار: " + (string.IsNullOrWhiteSpace(item.Version) ? "راجع صفحة المصدر" : item.Version),
+            "عدد التحميلات: " + (item.DownloadCount.HasValue ? item.DownloadCount.Value.ToString("N0") : "غير متاح من المصدر")
+        });
+        DetailInfo.Text = item.Summary;
+        InstallSteps.Text = item.InstallMethod;
+        SafetyNotes.Text = item.SafetyNotes;
+        SourceAddress.Text = item.SourceUrl;
+        OpenSourceButton.IsEnabled = IsAllowedSource(item.SourceUrl);
+    }
+
+    private static bool IsAllowedSource(string value)
+    {
+        if (!Uri.TryCreate(value, UriKind.Absolute, out var uri) ||
+            uri.Scheme != Uri.UriSchemeHttps || !uri.IsDefaultPort ||
+            !string.IsNullOrEmpty(uri.UserInfo)) return false;
+        var allowed = new[] {
+            "curseforge.com", "minecraft.net", "moddingway.com", "fifa-infinity.com", "steamcommunity.com", "farming-simulator.com", "stardewvalleywiki.com"
+        };
+        return allowed.Any(host => uri.Host.Equals(host, StringComparison.OrdinalIgnoreCase) ||
+                                   uri.Host.EndsWith("." + host, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private void OpenSource_Click(object sender, RoutedEventArgs e)
+    {
+        if (EntriesList.SelectedItem is not ModEntry item || !IsAllowedSource(item.SourceUrl)) return;
+        try { Process.Start(new ProcessStartInfo(item.SourceUrl) { UseShellExecute = true }); }
+        catch { UpdateStatus.Text = "تعذر فتح المصدر. انسخ الرابط وافتحه يدويًا."; }
+    }
+}

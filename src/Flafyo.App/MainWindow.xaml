@@ -49,6 +49,7 @@
           <Button Style="{StaticResource NavButton}" Content="◉   الترجمة الفورية" Click="NavigateLive_Click"/>
           <Button Style="{StaticResource NavButton}" Content="▤   تعريب ملفات الألعاب" Click="DashboardFiles_Click"/>
           <Button Style="{StaticResource NavButton}" Content="▦   مكتبة التعريبات" Click="DashboardLibrary_Click"/>
+          <Button Style="{StaticResource NavButton}" Content="▧   مكتبة المودات" Click="DashboardMods_Click"/>
           <Button Style="{StaticResource NavButton}" Content="文   حزم اللغات" Click="DashboardLanguages_Click"/>
           <Button Style="{StaticResource NavButton}" Content="⌘   ملفات تعريف الألعاب" Click="DashboardGameSettings_Click"/>
           <Separator Margin="0,17"/>
@@ -375,6 +376,9 @@
         </TabItem>
         <TabItem Header="مكتبة التعريبات">
           <local:LocalizationLibraryWindow/>
+        </TabItem>
+        <TabItem Header="مكتبة المودات">
+          <local:ModsLibraryWindow/>
         </TabItem>
       </TabControl>
     </ScrollViewer>
