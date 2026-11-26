@@ -199,9 +199,7 @@ public partial class ModsLibraryWindow : UserControl
             uri.Scheme != Uri.UriSchemeHttps || !uri.IsDefaultPort ||
             !string.IsNullOrEmpty(uri.UserInfo)) return false;
         var allowed = new[] {
-            "nexusmods.com", "moddb.com", "thunderstore.io", "curseforge.com",
-            "modrinth.com", "gamebanana.com", "mcpedl.com", "minecraft.net",
-            "apps.apple.com", "play.google.com", "github.com"
+            "curseforge.com", "minecraft.net", "moddingway.com", "fifa-infinity.com"
         };
         return allowed.Any(host => uri.Host.Equals(host, StringComparison.OrdinalIgnoreCase) ||
                                    uri.Host.EndsWith("." + host, StringComparison.OrdinalIgnoreCase));
