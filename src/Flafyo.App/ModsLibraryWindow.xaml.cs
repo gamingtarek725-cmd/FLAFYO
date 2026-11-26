@@ -42,6 +42,40 @@ public partial class ModsLibraryWindow : UserControl
 
     private async void RefreshLibrary_Click(object sender, RoutedEventArgs e) => await RefreshCatalogAsync();
 
+    private void BrowseGames_Click(object sender, RoutedEventArgs e)
+    {
+        var games = _remoteCatalog
+            .GroupBy(x => x.Game, StringComparer.OrdinalIgnoreCase)
+            .Where(g => !string.IsNullOrWhiteSpace(g.Key))
+            .Select(g => new GameCard(g.Key, g.Count(), g.Select(x => x.CoverUrl).FirstOrDefault(url => !string.IsNullOrWhiteSpace(url)) ?? ""))
+            .OrderBy(g => g.Name, StringComparer.CurrentCultureIgnoreCase)
+            .ToList();
+
+        var dialog = new GamesBrowserDialog(games, gameName =>
+        {
+            _gameFilter = gameName;
+            if (GameFilter != null)
+            {
+                var option = GameFilter.Items.OfType<ComboBoxItem>()
+                    .FirstOrDefault(item => string.Equals(item.Tag?.ToString(), gameName, StringComparison.OrdinalIgnoreCase));
+                if (option == null)
+                {
+                    option = new ComboBoxItem { Content = gameName, Tag = gameName };
+                    GameFilter.Items.Add(option);
+                }
+                GameFilter.SelectedItem = option;
+            }
+
+            var gameMods = _remoteCatalog
+                .Where(x => string.Equals(x.Game, gameName, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            new GameModsDialog(gameName, gameMods) { Owner = Window.GetWindow(this) }.ShowDialog();
+        }) { Owner = Window.GetWindow(this) };
+        dialog.ShowDialog();
+    }
+
+    public sealed record GameCard(string Name, int ModCount, string CoverUrl);
+
     private async Task RefreshCatalogAsync()
     {
         if (_refreshing) return;
