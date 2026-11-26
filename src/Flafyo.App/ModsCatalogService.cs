@@ -10,7 +10,7 @@ namespace Flafyo.Desktop;
 
 internal sealed class ModsCatalogService
 {
-    private const string CatalogUrl = "https://raw.githubusercontent.com/gamingtarek725-cmd/FLAFYO/main/data/mods-library.json";
+    private const string CatalogUrl = "https://raw.githubusercontent.com/gamingtarek725-cmd/FLAFYO/feature/cross-platform-mods-library/data/mods-library.json";
     private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(15) };
     private static readonly JsonSerializerOptions Options = new() { PropertyNameCaseInsensitive = true };
 
