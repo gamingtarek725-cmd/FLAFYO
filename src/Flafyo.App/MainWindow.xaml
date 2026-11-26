@@ -5,7 +5,7 @@
         Title="FLAFYO GAME TRANSLATOR" Icon="Assets/flafyo.ico"
         Width="1440" Height="900" MinWidth="1000" MinHeight="650"
         Background="{StaticResource Page}" FlowDirection="RightToLeft"
-        FontFamily="Segoe UI, Tahoma" FontSize="13" WindowStartupLocation="CenterScreen">
+        FontFamily="Segoe UI, Tahoma" FontSize="13" WindowStartupLocation="CenterScreen" SizeChanged="MainWindow_SizeChanged">
   <Window.Resources>
     <Style x:Key="NavButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
       <Setter Property="HorizontalContentAlignment" Value="Right"/>
@@ -28,7 +28,7 @@
     </Style>
   </Window.Resources>
   <Grid>
-    <Grid.ColumnDefinitions><ColumnDefinition Width="252"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+    <Grid.ColumnDefinitions><ColumnDefinition x:Name="SidebarColumn" Width="252"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
     <Grid.RowDefinitions><RowDefinition Height="76"/><RowDefinition Height="*"/></Grid.RowDefinitions>
 
     <!-- Permanent navigation: each destination appears once. -->
@@ -118,7 +118,7 @@
               </Border>
 
               <TextBlock Text="نظرة عامة" Style="{StaticResource SectionTitle}"/>
-              <UniformGrid Columns="3" Margin="0,0,0,18">
+              <UniformGrid x:Name="OverviewCardsGrid" Columns="3" Margin="0,0,0,18">
                 <Border Background="#191B23" BorderBrush="#303542" BorderThickness="1" CornerRadius="15" Padding="17" Margin="0,0,10,0">
                   <StackPanel><TextBlock Text="محرك الترجمة" Foreground="#9AA3B2"/><TextBlock x:Name="DashboardEngineStatus" Text="OCR · Offline · Overlay" Foreground="#F3F5F8" FontSize="14" FontWeight="SemiBold" Margin="0,9,0,0"/><TextBlock Text="حالة المحرك" Foreground="#687282" FontSize="10" Margin="0,4,0,0"/></StackPanel>
                 </Border>
@@ -131,7 +131,7 @@
               </UniformGrid>
 
               <TextBlock Text="أدوات FLAFYO" Style="{StaticResource SectionTitle}"/>
-              <UniformGrid Columns="3">
+              <UniformGrid x:Name="ToolsCardsGrid" Columns="3">
                 <Border Background="#191B23" BorderBrush="#303542" BorderThickness="1" CornerRadius="15" Padding="17" Margin="0,0,8,0">
                   <StackPanel><TextBlock Text="01  /  LIVE OCR" Foreground="#00D4FF" FontSize="10" FontWeight="Bold" FlowDirection="LeftToRight"/><TextBlock Text="التقاط النصوص وترجمتها فوق اللعبة" Foreground="#F3F5F8" FontWeight="SemiBold" Margin="0,9,0,0" TextWrapping="Wrap"/></StackPanel>
                 </Border>
