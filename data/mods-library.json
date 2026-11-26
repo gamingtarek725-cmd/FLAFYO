@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-26T18:30:00+02:00",
+  "generatedAt": "2026-11-26T19:00:00+02:00",
   "entries": [
     {
       "title": "Minecraft Marketplace",
@@ -492,6 +492,90 @@
       "installMethod": "افتح الورشة عبر Steam، واختر الخلفيات المناسبة، ثم اشترك فيها من صفحة العنصر.",
       "safetyNotes": "هذا القسم مخصص للخلفيات والتخصيص البصري. راجع محتوى كل عنصر قبل استخدامه.",
       "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/621060/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Airport CEO — ورشة المجتمع",
+      "game": "Airport CEO",
+      "platform": "PC / Windows",
+      "category": "تصميم مطارات · شركات طيران · حفظات",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/673610/workshop/",
+      "version": "تحقق من توافق المحتوى مع إصدار اللعبة",
+      "summary": "ورشة المجتمع الرسمية لمشاركة تصميمات المطارات والحفظات وشركات الطيران والطلاءات المخصصة.",
+      "installMethod": "افتح ورشة Steam، ثم راجع وصف العنصر ومتطلباته قبل الاشتراك فيه.",
+      "safetyNotes": "بعض العناصر قد تكون حفظات كاملة أو تحتاج إصدارًا محددًا. المكتبة تعرض المصدر الأصلي فقط.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/673610/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Car Mechanic Simulator 2018 — ورشة المجتمع",
+      "game": "Car Mechanic Simulator 2018",
+      "platform": "PC / Windows",
+      "category": "سيارات · تخصيص · محتوى مجتمع",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/645630/workshop/",
+      "version": "تحقق من توافق المحتوى مع إصدار اللعبة",
+      "summary": "ورشة Steam الرسمية للعبة، وتدعم محتوى السيارات المخصصة ومشاركات المجتمع وأدوات محرر السيارات.",
+      "installMethod": "افتح الورشة عبر Steam، واقرأ وصف العنصر وإصداره ومتطلباته قبل الاشتراك.",
+      "safetyNotes": "المكتبة تعرض المصدر الأصلي ولا تستضيف الملفات. تحقق من التوافق قبل إضافة أي محتوى.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/645630/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Cities in Motion 2 — ورشة المجتمع",
+      "game": "Cities in Motion 2",
+      "platform": "PC / Windows",
+      "category": "خرائط · مركبات نقل · تصميم شبكات",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/225420/workshop/",
+      "version": "تحقق من توافق المحتوى مع إصدار اللعبة",
+      "summary": "ورشة مجتمع لعبة إدارة النقل العام، لمشاركة محتوى إضافي مرتبط بالمدن وشبكات النقل والمركبات.",
+      "installMethod": "افتح صفحة الورشة عبر Steam، ثم راجع وصف العنصر وتوافقه قبل الاشتراك.",
+      "safetyNotes": "قد تختلف متطلبات المحتوى بحسب الإضافة. المكتبة تربط بالمصدر الأصلي فقط.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/225420/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Bus Simulator 18 — ورشة المجتمع",
+      "game": "Bus Simulator 18",
+      "platform": "PC / Windows",
+      "category": "حافلات · طلاءات · تخصيص",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/515180/workshop/",
+      "version": "تحقق من توافق المحتوى مع إصدار اللعبة",
+      "summary": "ورشة مجتمع لمحاكاة قيادة الحافلات، مع محتوى تخصيص ومشاركات مرتبطة بالحافلات وتجربة النقل.",
+      "installMethod": "افتح ورشة Steam، واقرأ وصف العنصر ومتطلبات المحتوى قبل الاشتراك.",
+      "safetyNotes": "تحقق من توافق الإضافة مع إصدار اللعبة. المكتبة لا تستضيف ملفات المودات.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/515180/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Theme Park Studio — ورشة المجتمع",
+      "game": "Theme Park Studio",
+      "platform": "PC / Windows",
+      "category": "مدن ملاهٍ · ألعاب · تصميم",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/254590/workshop/",
+      "version": "تحقق من توافق المحتوى مع إصدار اللعبة",
+      "summary": "محتوى مجتمعي لتصميم مدن الملاهي والألعاب والمرافق والعناصر الإبداعية.",
+      "installMethod": "افتح ورشة Steam، ثم راجع تفاصيل التصميم ومتطلبات الإصدار قبل الاشتراك.",
+      "safetyNotes": "قد تتطلب بعض التصميمات عناصر أو إصدارات محددة. استخدم المصدر الأصلي فقط.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/254590/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Poly Bridge — ورشة المجتمع",
+      "game": "Poly Bridge",
+      "platform": "PC / Windows",
+      "category": "مراحل ألغاز · هندسة · بناء جسور",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/367450/workshop/",
+      "version": "تحقق من توافق المرحلة مع إصدار اللعبة",
+      "summary": "مراحل هندسية وألغاز بناء جسور من تصميم المجتمع، مناسبة لتوسيع تحديات اللعبة.",
+      "installMethod": "افتح ورشة Steam، واختر مرحلة، ثم راجع وصفها وإصدار اللعبة المطلوب.",
+      "safetyNotes": "المكتبة تعرض صفحة المصدر ولا تستضيف ملفات المراحل.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/367450/library_600x900_2x.jpg",
       "entryType": "directory"
     }
   ]
