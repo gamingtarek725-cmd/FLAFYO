@@ -29,9 +29,9 @@
         <TextBlock x:Name="UpdateStatus" Text="يتم تحميل فهرس المصادر عند فتح القسم."
                    Style="{StaticResource MutedText}" Margin="0,7,0,0"/>
       </StackPanel>
-      <Button x:Name="RefreshButton" Grid.Column="1" Content="⟳  تحديث المكتبة"
+      <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"><Button Content="استعراض الألعاب" Click="BrowseGames_Click" Padding="15,11" Margin="0,0,8,0" Background="#17233A" BorderBrush="#2B3B5A"/><Button x:Name="RefreshButton" Content="⟳  تحديث المكتبة"
               Style="{StaticResource PrimaryButton}" VerticalAlignment="Center"
-              Margin="14,0,0,0" Padding="16,11" Click="RefreshLibrary_Click"/>
+              Margin="14,0,0,0" Padding="16,11" Click="RefreshLibrary_Click"/></StackPanel>
     </Grid>
 
     <Border Grid.Row="1" Background="{StaticResource Surface}" BorderBrush="{StaticResource Line}"
