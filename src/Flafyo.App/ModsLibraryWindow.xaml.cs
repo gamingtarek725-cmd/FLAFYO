@@ -29,6 +29,7 @@ public partial class ModsLibraryWindow : UserControl
     private readonly System.Collections.Generic.List<ModEntry> _remoteCatalog = new();
     private bool _refreshing;
     private string _platformFilter = "all";
+    private string _gameFilter = "all";
 
     public ModsLibraryWindow()
     {
@@ -100,6 +101,7 @@ public partial class ModsLibraryWindow : UserControl
              (_platformFilter == "android" && HasPlatform(x, "Android")) ||
              (_platformFilter == "ios" && HasPlatform(x, "iOS", "iPhone", "iPad")) ||
              (_platformFilter == "multi" && IsMultiPlatform(x))) &&
+            (_gameFilter == "all" || ContainsText(x.Game, _gameFilter)) &&
             (string.IsNullOrWhiteSpace(query) ||
              ContainsText(x.Title, query) || ContainsText(x.Game, query) ||
              ContainsText(x.Category, query) || ContainsText(x.SourceName, query) ||
@@ -154,6 +156,13 @@ public partial class ModsLibraryWindow : UserControl
     }
 
     private void SearchBox_TextChanged(object sender, TextChangedEventArgs e) => RefreshList();
+
+    private void GameFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (GameFilter?.SelectedItem is ComboBoxItem item)
+            _gameFilter = item.Tag?.ToString() ?? "all";
+        RefreshList();
+    }
 
     private void Platform_Click(object sender, RoutedEventArgs e)
     {
