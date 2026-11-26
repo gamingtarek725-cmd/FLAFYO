@@ -33,6 +33,7 @@ internal sealed class ModsCatalogService
         public string InstallMethod { get; set; } = "";
         public string SafetyNotes { get; set; } = "";
         public string CoverUrl { get; set; } = "";
+        public long? DownloadCount { get; set; }
         public string EntryType { get; set; } = "directory";
     }
 
