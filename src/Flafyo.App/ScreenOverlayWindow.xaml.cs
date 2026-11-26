@@ -168,3 +168,53 @@ public sealed class WpfScreenOverlay : IScreenOverlay
 
     public void Clear() => _window.Dispatcher.InvokeAsync(() => _window.ClearAll());
 }
+
+/// <summary>
+/// Region-mode translation sink. Translation cards are rendered in the independent
+/// click-through screen layer; FLAFYO Island remains a status/control surface only.
+/// </summary>
+public sealed class WpfRegionOverlaySink : IOverlaySink
+{
+    private readonly ScreenOverlayWindow _window;
+    private readonly Func<System.Drawing.Rectangle> _region;
+    private readonly Func<OverlayStyle> _style;
+
+    public WpfRegionOverlaySink(
+        ScreenOverlayWindow window,
+        Func<System.Drawing.Rectangle> region,
+        Func<OverlayStyle> style)
+    {
+        _window = window;
+        _region = region;
+        _style = style;
+    }
+
+    public void Show(int regionId, string translated) => Show(regionId, translated, "");
+
+    public void Show(int regionId, string translated, string source)
+    {
+        var area = _region();
+        if (area.Width < 20 || area.Height < 10 || string.IsNullOrWhiteSpace(translated))
+            return;
+
+        var box = new System.Drawing.Rectangle(
+            area.Width / 10,
+            area.Height / 4,
+            Math.Max(1, area.Width * 8 / 10),
+            Math.Max(1, area.Height / 2));
+        var style = _style();
+        var lineHeight = Math.Max(16, style.FontSize);
+        var block = new ScreenBlock(source ?? "", box, BlockKind.Body, lineHeight);
+        var translatedBlocks = new[] { new TranslatedBlock(block, translated) };
+
+        _window.Dispatcher.InvokeAsync(() =>
+        {
+            try { _window.ShowBlocks(translatedBlocks, area, _style()); }
+            catch (Exception ex) { AppLog.Write(ex); }
+        });
+    }
+
+    public void Clear(int regionId) =>
+        _window.Dispatcher.InvokeAsync(() => _window.ClearAll());
+}
+
