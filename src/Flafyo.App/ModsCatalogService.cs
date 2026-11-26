@@ -44,9 +44,18 @@ internal sealed class ModsCatalogService
     {
         try
         {
-            if (!File.Exists(CachePath)) return null;
-            var cached = JsonSerializer.Deserialize<Catalog>(File.ReadAllText(CachePath), Options);
-            return cached == null ? null : NormalizeCatalog(cached);
+            if (File.Exists(CachePath))
+            {
+                var cached = JsonSerializer.Deserialize<Catalog>(File.ReadAllText(CachePath), Options);
+                if (cached != null) return NormalizeCatalog(cached);
+            }
+
+            // First-run offline fallback bundled with the application.
+            using var stream = typeof(ModsCatalogService).Assembly
+                .GetManifestResourceStream("Flafyo.Desktop.mods-library.json");
+            if (stream == null) return null;
+            var bundled = JsonSerializer.Deserialize<Catalog>(stream, Options);
+            return bundled == null ? null : NormalizeCatalog(bundled);
         }
         catch { return null; }
     }
