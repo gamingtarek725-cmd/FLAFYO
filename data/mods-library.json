@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-26T16:15:00Z",
+  "generatedAt": "2026-11-26T16:25:00Z",
   "entries": [
     {
       "title": "Minecraft Marketplace",
@@ -58,16 +58,16 @@
       "entryType": "directory"
     },
     {
-      "title": "The Sims 4 — محتوى البناء وCreate-a-Sim",
+      "title": "The Sims 4 — Build / Buy",
       "game": "The Sims 4",
       "platform": "PC / Windows",
-      "category": "Build/Buy · Create-a-Sim · ملابس وديكور",
+      "category": "Build / Buy · ديكور · أثاث",
       "sourceName": "CurseForge · The Sims 4",
-      "sourceUrl": "https://www.curseforge.com/sims4",
+      "sourceUrl": "https://www.curseforge.com/sims4/search?class=build-buy&page=1&pageSize=20&sortBy=popularity",
       "version": "تحقق من توافق إصدار اللعبة مع كل إضافة",
-      "summary": "فهرس CurseForge الرسمي لمحتوى The Sims 4. استخدم أقسام Build/Buy وCreate-a-Sim للمباني والديكور والملابس والمحتوى التجميلي.",
-      "installMethod": "افتح صفحة المصدر، واختر محتوى Build/Buy أو Create-a-Sim، ثم راجع وصف العنصر ومتطلبات الإصدار قبل التثبيت.",
-      "safetyNotes": "المكتبة تعرض المصدر فقط. راجع وصف كل عنصر وتجنب المحتوى غير المناسب أو الملفات الخارجية غير الموثوقة.",
+      "summary": "قسم Build / Buy في CurseForge لمحتوى الأثاث والديكور وعناصر البناء. تم تقييد المصدر بهذا القسم التجميلي بدل دليل مودات عام.",
+      "installMethod": "افتح قسم Build / Buy، واختر الإضافة المناسبة، ثم تحقق من توافق إصدار The Sims 4 قبل التثبيت.",
+      "safetyNotes": "المكتبة تربط بقسم البناء والديكور فقط. راجع وصف كل عنصر وإصداره ومتطلباته.",
       "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/1222670/library_600x900_2x.jpg",
       "entryType": "directory"
     },
@@ -112,6 +112,51 @@
       "safetyNotes": "بعض العناصر تتطلب حزم DLC محددة. راجع المتطلبات والتوافق قبل إضافتها إلى لعبتك.",
       "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/703080/library_600x900_2x.jpg",
       "entryType": "directory"
+    },
+    {
+      "title": "QICC - Sleek Hallway Set",
+      "game": "The Sims 4",
+      "platform": "PC / Windows",
+      "category": "Build / Buy · ديكور",
+      "sourceName": "CurseForge · The Sims 4",
+      "sourceUrl": "https://www.curseforge.com/sims4/build-buy/qicc-sleek-hallway-set",
+      "version": "تحقق من إصدارات اللعبة المدعومة في المصدر",
+      "summary": "مجموعة ديكور للممر تضم 15 عنصرًا، مثل خزائن وأرفف ومرايا وسجاد. صفحة CurseForge تصفها بأنها متوافقة مع اللعبة الأساسية.",
+      "installMethod": "افتح صفحة الإضافة في CurseForge، راجع الملفات والإصدار المتوافق، ثم اتبع تعليمات المصدر.",
+      "safetyNotes": "عدد التحميلات رقم منشور في CurseForge عند مراجعة الصفحة بتاريخ 26 نوفمبر 2026، وقد يتغير لاحقًا. لا تعِد رفع ملفات المنشئ.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/1222670/library_600x900_2x.jpg",
+      "downloadCount": 4529779,
+      "entryType": "mod"
+    },
+    {
+      "title": "GoldFish Elite Bed",
+      "game": "The Sims 4",
+      "platform": "PC / Windows",
+      "category": "Build / Buy · ديكور",
+      "sourceName": "CurseForge · The Sims 4",
+      "sourceUrl": "https://www.curseforge.com/sims4/build-buy/goldfish-elite-bed",
+      "version": "تحقق من إصدارات اللعبة المدعومة في المصدر",
+      "summary": "سرير وظيفي بأربعة ألوان ضمن قسم Build / Buy. راجع إصدارات اللعبة المدعومة في صفحة المصدر.",
+      "installMethod": "افتح صفحة الإضافة في CurseForge، راجع الملفات والإصدار المتوافق، ثم اتبع تعليمات المصدر.",
+      "safetyNotes": "عدد التحميلات رقم منشور في CurseForge عند مراجعة الصفحة بتاريخ 26 نوفمبر 2026، وقد يتغير لاحقًا. لا تعِد رفع ملفات المنشئ.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/1222670/library_600x900_2x.jpg",
+      "downloadCount": 3767704,
+      "entryType": "mod"
+    },
+    {
+      "title": "Grunge Decors Set",
+      "game": "The Sims 4",
+      "platform": "PC / Windows",
+      "category": "Build / Buy · ديكور",
+      "sourceName": "CurseForge · The Sims 4",
+      "sourceUrl": "https://www.curseforge.com/sims4/build-buy/grunge-decors-set",
+      "version": "تحقق من إصدارات اللعبة المدعومة في المصدر",
+      "summary": "مجموعة ديكور تشمل ملصقات وسجادًا وعناصر تزيين، وتذكر صفحة المصدر توافقها مع اللعبة الأساسية.",
+      "installMethod": "افتح صفحة الإضافة في CurseForge، راجع الملفات والإصدار المتوافق، ثم اتبع تعليمات المصدر.",
+      "safetyNotes": "عدد التحميلات رقم منشور في CurseForge عند مراجعة الصفحة بتاريخ 26 نوفمبر 2026، وقد يتغير لاحقًا. لا تعِد رفع ملفات المنشئ.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/1222670/library_600x900_2x.jpg",
+      "downloadCount": 2274881,
+      "entryType": "mod"
     }
   ]
 }
