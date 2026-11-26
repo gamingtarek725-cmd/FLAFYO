@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-26T00:00:00Z",
+  "generatedAt": "2026-11-26T16:00:00Z",
   "entries": [
     {
       "title": "Minecraft Marketplace",
@@ -40,7 +40,7 @@
       "summary": "قسم FIFA 23 في FIFA Infinity يعرض إضافات ومشاريع مجتمع اللعبة. تحقق من تاريخ النشر ونسخة Title Update والمتطلبات الخاصة بكل مود.",
       "installMethod": "افتح صفحة المود المحدد واقرأ تعليمات صاحبه. استخدم أدوات التعديل التي يذكرها المصدر فقط، ولا تخلط ملفات مخصصة لتحديثات مختلفة.",
       "safetyNotes": "بعض المودات قديمة أو تجريبية. احتفظ بنسخة احتياطية من ملفات اللعبة وملفات الحفظ، واستخدم المودات في أوضاع اللعب الفردي فقط إذا كانت شروط المود تنص على ذلك.",
-      "coverUrl": "",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/1811260/library_600x900_2x.jpg",
       "entryType": "directory"
     },
     {
@@ -55,6 +55,34 @@
       "installMethod": "اتبع تعليمات صفحة المشروع، وتأكد من توافق المود مع Title Update المثبت عندك قبل استبدال أي ملفات.",
       "safetyNotes": "المحتوى من المجتمع وليس صادرًا عن EA. افحص الملفات واحتفظ بنسخة احتياطية، ولا تستخدم التعديلات في اللعب عبر الإنترنت إذا كانت تخالف قواعد اللعبة.",
       "coverUrl": "",
+      "entryType": "directory"
+    },
+    {
+      "title": "The Sims 4 — محتوى البناء وCreate-a-Sim",
+      "game": "The Sims 4",
+      "platform": "PC / Windows",
+      "category": "Build/Buy · Create-a-Sim · ملابس وديكور",
+      "sourceName": "CurseForge · The Sims 4",
+      "sourceUrl": "https://www.curseforge.com/sims4",
+      "version": "تحقق من توافق إصدار اللعبة مع كل إضافة",
+      "summary": "فهرس CurseForge الرسمي لمحتوى The Sims 4. استخدم أقسام Build/Buy وCreate-a-Sim للمباني والديكور والملابس والمحتوى التجميلي.",
+      "installMethod": "افتح صفحة المصدر، واختر محتوى Build/Buy أو Create-a-Sim، ثم راجع وصف العنصر ومتطلبات الإصدار قبل التثبيت.",
+      "safetyNotes": "المكتبة تعرض المصدر فقط. راجع وصف كل عنصر وتجنب المحتوى غير المناسب أو الملفات الخارجية غير الموثوقة.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/1222670/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Cities: Skylines — خرائط ومباني وأصول المدن",
+      "game": "Cities: Skylines",
+      "platform": "PC / Windows",
+      "category": "خرائط · مباني · أصول وديكورات",
+      "sourceName": "Steam Workshop · Cities: Skylines",
+      "sourceUrl": "https://steamcommunity.com/app/255710/workshop/",
+      "version": "تأكد من التوافق مع إصدار اللعبة وDLCs",
+      "summary": "ورشة Steam الرسمية للعبة Cities: Skylines. تتضمن خرائط ومباني وأصولًا يمكن استخدامها لتخصيص المدن.",
+      "installMethod": "افتح الورشة من حساب Steam، واختر خرائط أو مباني أو أصولًا، ثم اقرأ المتطلبات والتوافق قبل الاشتراك في المحتوى.",
+      "safetyNotes": "بعض العناصر تحتاج DLC أو إضافات أخرى. راجع التقييمات وتاريخ التحديث، ولا تثبّت عناصر غير متوافقة مع نسختك.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/255710/library_600x900_2x.jpg",
       "entryType": "directory"
     }
   ]
