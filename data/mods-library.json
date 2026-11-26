@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-26T18:05:00+02:00",
+  "generatedAt": "2026-11-26T18:10:00+02:00",
   "entries": [
     {
       "title": "Minecraft Marketplace",
@@ -397,31 +397,45 @@
       "entryType": "directory"
     },
     {
-      "title": "Unpacking — مصادر المجتمع",
-      "game": "Unpacking",
+      "title": "Parkitect — Steam Workshop",
+      "game": "Parkitect",
       "platform": "PC / Windows",
-      "category": "خرائط · تخصيص · واجهات · تحسينات",
-      "sourceName": "Steam Community",
-      "sourceUrl": "https://steamcommunity.com/app/1135690/discussions/",
-      "version": "تحقق من توافق كل عنصر مع إصدار اللعبة والمنصة",
-      "summary": "أفكار ومناقشات مجتمعية؛ لا توجد ورشة مودات رسمية مؤكدة.",
-      "installMethod": "افتح صفحة المصدر، ثم راجع وصف العنصر وتاريخ تحديثه ومتطلبات التوافق قبل استخدامه.",
-      "safetyNotes": "المكتبة تعرض صفحات المصدر ولا تستضيف الملفات. قد تختلف جودة وتوافق عناصر المجتمع؛ استخدم المحتوى المناسب فقط.",
-      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/1135690/library_600x900_2x.jpg",
+      "category": "بناء · تصميم · مراحل مجتمعية",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/453090/workshop/",
+      "version": "تحقق من توافق العنصر مع إصدار اللعبة",
+      "summary": "تصميم مدن الملاهي، الألعاب، المسارات والديكورات.",
+      "installMethod": "افتح ورشة Steam، وراجع وصف العنصر ومتطلباته وتاريخ تحديثه قبل الاشتراك.",
+      "safetyNotes": "المكتبة تعرض المصدر الأصلي فقط ولا تستضيف الملفات. تحقق من توافق المحتوى قبل استخدامه.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/453090/library_600x900_2x.jpg",
       "entryType": "directory"
     },
     {
-      "title": "My Summer Car — مصادر المجتمع",
-      "game": "My Summer Car",
+      "title": "Poly Bridge 2 — Steam Workshop",
+      "game": "Poly Bridge 2",
       "platform": "PC / Windows",
-      "category": "خرائط · تخصيص · واجهات · تحسينات",
-      "sourceName": "Nexus Mods",
-      "sourceUrl": "https://www.nexusmods.com/mysummercar",
-      "version": "تحقق من توافق كل عنصر مع إصدار اللعبة والمنصة",
-      "summary": "تخصيصات سيارات وواجهات وتحسينات جودة الحياة.",
-      "installMethod": "افتح صفحة المصدر، ثم راجع وصف العنصر وتاريخ تحديثه ومتطلبات التوافق قبل استخدامه.",
-      "safetyNotes": "المكتبة تعرض صفحات المصدر ولا تستضيف الملفات. قد تختلف جودة وتوافق عناصر المجتمع؛ استخدم المحتوى المناسب فقط.",
-      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/516750/library_600x900_2x.jpg",
+      "category": "بناء · تصميم · مراحل مجتمعية",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/1062160/workshop/",
+      "version": "تحقق من توافق العنصر مع إصدار اللعبة",
+      "summary": "مراحل بناء الجسور وتحديات هندسية يصنعها المجتمع.",
+      "installMethod": "افتح ورشة Steam، وراجع وصف العنصر ومتطلباته وتاريخ تحديثه قبل الاشتراك.",
+      "safetyNotes": "المكتبة تعرض المصدر الأصلي فقط ولا تستضيف الملفات. تحقق من توافق المحتوى قبل استخدامه.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/1062160/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Planet Coaster 2 — Steam Workshop",
+      "game": "Planet Coaster 2",
+      "platform": "PC / Windows",
+      "category": "بناء · تصميم · مراحل مجتمعية",
+      "sourceName": "Steam Workshop",
+      "sourceUrl": "https://steamcommunity.com/app/2688950/workshop/",
+      "version": "تحقق من توافق العنصر مع إصدار اللعبة",
+      "summary": "مخططات مدن الملاهي والمرافق والديكورات.",
+      "installMethod": "افتح ورشة Steam، وراجع وصف العنصر ومتطلباته وتاريخ تحديثه قبل الاشتراك.",
+      "safetyNotes": "المكتبة تعرض المصدر الأصلي فقط ولا تستضيف الملفات. تحقق من توافق المحتوى قبل استخدامه.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/2688950/library_600x900_2x.jpg",
       "entryType": "directory"
     }
   ]
