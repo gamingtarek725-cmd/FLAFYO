@@ -157,6 +157,34 @@
       "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/1222670/library_600x900_2x.jpg",
       "downloadCount": 2274881,
       "entryType": "mod"
+    },
+    {
+      "title": "Farming Simulator 25 — ModHub الأكثر تحميلًا",
+      "game": "Farming Simulator 25",
+      "platform": "PC / PlayStation / Xbox",
+      "category": "خرائط · معدات زراعية · مبانٍ · تحسينات",
+      "sourceName": "GIANTS Software · Official ModHub",
+      "sourceUrl": "https://www.farming-simulator.com/mods.php?filter=mostDownloaded&page=0&title=fs2025",
+      "version": "اختر FS25 وتحقق من دعم المنصة داخل ModHub",
+      "summary": "بوابة ModHub الرسمية للعبة Farming Simulator 25، مع صفحة مرتبة حسب الأكثر تحميلًا. يتضمن ModHub محتوى مختبرًا ومنسقًا من GIANTS Software، كما يوضح دليل اللعبة أن الإضافات متاحة عبر قائمة Downloadable Content على المنصات المدعومة.",
+      "installMethod": "يمكنك فتح ModHub من اللعبة عبر Downloadable Content، أو تصفح صفحة FS25 الرسمية ثم مراجعة توافق كل مود مع منصتك وإصدار اللعبة.",
+      "safetyNotes": "التوافق يختلف بين PC وPlayStation وXbox؛ تأكد من علامة المنصة قبل التثبيت. الصفحة الرسمية تنبه إلى أن المحتوى ينشئه المستخدمون.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/2300320/library_600x900_2x.jpg",
+      "entryType": "directory"
+    },
+    {
+      "title": "Stardew Valley — دليل المودات والتوافق",
+      "game": "Stardew Valley",
+      "platform": "PC / Windows / macOS / Linux / Android",
+      "category": "دليل التثبيت · توافق · محتوى تجميلي",
+      "sourceName": "Stardew Valley Wiki · Modding Guide",
+      "sourceUrl": "https://stardewvalleywiki.com/Modding:Player_Guide/Getting_Started",
+      "version": "راجع إصدار SMAPI وتوافق كل مود",
+      "summary": "دليل مجتمع Stardew Valley لبدء استخدام المودات، ويتناول SMAPI والتثبيت والتوافق ومصادر المودات. يدعم الدليل إرشادات لأنظمة Windows وmacOS وLinux وSteam Deck وAndroid.",
+      "installMethod": "ابدأ بقراءة الدليل، وتحقق من توافق المود مع إصدار اللعبة وSMAPI ونظام التشغيل قبل التثبيت.",
+      "safetyNotes": "هذه صفحة إرشادية وليست متجرًا رسميًا. راجع توصيات المجتمع وتوافق الملفات، وتجنب مواقع إعادة الرفع غير الموثوقة.",
+      "coverUrl": "https://cdn.akamai.steamstatic.com/steam/apps/413150/library_600x900_2x.jpg",
+      "entryType": "directory"
     }
   ]
 }
