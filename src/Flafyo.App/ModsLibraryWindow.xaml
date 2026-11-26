@@ -37,7 +37,7 @@
     <Border Grid.Row="1" Background="{StaticResource Surface}" BorderBrush="{StaticResource Line}"
             BorderThickness="1" CornerRadius="14" Padding="12" Margin="0,0,0,14">
       <Grid>
-        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
         <TextBox x:Name="SearchBox" Grid.Column="0" Padding="13,10" FontSize="14"
                  TextChanged="SearchBox_TextChanged" ToolTip="ابحث باسم اللعبة أو نوع المود أو المصدر"
@@ -48,7 +48,12 @@
           <TextBlock Text="نتيجة" Foreground="{StaticResource Muted}" FontSize="10"
                      TextAlignment="Center" Margin="0,2,0,0"/>
         </StackPanel>
-        <WrapPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="0,11,0,0" x:Name="PlatformFilters">
+        <ComboBox x:Name="GameFilter" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,10,0,0" Padding="9,6" SelectedIndex="0" SelectionChanged="GameFilter_SelectionChanged" ToolTip="تصفية حسب اللعبة">
+          <ComboBoxItem Content="كل الألعاب" Tag="all"/>
+          <ComboBoxItem Content="Minecraft" Tag="Minecraft"/>
+          <ComboBoxItem Content="FIFA 23" Tag="FIFA 23"/>
+        </ComboBox>
+        <WrapPanel Grid.Row="2" Grid.ColumnSpan="2" Margin="0,11,0,0" x:Name="PlatformFilters">
           <Button Style="{StaticResource ModsFilterButton}" Content="كل المنصات" Tag="all" Click="Platform_Click"
                   Background="#20BFD0" Foreground="#071321" BorderBrush="#20BFD0"/>
           <Button Style="{StaticResource ModsFilterButton}" Content="PC" Tag="pc" Click="Platform_Click"/>
