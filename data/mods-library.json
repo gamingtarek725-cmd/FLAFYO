@@ -154,6 +154,48 @@
       "safetyNotes": "وجود المشروع على GitHub لا يعني أنه آمن أو رسمي. راجع نشاط المستودع والملفات والصلاحيات المطلوبة.",
       "coverUrl": "",
       "entryType": "directory"
+    },
+    {
+      "title": "Just Enough Items (JEI) — Forge 1.19.2",
+      "game": "Minecraft Java Edition",
+      "platform": "PC / Windows",
+      "category": "عرض الوصفات والعناصر",
+      "sourceName": "CurseForge · المشروع الرسمي",
+      "sourceUrl": "https://www.curseforge.com/minecraft/mc-mods/jei/files/9395717",
+      "version": "Forge 1.19.2 · 11.80.0.1094 · Beta",
+      "summary": "إضافة لعرض وصفات التصنيع والعناصر داخل Minecraft. صفحة الملف تحدد إصدار Forge 1.19.2 واسم الملف الدقيق، لذلك لا تستخدم إصدارًا مخصصًا لـMinecraft أو Loader مختلف.",
+      "installMethod": "راجع صفحة الملف وتأكد أن نسختك Minecraft Java 1.19.2 مع Forge. حمّل الملف من CurseForge واتبع طريقة التثبيت الموضحة هناك. خذ نسخة احتياطية من عالمك ومجلد mods قبل التعديل.",
+      "safetyNotes": "الإصدار المدرج Beta بحسب صفحة المصدر. تحقق من المتطلبات والتوافق قبل إضافته إلى Modpack، ولا تخلط ملفات Fabric مع Forge.",
+      "coverUrl": "",
+      "entryType": "mod"
+    },
+    {
+      "title": "FIFA 23 — مودات المجتمع والتحديثات",
+      "game": "FIFA 23",
+      "platform": "PC / Windows",
+      "category": "أطقم · ملاعب · واجهات · تحديثات",
+      "sourceName": "FIFA Infinity",
+      "sourceUrl": "https://dl.fifa-infinity.com/fifa-23/",
+      "version": "تختلف حسب المود وTitle Update",
+      "summary": "قسم FIFA 23 في FIFA Infinity يعرض إضافات ومشاريع مجتمع اللعبة. تحقق من تاريخ النشر ونسخة Title Update والمتطلبات الخاصة بكل مود.",
+      "installMethod": "افتح صفحة المود المحدد واقرأ تعليمات صاحبه. استخدم أدوات التعديل التي يذكرها المصدر فقط، ولا تخلط ملفات مخصصة لتحديثات مختلفة.",
+      "safetyNotes": "بعض المودات قديمة أو تجريبية. احتفظ بنسخة احتياطية من ملفات اللعبة وملفات الحفظ، واستخدم المودات في أوضاع اللعب الفردي فقط إذا كانت شروط المود تنص على ذلك.",
+      "coverUrl": "",
+      "entryType": "directory"
+    },
+    {
+      "title": "FIFA 23 — قاعدة مودات وتعديلات",
+      "game": "FIFA 23",
+      "platform": "PC / Windows",
+      "category": "مودات · تعديلات · أدوات",
+      "sourceName": "ModdingWay",
+      "sourceUrl": "https://www.moddingway.com/game/fifa-23/mods/category/478/mods",
+      "version": "تختلف حسب Title Update",
+      "summary": "صفحة مخصصة لمودات FIFA 23، تعرض مشاريع مثل تحديثات المظهر والمحتوى وأدوات التعديل. راجع إصدار اللعبة المدعوم في كل صفحة.",
+      "installMethod": "اتبع تعليمات صفحة المشروع، وتأكد من توافق المود مع Title Update المثبت عندك قبل استبدال أي ملفات.",
+      "safetyNotes": "المحتوى من المجتمع وليس صادرًا عن EA. افحص الملفات واحتفظ بنسخة احتياطية، ولا تستخدم التعديلات في اللعب عبر الإنترنت إذا كانت تخالف قواعد اللعبة.",
+      "coverUrl": "",
+      "entryType": "directory"
     }
   ]
 }
