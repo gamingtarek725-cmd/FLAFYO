@@ -64,7 +64,7 @@ internal sealed class ModsCatalogService
     private static Catalog NormalizeCatalog(Catalog catalog)
     {
         var allowed = new[] {
-            "curseforge.com", "minecraft.net", "moddingway.com", "fifa-infinity.com"
+            "curseforge.com", "minecraft.net", "moddingway.com", "fifa-infinity.com", "steamcommunity.com"
         };
         catalog.Entries = (catalog.Entries ?? new List<Entry>())
             .Where(e => e is not null &&
